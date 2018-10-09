@@ -204,14 +204,14 @@ class ReportDetails extends Component {
                                 <li className="list-group-item">Assembly: {report[CASE_SUP_BODY]}</li>
                                 <li className="list-group-item">Date and Time: {formatDate(report.ts)}</li>
                                 <li className="list-group-item">Report Status: {getStatusFromCode(report.status)}</li>
-                                {report.VehicleType !== null ? (
-                                    <li className="list-group-item"> Type of Vehicle: {report.VehicleType}</li>
+                                {report.extras !== null ? (
+                                    <li className="list-group-item"> Type of Vehicle: {report.extras.VehicleType}</li>
                                 ) : null}
-                                {report.VehicleNumber !== null ? (
-                                    <li className="list-group-item"> Vehicle Number: {report.VehicleNumber}</li>
+                                {report.extras !== null ? (
+                                    <li className="list-group-item"> Vehicle Number: {report.extras.VehicleNumber}</li>
                                 ) : null}
-                                {report.VehicleColor !== null ? (
-                                    <li className="list-group-item">Color Vehicle: {report.VehicleColor}</li>
+                                {report.extras !== null ? (
+                                    <li className="list-group-item">Color Vehicle: {report.extras.VehicleColor}</li>
                                 ) : null}
                             </ul>
                         </div>
