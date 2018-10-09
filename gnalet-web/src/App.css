@@ -14,12 +14,34 @@
   color: white;
 }
 
+.gndropdown-butt{
+  float: right;
+  margin-bottom: 10%;
+  margin-right: 7%;
+  
+}
+
 .App-title {
   font-size: 1.5em;
 }
 
 .App-intro {
   font-size: large;
+}
+
+
+.row-dashbord{
+  margin-right: 5%;
+} 
+
+
+.row-dashbord-sep{
+  margin-right: 5%;
+  margin-top: 5% 
+}
+
+.mg{
+  margin-top: 3%
 }
 
 @keyframes App-logo-spin {
