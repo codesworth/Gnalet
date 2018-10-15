@@ -73,7 +73,8 @@ if (localStorage.getItem('settings') == 'undefined' || localStorage.getItem('set
         categories: [],
         region: [],
         access:0,
-        uid: []
+        uid: [],
+        username:''
     }
 
     //Set to local storage

@@ -25,7 +25,9 @@ class AppNavBar extends Component {
     componentDidUpdate(){
         console.log("componentDidUpdate");
         if(this.state.username === ''){
+            console.log("functionWillBeCalled");
             this.loadusername(this.props.auth.uid);
+
         }
         
     }
@@ -33,7 +35,7 @@ class AppNavBar extends Component {
     
 
     loadusername(uid) {
-        const {firestore} = this.props;
+        const {firestore,settings} = this.props;
         firestore.get(`${Constants.REF_AUTHORITIES}/${uid}`).then(data =>{
             console.log(data.data());
             const regions = data.data().region;
@@ -44,6 +46,7 @@ class AppNavBar extends Component {
             setRegions(regions);
             setUid(uid);
             setAccess(access);
+            console.log("The settings inss, :",settings);
             this.setState({username:data.data().username});
         });
     }
@@ -63,13 +66,16 @@ class AppNavBar extends Component {
     onLogoutClick = (e) => {
         e.preventDefault();
 
-        const {firebase} = this.props
+        const {firebase, settings} = this.props
         setCategories([]);
         setRegions([]);
         setUid(null);
         setAccess(0);
+        console.log("The settings ois, :",settings);
+        
         firebase.logout()
-        //console.log("Logout Serrtihgd: ",this.props.settings);
+        this.setState({username:''});
+        
     }
 
   render() {

@@ -1,6 +1,7 @@
 import * as moment from 'moment';
 
 export const REF_REPORTERS = "GN-REPORTERS";
+export const REF_MONTHS = "Months";
 export const REF_REPORTS = "GN-REPORTS";
 export const REF_AUTHORITIES = "GN-Authorities";
 export const REF_TOKENS = "TOKENS";
@@ -43,6 +44,7 @@ export const REF_GC_POINTS = "gcpoints";
 export const _DATE = "date";
 export const ACCESS_CODE_EDIT = 1020;
 export const ACCESS_CODE_READ = 1000;
+export const ACCESS_CODE_MASTER = 2000
 
 
 "VEHICULAR";
@@ -74,4 +76,54 @@ export function getStatusFromCode(status){
         default:
             return 'Flagged';
     }
+}
+
+export function facingCategoryname(symlnk){
+    switch (symlnk){
+        case "VEHICULAR":
+        return "Accidents/Vehicular"
+    case "CRIMES":
+        return "Criminal Activities";
+    case "SANITATION":
+        return "Sanitation"
+    case "POTHOLES":
+        return "Potholes"
+    case  "ECG":
+        return "Electricity/ECG"
+    case  "WATER":
+        return "Pipes/Water"
+    case  "HFDA":
+        return "Food/Drugs Board"
+    case  "GSA":
+        return "Ghana Standards Authority"
+    default: 
+        return "OTHERS";
+
+    }
+}
+
+export function publicFacingRegion(region){
+
+    switch (region){
+        case "AMA":
+            return "Accra Metropolitan Assembly";
+        case "TMA":
+            return "Tema Municipal Assembly";
+        default:
+            return region;
+    }
+}
+
+
+export function returnMonthYear(ts){
+    let date;
+    if(ts === null){
+        date = new Date();
+    }else{
+        date = new Date(ts)
+    } 
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    const val = String(year).concat("-").concat(String(month));
+    return val;
 }

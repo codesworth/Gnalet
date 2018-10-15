@@ -5,59 +5,59 @@ import { connect } from 'react-redux';
 import { firestoreConnect} from 'react-redux-firebase';
 import PropTypes from 'prop-types'
 import Spinner from '../layout/Spinner'
+
 import classnames from 'classnames'
-import {REF_REPORTS, CASE_SUP_BODY, formatDate, getStatusFromCode, VEHICULAR} from '../../Helpers/Constants';
+import {REF_REPORTS, CASE_SUP_BODY, formatDate, getStatusFromCode, VEHICULAR, facingCategoryname} from '../../Helpers/Constants';
+
 
 
 class ReportDetails extends Component {
 
     state = {
-        showImage: true,
+        showImage: false,
         balanceUpdateAmount: '',
         category: '',
+        st:0,
+        show:false
         
     }
 
     
     static  getDerivedStateFromProps(props, state){
 
-        const cat = props.match.params.category;
+        const cat = props.match.params.regcat;
         return {category:cat};
     }
 
-    statusChanged(newStatus){
+    statusChanged = () => {
+        const newStatus = this.state.st;
+        console.log("I have been called with status: ",newStatus)
+        this.setState({st:0, show:false});
+        const { firestore, } = this.props;
+        //firestore.collection(REF_REPORTS).doc(this.props.match.params.id).update({status:newStatus});
+    }
 
+    statusWillChange = (status) => {
+        this.setState({st:status, show:true});
+        console.log("New Sttua, ", status);
     }
 
 
     onChange = (e) => this.setState({[e.target.name] : e.target.value})
 
-    balanceSubmit = (e) => {
-        e.preventDefault()
-        console.log(this.state.balanceUpdateAmount);
 
-        const {client, firestore } = this.props;
-        const { balanceUpdateAmount} = this.state;
-        
-        const clientUpdate = {
-            balance: parseFloat(balanceUpdateAmount)
-        }
 
-        firestore.update({collection:'clients', doc: client.id}, clientUpdate);
-    }
-
-    onDeleteClick = () => {
-         const {client, firestore, history } = this.props
-
-         firestore.delete({collection: 'clients', doc: client.id}).then(history.push('/'))
-    }
 
     cateChanged = (e) => {
         e.preventDefault();
         
+        
         const index = parseInt(e.target.value);
         let c = '';
+        console.log(index);
         switch (index){
+            case 0:
+                c = this.props.match.params.category;
             case 1:
                 c =  "VEHICULAR";
                 break;
@@ -86,7 +86,10 @@ class ReportDetails extends Component {
                 c =  "OTHERS";
         }
 
+        console.log(this.props.match.params.category );
+        
         if(this.props.match.params.category !== c){
+            console.log("New Category is,",c);
             this.setState({category:c,canupdate:true});
         }else{
             this.setState({canupdate:false});
@@ -100,6 +103,35 @@ class ReportDetails extends Component {
         firestore.update({collection:REF_REPORTS, id}, {category: newcategory})
     }
 
+    handleClose() {
+        this.setState({ show: false });
+    }
+
+    showModal(){
+        return (
+            <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div className="modal-dialog" role="document">
+                    <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
+                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        You are about to change the status of this Report. Please confirm that the report has been identified and addressed 
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.statusChanged.bind(this)}>Update Status</button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+
   render() {
 
     const { report } = this.props;
@@ -111,7 +143,7 @@ class ReportDetails extends Component {
         balanceform = (
             <div className="input-group">
                 <select className="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon" onChange={this.cateChanged}>
-                    <option defaultValue>{category}</option>
+                    <option value="0">{facingCategoryname(category)}</option>
                     <option value="1">Accidents/Vehicular</option>
                     <option value="2">Criminal Activities</option>
                     <option value="3">Sanitation</option>
@@ -130,26 +162,7 @@ class ReportDetails extends Component {
                 </div>
             </div>
         )
-        /*balanceform = (
-            <div className="btn-group">
-                <button type="button" className="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onSelect={this.selected}>
-                    {category}
-                </button>
-                <button type="button" className="btn btn-light">Update</button>
-                <div className="dropdown-menu">
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Accidents/Vehicular</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Public Crimes</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}}>Sanitation</a>
-                    <div className="dropdown-divider"></div>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Potholes</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Electricity/ECG</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Pipes/Water</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Food/Drugs Board</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} >Ghana Standards Authority</a>
-                    <a className="dropdown-item" style={{cursor:'pointer'}} /*onClick={this.cateChanged(8)}>>Others</a>
-                </div>
-            </div>
-        )*/
+
     
     }else{
         balanceform = null
@@ -158,6 +171,7 @@ class ReportDetails extends Component {
     if(report){
         return (
             <div>
+                {this.showModal()}
                 <div className="row">
                     <div className="col-md-6">
                         <Link to='/' className="btn btn-link">
@@ -167,9 +181,12 @@ class ReportDetails extends Component {
                     </div>
                     <div className="col-md-6">
                         <div className="btn-group float-right">
-                            <button className="btn btn-warning" onClick={this.statusChanged(1)}>Set Pending</button>
-                            <button onClick={this.statusChanged(2)} className="btn btn-success">Set Solved</button>
-                            <button onClick={this.statusChanged(100)} className="btn btn-danger">Flag Report</button>
+                            <button className="btn btn-warning" data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,1)}>Set Pending</button>
+                            <button data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,2)} className="btn btn-success">Set Solved</button>
+                            <button data-toggle="modal" data-target="#exampleModal" style={{outline:"false"}} onClick= {this.statusWillChange.bind(this,100)} className="btn btn-danger">Flag Report</button>
+                        </div>
+                        <div>
+                        
                         </div>
                     </div>
                 </div>
@@ -182,6 +199,7 @@ class ReportDetails extends Component {
                             <div className="row">
                                 <div className="col-md-8 col-sm-6">
                                 <h4>Address:{' '} <span className="text-secondary">{report.location}</span></h4>
+                                <Link className="btn btn-outline-info" to={`location/${report.latitude}&${report.longitude}`}>Show On Map{'  '}<i className="fas fa-map-marker-alt"></i></Link>
                                 </div>
 
                                 <div className="col-md-4 col-sm-6">
@@ -216,12 +234,19 @@ class ReportDetails extends Component {
                             </ul>
                         </div>
                 </div>
-                <div className='row'>
+                <div className='row mg'>
                     <div className="col">
                         <div className="card">
+                            <div className="card-header">
+                                <h3>REPORT IMAGE</h3>
+                            </div>
                             <div className="card-body">
                                 <div className="view overlay hm-white-light z-depth-1-half">
-                                    <img src={report.link} alt="Report Image" className="img-fluid" onClick={() => window.open(report.link)}/>
+                                    {report.link !== "" ? (
+                                        <img src={report.link} alt="Report Image" className="img-fluid" onClick={() => window.open(report.link)}/>
+                                    ) : (
+                                        <h3>NO IMAGE ATTACHED TO THIS REPORT</h3>
+                                    )}
                                     <div className="mask"></div>
                                 </div>
                             </div>

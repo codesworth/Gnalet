@@ -13,7 +13,8 @@ import * as Constants from '../../Helpers/Constants'
 class Reports extends Component {
 
     state = {
-        issues: []
+        issues: [],
+        notFound:false
     }
 
     static getDerivedStateFromProps(props, state){
@@ -34,16 +35,17 @@ class Reports extends Component {
     componentDidMount(){
         const issues = [];
         const {firestore, auth, settings} = this.props;
-        console.log("This is the auth", auth);
-        console.log("This is the settings", settings);
-        const {sort,category} = this.props.match.params;
         const { categories, region } = settings;
-        const status = this.getStatusFromSort(sort);
+        const {sort,regcat} = this.props.match.params;
+        const regcarray = regcat.split('&');
+        let freg = ''; let fcat = ''
+        if(regcarray.length == 2){
+            let reg = regcat[0]; let cat = regcat[1];
+            region.includes(reg) ? freg = reg : freg = region[0];
+            categories.includes(cat) ? fcat = cat : fcat = categories[0];
+            const status = this.getStatusFromSort(sort);
         
-        let query = firestore.collection(Constants.REF_REPORTS).where(Constants.FIELD_CATEGORY, "==",category);
-        region.forEach(reg => {
-            query = query.where(Constants.FIELD_SUPBODY,"==",reg);
-        })
+        let query = firestore.collection(Constants.REF_REPORTS).where(Constants.FIELD_CATEGORY, "==",fcat).where(Constants.FIELD_SUPBODY,"==",freg);
         if(status  < 3){
              query = query.where(Constants.CASE_STATUS,"==",status);  
         }
@@ -56,14 +58,17 @@ class Reports extends Component {
 
             this.setState({issues:issues});
         });
+        }else{
+            this.setState({notFound:true});
+        }
 
 
     }
 
   render() {
         const {auth} = this.props;
-        const category = this.props.match.params.category;
-
+        const category = this.props.match.params.regcat;
+        console.log("Catwegory is ",category);
     if (auth.uid){
         const {issues} = this.state;
         return (

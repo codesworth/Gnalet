@@ -296,6 +296,66 @@ async function fetchDocBy(uid:string) {
 }
 
 
+export const resetToZero = functions.https.onRequest(async (request,response) => {
+    const date = returnMonthYear();
+    const batch = admin.firestore().batch();
+
+    //const r = getWeekNumber(new Date());
+    //console.log(date+' The week stuff are',r);
+    
+    try{
+        const data = {
+            AMA:{
+                unsolved:0,
+                pending: 0,
+                solved: 0,
+                flag: 0
+            },
+            TMA:{
+                unsolved:0,
+                pending: 0,
+                solved: 0,
+                flag: 0
+            }
+        }
+
+        const cats = [VEHICULAR ,
+            SANITATION,
+            CRIMES,  
+        
+            WATER,   
+            POTHOLES,
+            ECG,
+            HFDA,
+            OTHERS]
+            cats.forEach(cat => {
+                batch.set(admin.firestore().doc(`${REF_ANALYTICS}/${cat}`),data,{merge:true}); 
+            });
+        
+        const years = ["2018-10","2018-11","2018-12","2019-01","2019-02","2019-03","2019-04","2019-05","2019-06","2019-07","2019-08","2019-09","2019-10"];
+        const docs = await admin.firestore().collection(REF_ANALYTICS).get();
+        docs.forEach( doc =>{
+            const id = doc.id;
+            years.forEach( key => {
+                let ref = admin.firestore().collection(REF_ANALYTICS).doc(id).collection("Months").doc(key);
+                batch.set(ref,data,{merge:true});
+            });
+        });
+
+        const write = await batch.commit();
+        response.status(200).send(write);
+
+    }catch(e){
+        console.log(e);
+        response.status(504).send(e);
+        
+    }
+   
+    
+    
+})
+
+
 
 /**
  * FUnctions tests

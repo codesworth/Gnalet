@@ -1,4 +1,5 @@
-import { PV_CATEGORIES, PV_REGION, UID, ACCESS} from '../actions/types';
+import { PV_CATEGORIES, PV_REGION, UID, ACCESS, USERNAME} from '../actions/types';
+
 
 export const setCategories = (payload) => {
 
@@ -53,5 +54,19 @@ export const setAccess = (payload) => {
     return {
         type: ACCESS,
         payload: settings.access
+    }
+}
+
+export const setUsername = (payload) => {
+    
+    const settings = JSON.parse(localStorage.getItem('settings'));
+
+    settings.username = payload;
+
+    localStorage.setItem('settings', JSON.stringify(settings));
+
+    return {
+        type: USERNAME,
+        payload: settings.username
     }
 }

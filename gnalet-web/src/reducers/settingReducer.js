@@ -1,4 +1,4 @@
-import { PV_CATEGORIES, PV_REGION, UID, ACCESS} from '../actions/types';
+import { PV_CATEGORIES, PV_REGION, UID, ACCESS, USERNAME} from '../actions/types';
 
 
 
@@ -25,6 +25,11 @@ export default function(state = {}, action){
             return{
                 ...state,
                 access: action.payload
+            }
+        case USERNAME:
+            return{
+                ...state,
+                username: action.payload
             }
         default:
             return state;

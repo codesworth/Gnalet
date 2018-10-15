@@ -4,3 +4,4 @@ export const PV_CATEGORIES = "CATEGORIES";
 export const PV_REGION = "REGION";
 export const UID = "UID";
 export const ACCESS = "ACCESS";
+export const USERNAME = "username";

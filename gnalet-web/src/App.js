@@ -15,6 +15,7 @@ import Settings from './Components/settings/Settings';
 import Home from './Components/Clients/Home';
 import Reports from './Components/Clients/Reports';
 import ReportDetail from './Components/Clients/ReportDetail';
+import ReportLocation from './Components/Clients/ReportLocation';
 
 
 
@@ -28,9 +29,11 @@ class App extends Component {
         <div className='container'>
           <Switch>
             <Route exact path ='/' component={UserIsAuthenticated(Home)}></Route>
-            <Route exact path ='/reports/:category/:sort' component={UserIsAuthenticated(Reports)}></Route>
+            <Route exact path ='/reports/:regcat/:sort' component={UserIsAuthenticated(Reports)}></Route>
             <Route exact path = '/client/add' component={UserIsAuthenticated(AddClient)}></Route>
             <Route exact path = '/report/:category/:id' component={UserIsAuthenticated(ReportDetail)}></Route>
+            <Route exact path = '/report/:category/location/:coordinate' component={UserIsAuthenticated(ReportLocation)}></Route>
+            <Route exact path = '/settings' component={UserIsAuthenticated(Settings)}></Route>
             <Route exact path = '/client/edit/:id' component={UserIsAuthenticated(EditClient)}></Route>
             <Route exact path = '/login' component={UserIsNotAuthenticated(Login)}></Route>
             <Route exact path = '/register' component={UserIsNotAuthenticated(Register)}></Route>
