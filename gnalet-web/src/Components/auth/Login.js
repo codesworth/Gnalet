@@ -4,7 +4,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firebaseConnect} from 'react-redux-firebase';
 import PropTypes from 'prop-types'
-import Spinner from '../layout/Spinner'
+
 import {notifyUser} from '../../actions/notifyActons'
 import Alert from '../layout/Alert'
 import gnaletlogo from './gnalet2.png'

@@ -1,5 +1,8 @@
 import * as functions from  'firebase-functions';
 import * as admin from 'firebase-admin';
+import * as cors from 'cors';
+
+//const cors = require('cors')({origin: true});
 
 
 admin.initializeApp();
@@ -8,14 +11,18 @@ const rsettings = {timestampsInSnapshots:true};
 admin.firestore().settings(rsettings);
 
 
+
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //
 // export const helloWorld = functions.https.onRequest((request, response) => {
 //  response.send("Hello from Firebase!");
 // });
-
+const corsHandler = cors({origin:true});
+//const corsHandler = cors({origin:true});
+const REQUEST_OPTIONS = 'OPTIONS';
 const REF_REPORTERS = "GN-REPORTERS";
+const REF_DUMMY_HOLDER = "AUTHHOLDER";
 const REF_REPORTS = "GN-REPORTS";
 const REF_AUTHORITIES = "GN-Authorities";
 const REF_TOKENS = "TOKENS";
@@ -222,6 +229,56 @@ export const deletedDocument = functions.firestore.document(`${REF_REPORTS}/{doc
     }
 });
 
+export const addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_HOLDER}/{docId}`).onCreate(async (snapshot,context) => {
+    const data  = snapshot.get("data");
+    const {email,password} = data;
+    const batch = admin.firestore().batch();
+    try{
+        const res = await admin.auth().createUser({email:email,password:password});
+        batch.set(admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`),data,{merge:true});
+        batch.delete(snapshot.ref);
+        const final = await batch.commit();
+        return Promise.resolve("Succesfully Added Authority User Account: "+final);
+        
+    }
+    catch(e){
+            console.log("Error Occurred with sig: ", e);
+            return Promise.reject(e);
+    }
+});
+
+
+export const addAuthorityAccount = functions.https.onRequest(async (request,response) => {
+
+    corsHandler(request, response, () => {
+        
+        const { data } = request.body;
+        const {email,password} = data;
+        admin.auth().createUser({email:email,password:password}).then(res => {
+            
+            return admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`).set(data, {merge:true})
+        }).then(final => {
+            response.status(200).send("Succesfully Added Authority User Account: "+final);
+        }).catch(e =>{
+            console.log("Error Occurred with sig: ", e);
+            response.status(504).send(e);
+        });
+       
+        
+    });
+});
+
+function helperAccess(access){
+    if (access === '1000'){
+        return 1000
+    }else if (access === '1020'){
+        return 1020;
+    }else if (access === '2000'){
+        return 2000;
+    }else{
+        return 1000;
+    }
+}
 
 
 

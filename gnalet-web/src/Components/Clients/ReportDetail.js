@@ -7,7 +7,7 @@ import PropTypes from 'prop-types'
 import Spinner from '../layout/Spinner'
 
 import classnames from 'classnames'
-import {REF_REPORTS, CASE_SUP_BODY, formatDate, getStatusFromCode, VEHICULAR, facingCategoryname} from '../../Helpers/Constants';
+import {REF_REPORTS, CASE_SUP_BODY, formatDate, getStatusFromCode, facingCategoryname, ACCESS_CODE_READ} from '../../Helpers/Constants';
 
 
 
@@ -30,16 +30,16 @@ class ReportDetails extends Component {
     }
 
     statusChanged = () => {
-        const newStatus = this.state.st;
-        console.log("I have been called with status: ",newStatus)
+        // const newStatus = this.state.st;
+        //console.log("I have been called with status: ",newStatus)
         this.setState({st:0, show:false});
-        const { firestore, } = this.props;
+       // const { firestore, } = this.props;
         //firestore.collection(REF_REPORTS).doc(this.props.match.params.id).update({status:newStatus});
     }
 
     statusWillChange = (status) => {
         this.setState({st:status, show:true});
-        console.log("New Sttua, ", status);
+        //console.log("New Sttua, ", status);
     }
 
 
@@ -52,12 +52,13 @@ class ReportDetails extends Component {
         e.preventDefault();
         
         
-        const index = parseInt(e.target.value);
+        const index = parseInt(e.target.value,10);
         let c = '';
-        console.log(index);
+        //console.log(index);
         switch (index){
             case 0:
                 c = this.props.match.params.category;
+                break;
             case 1:
                 c =  "VEHICULAR";
                 break;
@@ -86,10 +87,10 @@ class ReportDetails extends Component {
                 c =  "OTHERS";
         }
 
-        console.log(this.props.match.params.category );
+        //console.log(this.props.match.params.category );
         
         if(this.props.match.params.category !== c){
-            console.log("New Category is,",c);
+            //console.log("New Category is,",c);
             this.setState({category:c,canupdate:true});
         }else{
             this.setState({canupdate:false});
@@ -134,8 +135,9 @@ class ReportDetails extends Component {
 
   render() {
 
-    const { report } = this.props;
+    const { report, settings } = this.props;
     const {showImage,canupdate} = this.state;
+    const {access} = settings;
     let balanceform = '';
     const category = this.props.match.params.category;
     if(showImage){
@@ -179,16 +181,18 @@ class ReportDetails extends Component {
                             Back To Dashboard
                         </Link>
                     </div>
-                    <div className="col-md-6">
-                        <div className="btn-group float-right">
-                            <button className="btn btn-warning" data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,1)}>Set Pending</button>
-                            <button data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,2)} className="btn btn-success">Set Solved</button>
-                            <button data-toggle="modal" data-target="#exampleModal" style={{outline:"false"}} onClick= {this.statusWillChange.bind(this,100)} className="btn btn-danger">Flag Report</button>
-                        </div>
-                        <div>
-                        
-                        </div>
-                    </div>
+                    {access > ACCESS_CODE_READ ? (
+                                            <div className="col-md-6">
+                                            <div className="btn-group float-right">
+                                                <button className="btn btn-warning" data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,1)}>Set Pending</button>
+                                                <button data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,2)} className="btn btn-success">Set Solved</button>
+                                                <button data-toggle="modal" data-target="#exampleModal" style={{outline:"false"}} onClick= {this.statusWillChange.bind(this,100)} className="btn btn-danger">Flag Report</button>
+                                            </div>
+                                            <div>
+                                            
+                                            </div>
+                                        </div>
+                    ) : null}
                 </div>
                 <hr/>
                 <div className="card">
@@ -202,7 +206,8 @@ class ReportDetails extends Component {
                                 <Link className="btn btn-outline-info" to={`location/${report.latitude}&${report.longitude}`}>Show On Map{'  '}<i className="fas fa-map-marker-alt"></i></Link>
                                 </div>
 
-                                <div className="col-md-4 col-sm-6">
+                                {access > ACCESS_CODE_READ ? (
+                                    <div className="col-md-4 col-sm-6">
                                     <h4 className="pull-right">Change Category:<span>
                                     </span>
                                         <small>
@@ -213,7 +218,8 @@ class ReportDetails extends Component {
                                         </small>
                                     </h4>
                                     {balanceform}
-                                </div>
+                                </div> 
+                                ) : null}
                             </div>
                             <hr/>
                             <ul className="list-group">
@@ -243,7 +249,7 @@ class ReportDetails extends Component {
                             <div className="card-body">
                                 <div className="view overlay hm-white-light z-depth-1-half">
                                     {report.link !== "" ? (
-                                        <img src={report.link} alt="Report Image" className="img-fluid" onClick={() => window.open(report.link)}/>
+                                        <img src={report.link} className="img-fluid" onClick={() => window.open(report.link)}/>
                                     ) : (
                                         <h3>NO IMAGE ATTACHED TO THIS REPORT</h3>
                                     )}
@@ -271,7 +277,8 @@ ReportDetails.propTypes = {
 export default compose(
     firestoreConnect( props => [
         { collection: REF_REPORTS, storeAs: 'report', doc: props.match.params.id}
-    ]),connect(({ firestore: { ordered }}, props) => ({
-        report: ordered.report && ordered.report[0]
+    ]),connect(({ firestore: { ordered } , settings}, props) => ({
+        report: ordered.report && ordered.report[0],
+        settings: settings
     }))
 )(ReportDetails)

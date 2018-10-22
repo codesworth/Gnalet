@@ -15,6 +15,7 @@ import {
 } from 'redux-firestore'
 import NotifyReducer from './reducers/NotifyReducer'
 import settingReducer from './reducers/settingReducer';
+import { USER_SETTINGS } from './Helpers/Constants';
 //Reducers
 //@todo
 
@@ -65,9 +66,9 @@ const rootReducer = combineReducers({
 
 //Check for settings in local storage
 
-console.log(localStorage.getItem('settings'));
+console.log(localStorage.getItem(USER_SETTINGS));
 
-if (localStorage.getItem('settings') == 'undefined' || localStorage.getItem('settings') === null) {
+if (localStorage.getItem(USER_SETTINGS) === 'undefined' || localStorage.getItem(USER_SETTINGS) === null) {
     //Default  settings
     const defaultSettings = {
         categories: [],
@@ -80,12 +81,12 @@ if (localStorage.getItem('settings') == 'undefined' || localStorage.getItem('set
     //Set to local storage
 
 
-    localStorage.setItem("settings", JSON.stringify(defaultSettings));
+    localStorage.setItem(USER_SETTINGS, JSON.stringify(defaultSettings));
 }
 
 //create Initial State 
 const initialState = {
-    settings: JSON.parse(localStorage.getItem("settings"))
+    settings: JSON.parse(localStorage.getItem(USER_SETTINGS))
 };
 
 

@@ -3,7 +3,7 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { firebaseConnect, firestoreConnect , withFirestore} from 'react-redux-firebase';
+import { firebaseConnect, withFirestore} from 'react-redux-firebase';
 import PropTypes from 'prop-types'
 import {setCategories, setRegions, setUid, setAccess} from '../../actions/settingsAction';
 import * as Constants from '../../Helpers/Constants';
@@ -18,14 +18,14 @@ class AppNavBar extends Component {
     }
 
     componentDidMount(){
-        console.log("componentDidMount");
+        //console.log("componentDidMount");
 
     }
 
     componentDidUpdate(){
-        console.log("componentDidUpdate");
+        //console.log("componentDidUpdate");
         if(this.state.username === ''){
-            console.log("functionWillBeCalled");
+            //console.log("functionWillBeCalled");
             this.loadusername(this.props.auth.uid);
 
         }
@@ -35,18 +35,18 @@ class AppNavBar extends Component {
     
 
     loadusername(uid) {
-        const {firestore,settings} = this.props;
+        const {firestore} = this.props;
         firestore.get(`${Constants.REF_AUTHORITIES}/${uid}`).then(data =>{
-            console.log(data.data());
+            //console.log(data.data());
             const regions = data.data().region;
             const categories = data.data().categories;
-            console.log(regions, categories);
+            //console.log(regions, categories);
             const access = data.data().access;
             setCategories(categories);
             setRegions(regions);
             setUid(uid);
             setAccess(access);
-            console.log("The settings inss, :",settings);
+            //console.log("The settings inss, :",settings);
             this.setState({username:data.data().username});
         });
     }
@@ -66,12 +66,12 @@ class AppNavBar extends Component {
     onLogoutClick = (e) => {
         e.preventDefault();
 
-        const {firebase, settings} = this.props
+        const {firebase} = this.props
         setCategories([]);
         setRegions([]);
         setUid(null);
         setAccess(0);
-        console.log("The settings ois, :",settings);
+        //console.log("The settings ois, :",settings);
         
         firebase.logout()
         this.setState({username:''});
@@ -80,7 +80,7 @@ class AppNavBar extends Component {
 
   render() {
       const { isAuthenticated, username} = this.state;
-      const {auth } = this.props;
+      
       
       //const { allowRegistration} = this.props.settings;
     return (

@@ -16,6 +16,7 @@ import Home from './Components/Clients/Home';
 import Reports from './Components/Clients/Reports';
 import ReportDetail from './Components/Clients/ReportDetail';
 import ReportLocation from './Components/Clients/ReportLocation';
+import AuthBodyDetail from './Components/Clients/AuthBodyDetail';
 
 
 
@@ -34,6 +35,7 @@ class App extends Component {
             <Route exact path = '/report/:category/:id' component={UserIsAuthenticated(ReportDetail)}></Route>
             <Route exact path = '/report/:category/location/:coordinate' component={UserIsAuthenticated(ReportLocation)}></Route>
             <Route exact path = '/settings' component={UserIsAuthenticated(Settings)}></Route>
+            <Route exact path = '/settings/master/:id' component={UserIsAuthenticated(AuthBodyDetail)}></Route>
             <Route exact path = '/client/edit/:id' component={UserIsAuthenticated(EditClient)}></Route>
             <Route exact path = '/login' component={UserIsNotAuthenticated(Login)}></Route>
             <Route exact path = '/register' component={UserIsNotAuthenticated(Register)}></Route>

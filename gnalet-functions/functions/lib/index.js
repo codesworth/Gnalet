@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const cors = require("cors");
+//const cors = require('cors')({origin: true});
 admin.initializeApp();
 const rsettings = { timestampsInSnapshots: true };
 admin.firestore().settings(rsettings);
@@ -19,7 +21,11 @@ admin.firestore().settings(rsettings);
 // export const helloWorld = functions.https.onRequest((request, response) => {
 //  response.send("Hello from Firebase!");
 // });
+const corsHandler = cors({ credentials: true, origin: 'http://localhost:3000' });
+//const corsHandler = cors({origin:true});
+const REQUEST_OPTIONS = 'OPTIONS';
 const REF_REPORTERS = "GN-REPORTERS";
+const REF_DUMMY_HOLDER = "AUTHHOLDER";
 const REF_REPORTS = "GN-REPORTS";
 const REF_AUTHORITIES = "GN-Authorities";
 const REF_TOKENS = "TOKENS";
@@ -202,6 +208,36 @@ exports.deletedDocument = functions.firestore.document(`${REF_REPORTS}/{docId}`)
         console.log("Error occurred with sig: ", e);
         return Promise.reject(e);
     }
+}));
+exports.addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_HOLDER}/{docId}`).onCreate((snapshot, context) => __awaiter(this, void 0, void 0, function* () {
+    const data = snapshot.get("data");
+    const { email, password } = data;
+    const batch = admin.firestore().batch();
+    try {
+        const res = yield admin.auth().createUser({ email: email, password: password });
+        batch.set(admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`), data, { merge: true });
+        batch.delete(snapshot.ref);
+        const final = yield batch.commit();
+        return Promise.resolve("Succesfully Added Authority User Account: " + final);
+    }
+    catch (e) {
+        console.log("Error Occurred with sig: ", e);
+        return Promise.reject(e);
+    }
+}));
+exports.addAuthorityAccount = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
+    corsHandler(request, response, () => {
+        const { data } = request.body;
+        const { email, password } = data;
+        admin.auth().createUser({ email: email, password: password }).then(res => {
+            return admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`).set(data, { merge: true });
+        }).then(final => {
+            response.status(200).send("Succesfully Added Authority User Account: " + final);
+        }).catch(e => {
+            console.log("Error Occurred with sig: ", e);
+            response.status(504).send(e);
+        });
+    });
 }));
 // https.onRequest(async (request, response) =>{
 //     const supBody = request.params.supbody

@@ -34,12 +34,12 @@ class Reports extends Component {
 
     componentDidMount(){
         const issues = [];
-        const {firestore, auth, settings} = this.props;
+        const {firestore, settings} = this.props;
         const { categories, region } = settings;
         const {sort,regcat} = this.props.match.params;
         const regcarray = regcat.split('&');
         let freg = ''; let fcat = ''
-        if(regcarray.length == 2){
+        if(regcarray.length === 2){
             let reg = regcat[0]; let cat = regcat[1];
             region.includes(reg) ? freg = reg : freg = region[0];
             categories.includes(cat) ? fcat = cat : fcat = categories[0];
@@ -68,7 +68,7 @@ class Reports extends Component {
   render() {
         const {auth} = this.props;
         const category = this.props.match.params.regcat;
-        console.log("Catwegory is ",category);
+        //console.log("Catwegory is ",category);
     if (auth.uid){
         const {issues} = this.state;
         return (

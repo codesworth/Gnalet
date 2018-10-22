@@ -1,6 +1,11 @@
 import * as moment from 'moment';
 
+
+export const URL_ADD_AUTH = "https://us-central1-gnalet-e91c4.cloudfunctions.net/addAuthorityAccount";
 export const REF_REPORTERS = "GN-REPORTERS";
+export const REF_DUMMY_HOLDER = "AUTHHOLDER";
+export const EVENTS_DOC = "GN-EVENTS";
+export const REF_UTILS = "GN-UTILITIES";
 export const REF_MONTHS = "Months";
 export const REF_REPORTS = "GN-REPORTS";
 export const REF_AUTHORITIES = "GN-Authorities";
@@ -44,18 +49,25 @@ export const REF_GC_POINTS = "gcpoints";
 export const _DATE = "date";
 export const ACCESS_CODE_EDIT = 1020;
 export const ACCESS_CODE_READ = 1000;
-export const ACCESS_CODE_MASTER = 2000
+export const ACCESS_CODE_MASTER = 2000;
+export const USER_SETTINGS = "userSettings";
 
 
-"VEHICULAR";
-"SANITATION"
-"CRIMES";
-"WATER";
-"POTHOLES";
-"ECG";
-"HFDA";
+export const category_ids = [
+    "VEHICULAR",
+    "SANITATION",
+    "CRIMES",
+    "WATER",
+    "POTHOLES",
+    "ECG",
+    "HFDA",
+    "OTHERS",
+]
 
-"OTHERS";
+export const region_ids = [
+    
+    "AMA", "TMA"
+]
 
 
 

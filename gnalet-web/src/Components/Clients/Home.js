@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect, withFirestore} from 'react-redux-firebase';
@@ -45,7 +45,7 @@ class Home extends Component {
 
   onclicked = (path) => {
       //e.preventDefault()
-    const {history,settings} = this.props;
+    const {history} = this.props;
     const ucat = this.state.selectedcategory;
     const reg = this.state.selectedregion
     const uctr = reg.concat('&').concat(ucat)
@@ -56,7 +56,7 @@ class Home extends Component {
       e.preventDefault();
       const value = e.target.value;
       const vals = {};
-      if(parseInt(value) !== this.state.period){
+      if(parseInt(value,10) !== this.state.period){
           vals.canFetch = true;
       }
       if(value === "1"){
@@ -96,7 +96,7 @@ class Home extends Component {
 
     updateAnalysis(){
       const {selectedcategory, selectedregion, period} = this.state;
-      const {firestore, auth, settings} = this.props;
+      const {firestore} = this.props;
       let ref;
       if(period === 1){
         const id = returnMonthYear(null);
@@ -115,10 +115,10 @@ class Home extends Component {
     }
 
     componentDidMount(){
-        const {firestore, auth, settings} = this.props;
-        console.log("This is the auth", auth);
-        console.log("This is the settings", settings);
-        const {categories, access, region} = settings;
+        const {firestore, settings} = this.props;
+        //console.log("This is the auth", auth);
+        //console.log("This is the settings", settings);
+        const {categories, region} = settings;
         if(categories.length > 0){
           const primecat = categories[0];
           firestore.collection(REF_ANALYTICS).doc(primecat).get().then(analytic => {
@@ -128,7 +128,7 @@ class Home extends Component {
             const fl = this.makeAnalytics(analyticdata);
           
           this.setState({analytics:fl,selectedcategory:categories[0],selectedregion:region[0],data:analytic.data()});
-          console.log(this.state);
+         // console.log(this.state);
           });
           
         }
@@ -249,7 +249,7 @@ class Home extends Component {
    */
 
    makeAnalytics(bigdata){
-    console.log(bigdata);
+    //console.log(bigdata);
     let u = 0,p = 0,f = 0,s = 0;
     u = u + bigdata[FIELD_UNSOLVED];
     p = p + bigdata[FIELD_PENDING];
