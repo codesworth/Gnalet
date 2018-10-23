@@ -1,4 +1,4 @@
-import { PV_CATEGORIES, PV_REGION, UID, ACCESS, USERNAME} from '../actions/types';
+import { PV_CATEGORIES, PV_REGION, UID, ACCESS, USERNAME, RELOAD} from '../actions/types';
 import { USER_SETTINGS} from '../Helpers/Constants';
 
 export const setCategories = (payload) => {
@@ -68,5 +68,20 @@ export const setUsername = (payload) => {
     return {
         type: USERNAME,
         payload: settings.username
+    }
+}
+
+export const setReload = (payload) => {
+    
+    const settings = JSON.parse(localStorage.getItem(USER_SETTINGS));
+
+    settings.requiresReload = payload;
+    
+
+    localStorage.setItem(USER_SETTINGS, JSON.stringify(settings));
+
+    return {
+        type: RELOAD,
+        payload: settings.requiresReload
     }
 }

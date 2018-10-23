@@ -21,7 +21,7 @@ admin.firestore().settings(rsettings);
 // export const helloWorld = functions.https.onRequest((request, response) => {
 //  response.send("Hello from Firebase!");
 // });
-const corsHandler = cors({ credentials: true, origin: 'http://localhost:3000' });
+const corsHandler = cors({ origin: true });
 //const corsHandler = cors({origin:true});
 const REQUEST_OPTIONS = 'OPTIONS';
 const REF_REPORTERS = "GN-REPORTERS";
@@ -45,6 +45,7 @@ const POTHOLES = "POTHOLES";
 const ECG = "ECG";
 const HFDA = "HFDA";
 const OTHERS = "OTHERS";
+const GSA = "GSA";
 const CASE_EMAIL = "email";
 const CASE_PHONE = "phone";
 const CASE_DESC = "description";
@@ -225,6 +226,92 @@ exports.addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_HOLDE
         return Promise.reject(e);
     }
 }));
+exports.performAnalyticsOnAll = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
+    const store = admin.firestore();
+    const batch = store.batch();
+    const allcats = { VEHICULAR: {},
+        SANITATION: {},
+        CRIMES: {},
+        WATER: {},
+        POTHOLES: {},
+        ECG: {},
+        HFDA: {},
+        GSA: {},
+        OTHERS: {} };
+    const allmonths = {};
+    try {
+        const alldocs = yield store.collection(REF_REPORTS).get();
+        alldocs.forEach(element => {
+            const status = element.get(CASE_STATUS);
+            const category = element.get(FIELD_CATEGORY);
+            const region = element.get(CASE_SUP_BODY);
+            let numb = 0;
+            if (region in allcats[category]) {
+                if (getStatusString(status) in allcats[category][region]) {
+                    numb = allcats[category][region][getStatusString(status)];
+                }
+            }
+            else {
+                allcats[category][region] = {};
+            }
+            // if (allcats[category][region][getStatusString(status)] === undefined || allcats[category][region][getStatusString(status)] === 'undefined' || allcats[category][region][getStatusString(status)] === null){
+            //     numb = 0;
+            // }else{
+            // }
+            //= typeof(allcats[category][region][getStatusString(status)]) === 'number' ? allcats[category][region][getStatusString(status)] : 0 
+            allcats[category][region][getStatusString(status)] = numb + 1;
+            const mid = returnMonthYear(element.get("ts"));
+            let monthnumb = 0;
+            if (mid in allcats[category]) {
+                if (region in allcats[category][mid]) {
+                    if (getStatusString(status) in allcats[category][mid][region]) {
+                        monthnumb = allcats[category][mid][region][getStatusString(status)];
+                    }
+                    else {
+                        allcats[category][mid] = {};
+                    }
+                }
+            }
+            else {
+                allcats[category][mid] = {
+                    [region]: {}
+                };
+            }
+            // if (allcats[category][mid][region][getStatusString(status)] === undefined || allcats[category][mid][region][getStatusString(status)] === 'undefined' || allcats[category][mid][region][getStatusString(status)] === null){
+            //     monthnumb = 0;
+            // }else{
+            //     monthnumb = allcats[category][mid][region][getStatusString(status)]; 
+            // }
+            // typeof([category][mid][region][getStatusString(status)]) === 'number' ? allcats[category][mid][region][getStatusString(status)] : 0 
+            allcats[category][mid][region][getStatusString(status)] = monthnumb + 1;
+        });
+        for (const key in allcats) {
+            const value = allcats[key];
+            const gendata = {};
+            const monthdata = {};
+            for (const ikey in value) {
+                if (ikey.length === 3) {
+                    gendata[ikey] = value[ikey];
+                }
+                else {
+                    monthdata[ikey] = value[ikey];
+                }
+            }
+            batch.set(store.doc(`${REF_ANALYTICS}/${key}`), gendata, { merge: true });
+            for (const id in monthdata) {
+                const mref = store.doc(`${REF_ANALYTICS}/${key}/${REF_MONTHS}/${id}`);
+                batch.set(mref, monthdata[id], { merge: true });
+            }
+        }
+        const final = yield batch.commit();
+        response.status(200).send(`Finished performing analytics:
+        Write Time: ${final}`);
+    }
+    catch (e) {
+        console.log("Error occurred with sig: ", e);
+        response.status(504).send(`Error occurred with sig: ${e}`);
+    }
+}));
 exports.addAuthorityAccount = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
     corsHandler(request, response, () => {
         const { data } = request.body;
@@ -239,6 +326,20 @@ exports.addAuthorityAccount = functions.https.onRequest((request, response) => _
         });
     });
 }));
+function helperAccess(access) {
+    if (access === '1000') {
+        return 1000;
+    }
+    else if (access === '1020') {
+        return 1020;
+    }
+    else if (access === '2000') {
+        return 2000;
+    }
+    else {
+        return 1000;
+    }
+}
 // https.onRequest(async (request, response) =>{
 //     const supBody = request.params.supbody
 //     const category = request.params.category;
@@ -323,7 +424,7 @@ exports.resetToZero = functions.https.onRequest((request, response) => __awaiter
             WATER,
             POTHOLES,
             ECG,
-            HFDA,
+            HFDA, GSA,
             OTHERS];
         cats.forEach(cat => {
             batch.set(admin.firestore().doc(`${REF_ANALYTICS}/${cat}`), data, { merge: true });

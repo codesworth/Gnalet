@@ -5,3 +5,4 @@ export const PV_REGION = "REGION";
 export const UID = "UID";
 export const ACCESS = "ACCESS";
 export const USERNAME = "username";
+export const RELOAD = "reload";

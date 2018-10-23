@@ -66,7 +66,7 @@ const rootReducer = combineReducers({
 
 //Check for settings in local storage
 
-console.log(localStorage.getItem(USER_SETTINGS));
+//console.log(localStorage.getItem(USER_SETTINGS));
 
 if (localStorage.getItem(USER_SETTINGS) === 'undefined' || localStorage.getItem(USER_SETTINGS) === null) {
     //Default  settings
@@ -75,7 +75,8 @@ if (localStorage.getItem(USER_SETTINGS) === 'undefined' || localStorage.getItem(
         region: [],
         access:0,
         uid: [],
-        username:''
+        username:'',
+        requiresReload:true
     }
 
     //Set to local storage
@@ -94,7 +95,7 @@ const initialState = {
 
 const store = createStoreWithFirebase(rootReducer, initialState, compose(
     reactReduxFirebase(firebase),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    //window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 ));
 
 export default store;

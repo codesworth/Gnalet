@@ -5,7 +5,7 @@ import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firebaseConnect, withFirestore} from 'react-redux-firebase';
 import PropTypes from 'prop-types'
-import {setCategories, setRegions, setUid, setAccess} from '../../actions/settingsAction';
+import {setCategories, setRegions, setUid, setAccess, setReload} from '../../actions/settingsAction';
 import * as Constants from '../../Helpers/Constants';
 
 class AppNavBar extends Component {
@@ -46,8 +46,14 @@ class AppNavBar extends Component {
             setRegions(regions);
             setUid(uid);
             setAccess(access);
-            //console.log("The settings inss, :",settings);
+            //console.log("The settings inss, :",this.props.settings);
             this.setState({username:data.data().username});
+            const {requiresReload} = this.props.settings;
+            if (requiresReload){
+                setReload(false);
+                window.location.reload();
+            }
+            //
         });
     }
 
@@ -71,10 +77,13 @@ class AppNavBar extends Component {
         setRegions([]);
         setUid(null);
         setAccess(0);
-        //console.log("The settings ois, :",settings);
+        setReload(true);
+        //console.log("The settings ois, :",this.props);
         
         firebase.logout()
         this.setState({username:''});
+        
+        window.location.reload();
         
     }
 
@@ -130,5 +139,5 @@ export default compose(
     connect((state, props) => ({
         auth: state.firebase.auth,
         settings: state.settings
-    }),{setCategories,setRegions, setUid, setAccess})
+    }),{setCategories,setRegions, setUid, setAccess,setReload})
 )(AppNavBar);

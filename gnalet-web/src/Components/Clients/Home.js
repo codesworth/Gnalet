@@ -72,12 +72,14 @@ class Home extends Component {
       e.preventDefault();
       const value = e.target.value;
       this.setState({selectedregion:value});
+      
     }
 
     cateChange = (e) => {
       e.preventDefault();
       const value = e.target.value;
       this.setState({selectedcategory:value});
+      
     }
 
     updatePeriodAnalysis(){
@@ -214,7 +216,7 @@ class Home extends Component {
           })}
           </select>
           <div className="input-group-append">
-            <button className="btn btn-outline-secondary" type="button">Update</button>
+            <button className="btn btn-outline-secondary" type="button" onClick={this.updateAnalysis.bind(this)}>Update</button>
           </div>
         </div>
         ) : null}
@@ -228,7 +230,7 @@ class Home extends Component {
           })}
           </select>
           <div className="input-group-append">
-            <button className="btn btn-outline-secondary" type="button">Update</button>
+            <button className="btn btn-outline-secondary" type="button" onClick={ this.updateAnalysis.bind(this)}>Update</button>
           </div>
         </div>
         ) : null}

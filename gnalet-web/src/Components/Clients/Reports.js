@@ -40,20 +40,24 @@ class Reports extends Component {
         const regcarray = regcat.split('&');
         let freg = ''; let fcat = ''
         if(regcarray.length === 2){
-            let reg = regcat[0]; let cat = regcat[1];
+            
+            let reg = regcarray[0]; let cat = regcarray[1];
             region.includes(reg) ? freg = reg : freg = region[0];
             categories.includes(cat) ? fcat = cat : fcat = categories[0];
             const status = this.getStatusFromSort(sort);
-        
+            //console.log("We got here: ",fcat);
+            
         let query = firestore.collection(Constants.REF_REPORTS).where(Constants.FIELD_CATEGORY, "==",fcat).where(Constants.FIELD_SUPBODY,"==",freg);
         if(status  < 3){
              query = query.where(Constants.CASE_STATUS,"==",status);  
+             //console.log("Fetching: ");
         }
         
         query.get().then(querysnap => {
             querysnap.forEach(element => {
                 const doc = element.data();
                 issues.push(doc);
+                //console.log("Pushing: ");
             });
 
             this.setState({issues:issues});
