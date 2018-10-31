@@ -70,6 +70,16 @@
   margin-right: 5%;
 } 
 
+.gn-footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background-color:blue;
+  color: white;
+  text-align: left;
+}
+
 
 .row-dashbord-sep{
   margin-right: 5%;

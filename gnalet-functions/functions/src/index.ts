@@ -2,13 +2,15 @@ import * as functions from  'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as cors from 'cors';
 
+
 //const cors = require('cors')({origin: true});
 
 
 admin.initializeApp();
+const store = admin.firestore();
 
 const rsettings = {timestampsInSnapshots:true};
-admin.firestore().settings(rsettings);
+store.settings(rsettings);
 
 
 
@@ -31,6 +33,7 @@ const FIELD_SUPBODY = "supBody";
 const FIELD_CATEGORY = "category";
 const FIELD_UNSOLVED = "unsolved";
 const FIELD_SOLVED = "solved";
+const FIELD_DUPLICATE = "duplicate";
 const FIELD_PENDING = "pending";
 const FIELD_FLAGGED = "flag";
 const VEHICULAR = "VEHICULAR";
@@ -114,6 +117,7 @@ export const reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dc
     const month = returnMonthYear(ts)
     try{
         if(oldcat !== afcat){
+            
             await admin.firestore().runTransaction(async transaction => {
                 const aref = admin.firestore().doc(`${REF_ANALYTICS}/${oldcat}`);
                 const mref = admin.firestore().doc(`${REF_ANALYTICS}/${oldcat}/${REF_MONTHS}/${month}`);
@@ -121,12 +125,12 @@ export const reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dc
                 const newmref = admin.firestore().doc(`${REF_ANALYTICS}/${afcat}/${REF_MONTHS}/${month}`);
                 const analyticdata = await transaction.get(aref);
                 const analyticmonth = await transaction.get(mref);
-                const newanalyticdata = await transaction.get(aref);
-                const newanalyticmonth = await transaction.get(mref);
+                const newanalyticdata = await transaction.get(newaref);
+                const newanalyticmonth = await transaction.get(newmref);
                 const beforenum = analyticdata.get(sup)[getStatusString(oldstatus)] - 1;
                 const mbeforenum = analyticmonth.get(sup)[getStatusString(oldstatus)] - 1;
-                const afternum = newanalyticdata.get(sup)[getStatusString(oldstatus)] - 1;
-                const mafternum = newanalyticmonth.get(sup)[getStatusString(oldstatus)] - 1;
+                const afternum = newanalyticdata.get(sup)[getStatusString(oldstatus)] + 1;
+                const mafternum = newanalyticmonth.get(sup)[getStatusString(oldstatus)] + 1;
                 const upd = analyticdata.get(sup);
                 const mupd = analyticmonth.get(sup);
                 const newupd = newanalyticdata.get(sup);
@@ -165,6 +169,9 @@ export const reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dc
         }
 
         const tokensnap = await admin.firestore().collection(REF_TOKENS).doc(uid).get();
+        if (!tokensnap.exists){
+            return Promise.resolve("Nothing"); 
+        }
         const token = tokensnap.data().token;
 
         const status:number = after.get("status");
@@ -183,7 +190,7 @@ export const reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dc
             const payload = {
                 notification: {
                     title: "REPORT UPDATE",
-                    body: `Your reported issue has been Resolved by the ${sup}`,
+                    body: `Your reported issue has been Resolved`,
                     badge: '1',
                     sound: 'default'
 
@@ -214,12 +221,12 @@ export const deletedDocument = functions.firestore.document(`${REF_REPORTS}/{doc
     const sup = snap.get(FIELD_SUPBODY);
 
     try{
-        if(status > 3){
-            const analytic = await admin.firestore().doc(`${REF_ANALYTICS}/${category}`).get();
+        if(status === 3){
+            const analytic = await store.doc(`${REF_ANALYTICS}/${category}`).get();
             const supdata = analytic.get(sup);
             const newflagnum = supdata[getStatusString(status)] - 1;
             supdata[getStatusString(status)] = newflagnum;
-            const wr = await admin.firestore().doc(`${REF_ANALYTICS}/${category}`).update({[sup]:supdata});
+            const wr = await store.doc(`${REF_ANALYTICS}/${category}`).update({[sup]:supdata});
             return Promise.resolve(wr);
         }else{
             return Promise.resolve();
@@ -250,8 +257,9 @@ export const addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_
 
 
 export const performAnalyticsOnAll = functions.https.onRequest(async (request,response) => {
-    const store = admin.firestore();
+    
     const batch = store.batch();
+    
     const allcats = {VEHICULAR:{} ,
         SANITATION:{},
         CRIMES:{},  
@@ -266,6 +274,7 @@ export const performAnalyticsOnAll = functions.https.onRequest(async (request,re
     try{
         const alldocs = await store.collection(REF_REPORTS).get();
         alldocs.forEach(element => {
+            
             const status = element.get(CASE_STATUS);
             const category = element.get(FIELD_CATEGORY);
             const region = element.get(CASE_SUP_BODY);
@@ -283,6 +292,7 @@ export const performAnalyticsOnAll = functions.https.onRequest(async (request,re
                  
             // }
              //= typeof(allcats[category][region][getStatusString(status)]) === 'number' ? allcats[category][region][getStatusString(status)] : 0 
+             console.log(`the studd are ${category} and ${region}`);
             allcats[category][region][getStatusString(status)] = numb + 1;
             const mid = returnMonthYear(element.get("ts"));
             let monthnumb = 0
@@ -291,7 +301,7 @@ export const performAnalyticsOnAll = functions.https.onRequest(async (request,re
                     if (getStatusString(status) in allcats[category][mid][region]){
                         monthnumb = allcats[category][mid][region][getStatusString(status)]
                     }else{
-                        allcats[category][mid] = {}
+                        allcats[category][mid][region] = {}
                     }
                     
                 }
@@ -305,7 +315,8 @@ export const performAnalyticsOnAll = functions.https.onRequest(async (request,re
             // }else{
             //     monthnumb = allcats[category][mid][region][getStatusString(status)]; 
             // }
-            // typeof([category][mid][region][getStatusString(status)]) === 'number' ? allcats[category][mid][region][getStatusString(status)] : 0 
+            // typeof([category][mid][region][getStatusString(status)]) === 'number' ? allcats[category][mid][region][getStatusString(status)] : 0
+            console.log(`the studd are ${category} adnn ${mid} and ${region}`); 
             allcats[category][mid][region][getStatusString(status)] = monthnumb + 1;
             
         });
@@ -335,7 +346,9 @@ export const performAnalyticsOnAll = functions.https.onRequest(async (request,re
         response.status(200).send(`Finished performing analytics:
         Write Time: ${final}`);
     }catch(e){
+        
         console.log("Error occurred with sig: ", e);
+        //console.log("Object value ", allcats);
         response.status(504).send(`Error occurred with sig: ${e}`);
     }
 });
@@ -362,6 +375,7 @@ export const addAuthorityAccount = functions.https.onRequest(async (request,resp
         
     });
 });
+
 
 function helperAccess(access){
     if (access === '1000'){
@@ -435,8 +449,12 @@ function getStatusString(status:number):string{
             return FIELD_PENDING
         case 2:
             return FIELD_SOLVED
-        default:
+        case 3:
             return FIELD_FLAGGED
+        case 4:
+            return FIELD_DUPLICATE
+        default:
+            return ""
             
     }
 }
@@ -461,13 +479,15 @@ export const resetToZero = functions.https.onRequest(async (request,response) =>
                 unsolved:0,
                 pending: 0,
                 solved: 0,
-                flag: 0
+                flag: 0,
+                duplicate:0
             },
             TMA:{
                 unsolved:0,
                 pending: 0,
                 solved: 0,
-                flag: 0
+                flag: 0,
+                duplicate:0
             }
         }
 
@@ -505,7 +525,52 @@ export const resetToZero = functions.https.onRequest(async (request,response) =>
    
     
     
-})
+});
+
+
+export const test_addDuplicates = functions.https.onRequest(async (request,response) => {
+    const batch = store.batch();
+    const months = [];
+    try{
+        const snapdata = await store.collection(REF_ANALYTICS).get();
+        snapdata.docs.forEach(element => {
+            const data = element.data();
+            for(const key in data){
+                const val = data[key];
+                val[FIELD_DUPLICATE] = 0;
+                data[key] = val;
+            }
+            batch.update(element.ref,data);
+            months.push(store.collection(`${REF_ANALYTICS}/${element.id}/${REF_MONTHS}/`));
+        });
+
+        for (const colref of months){
+            const coldata = await colref.get();
+            coldata.docs.forEach(celement => {
+                const cdata = celement.data();
+                for(const key in cdata){
+                    const val = cdata[key];
+                    val[FIELD_DUPLICATE] = 0;
+                    cdata[key] = val;
+                }
+                batch.update(celement.ref,cdata);
+                
+            });
+
+        }
+
+        const resp = await batch.commit();
+
+        response.status(200).send(resp);
+    }catch(e){
+        console.log("Error occurred with sig: ",e);
+        response.status(504).send(e);
+    }
+});
+
+
+
+
 
 
 

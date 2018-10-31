@@ -20,6 +20,10 @@ class ReportLocation extends Component {
       this.setState({lat:lat, lng:lon});
       
     }
+
+    popBack = () => {
+        window.history.back()
+    }
     
 
   render() {
@@ -28,18 +32,18 @@ class ReportLocation extends Component {
         <div className="container">
             <div className="row">
                 <div className="col-md-6">
-                    <Link to='/' className="btn btn-link">
+                    <a onClick={this.popBack.bind(this)} className="btn btn-link">
                         <i className="fas fa-arrow-circle-left"></i>
                             Back To Dashboard
-                        </Link>
+                        </a>
                     </div>
-                    <div className="col-md-6">
+                    {/* <div className="col-md-6">
                         <div className="btn-group float-right">
                             <button className="btn btn-warning">Set Pending</button>
                             <button  className="btn btn-success">Set Solved</button>
                             <button className="btn btn-danger">Flag Report</button>
                         </div>
-                    </div>
+                    </div> */}
                 </div>
                 <div className='row mg'>
                     <div className="col">

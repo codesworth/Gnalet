@@ -2,12 +2,14 @@ import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { firestoreConnect} from 'react-redux-firebase';
+import { firestoreConnect, withFirestore} from 'react-redux-firebase';
 import PropTypes from 'prop-types'
 import Spinner from '../layout/Spinner'
+import Modal from 'react-bootstrap4-modal';
 
 import classnames from 'classnames'
 import {REF_REPORTS, CASE_SUP_BODY, formatDate, getStatusFromCode, facingCategoryname, ACCESS_CODE_READ} from '../../Helpers/Constants';
+import { firestore } from 'firebase';
 
 
 
@@ -15,27 +17,28 @@ class ReportDetails extends Component {
 
     state = {
         showImage: false,
-        balanceUpdateAmount: '',
         category: '',
-        st:0,
-        show:false
-        
+        show: false,
+        st:0
     }
 
     
     static  getDerivedStateFromProps(props, state){
 
-        const cat = props.match.params.regcat;
-        return {category:cat};
+        // const cat = props.match.params.regcat;
+        console.log("Props are: ", props);
+        console.log("Thus url: ", window.document.referrer);
+        
+         return null;
     }
 
-    statusChanged = () => {
-        // const newStatus = this.state.st;
-        //console.log("I have been called with status: ",newStatus)
-        this.setState({st:0, show:false});
-       // const { firestore, } = this.props;
-        //firestore.collection(REF_REPORTS).doc(this.props.match.params.id).update({status:newStatus});
-    }
+    // statusChanged = () => {
+    //     // const newStatus = this.state.st;
+    //     //console.log("I have been called with status: ",newStatus)
+    //     this.setState({st:0, show:false});
+    //    // const { firestore, } = this.props;
+    //     //firestore.collection(REF_REPORTS).doc(this.props.match.params.id).update({status:newStatus});
+    // }
 
     statusWillChange = (status) => {
         this.setState({st:status, show:true});
@@ -51,7 +54,7 @@ class ReportDetails extends Component {
     cateChanged = (e) => {
         e.preventDefault();
         
-        
+        console.log("The state is now: ", this.state);
         const index = parseInt(e.target.value,10);
         let c = '';
         //console.log(index);
@@ -87,51 +90,144 @@ class ReportDetails extends Component {
                 c =  "OTHERS";
         }
 
+        console.log("The state is now: ", this.state);
         //console.log(this.props.match.params.category );
         
         if(this.props.match.params.category !== c){
-            //console.log("New Category is,",c);
+            console.log("New Category is,",c);
             this.setState({category:c,canupdate:true});
         }else{
             this.setState({canupdate:false});
         }
+
+        console.log("The state is now: ", this.state);
+    }
+
+    showCatModal = () => {
+        this.setState({showCat:true});
     }
 
     updateCategory = () => {
-        const newcategory = this.state.category;
+        const {category} = this.state;
+        console.log("The new category is: ",category);
         const id = this.props.match.params.id;
         const {firestore} = this.props;
-        firestore.update({collection:REF_REPORTS, id}, {category: newcategory})
+        console.log("The things are: ", category)
+        firestore.doc(`${REF_REPORTS}/${id}`).update({category}).then(x => {
+            //console.log("The update was succesful: ",x);
+            this.props.history.push('/');
+        }).catch(e => {
+            console.log("Error Occurred : ", e);
+        });
     }
 
-    handleClose() {
-        this.setState({ show: false });
+    handleClose = () => {
+        this.setState({ show: false,st:0 });
+    }
+
+    modalbuttConfirmed = (type) => {
+        const {firestore,history} = this.props;
+        const {category} = this.state;
+        const id = this.props.match.params.id;
+        if (type > 0 && type < 5){
+            firestore.doc(`${REF_REPORTS}/${id}`).update({status:type}).then(x => {
+                this.setState({show:false,st:0})
+            }).catch(e => {
+                alert("Unable to update report: ",e);
+            });
+        }else if (type === 5){
+            firestore.doc(`${REF_REPORTS}/${id}`).update({category}).then(x => {
+                console.log("Category Chnged");
+                history.push('/');
+            }).catch(e => {
+                console.log("Error Occurred : ", e);
+            });
+        }
+    
     }
 
     showModal(){
-        return (
-            <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                <div className="modal-dialog" role="document">
-                    <div className="modal-content">
-                    <div className="modal-header">
-                        <h5 className="modal-title" id="exampleModalLabel">Modal title</h5>
-                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+        const {show,st} = this.state;
+        return(
+            <Modal visible={show}>
+                <div className="modal-header">
+                        <h5 className="modal-title" id="exampleModalLabel">{this.modalHeaderString(st)}</h5>
+                        <button type="button" className="close" onClick={this.handleClose.bind(this)} aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                         </button>
                     </div>
                     <div className="modal-body">
-                        You are about to change the status of this Report. Please confirm that the report has been identified and addressed 
+                         {this.modalDetailString(st)}
                     </div>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.statusChanged.bind(this)}>Update Status</button>
+                        <button type="button" className="btn btn-secondary" onClick={this.handleClose.bind(this)}>Close</button>
+                        <button type="button" className="btn btn-primary"  onClick={this.modalbuttConfirmed.bind(this,st)}>CONFIRM</button>
                     </div>
-                    </div>
-                </div>
-            </div>
+            </Modal>
         )
     }
 
+    modalHeaderString(type){
+        switch (type){
+            case 1:
+                return "UPDATE REPORT STATUS - PENDING";
+            case 2:
+                return "UPDATE REPORT STATUS - SOLVED";
+            case 3:
+                return "FLAG REPORT";
+            case 4:
+                return "MARK AS DUPLICATE REPORT";
+            case 5:
+                return "CHANGE REPORT CATEGORY"
+            default:
+                return ""
+        }
+    }
+
+    modalDetailString(type){
+        switch (type){
+            case 1:
+                return "You are about to change the status of this report to Pending. Please confirm that the report has been identified is being addressed";
+            case 2:
+                return "You are about to change the status of this report to Solved. Please confirm that the report has been identified and resolved"
+            case 3:
+                return "You are about to flag this report as inaprpriate. Consider reasigning the report to the next appropriate Responsible body if the report is of social concern. Flagged reports will no longer appear in your list of issues";
+            case 4:
+                return "You are about to mark this issue as a duplicate. Please confirm that this issue has already been identified and addressed elsewhere. Duplicate issues will not appear in your list of issues";
+            case 5:
+                return "You are about to change the category of this Report. Changing category will reassign this report to the next appropriate responsible body you have selected. The report will no longer be displayed in your list of issues"
+            default:
+                return ""
+        }
+    }
+
+    // showModalsss(){
+    //     return (
+    //         <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    //             <div className="modal-dialog" role="document">
+    //                 <div className="modal-content">
+    //                 <div className="modal-header">
+    //                     <h5 className="modal-title" id="exampleModalLabel">Update Report</h5>
+    //                     <button type="button" className="close" data-dismiss="modal" aria-label="Close">
+    //                     <span aria-hidden="true">&times;</span>
+    //                     </button>
+    //                 </div>
+    //                 <div className="modal-body">
+    //                     You are about to change the status of this Report. Please confirm that the report has been identified and addressed 
+    //                 </div>
+    //                 <div className="modal-footer">
+    //                     <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
+    //                     <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.statusChanged.bind(this)}>Update Status</button>
+    //                 </div>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     )
+    // }
+
+    popBack = () => {
+        window.history.back();
+    }
 
   render() {
 
@@ -144,7 +240,7 @@ class ReportDetails extends Component {
 
         balanceform = (
             <div className="input-group">
-                <select className="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon" onChange={this.cateChanged}>
+                <select className="custom-select" id="inputGroupSelect04" aria-label="Example select with button addon" onChange={this.cateChanged.bind(this)}>
                     <option value="0">{facingCategoryname(category)}</option>
                     <option value="1">Accidents/Vehicular</option>
                     <option value="2">Criminal Activities</option>
@@ -160,7 +256,7 @@ class ReportDetails extends Component {
                     <button className={classnames({
                                         'btn-primary':canupdate,
                                         'btn btn-outline-secondary': !canupdate
-                                    })} type="button">Update</button>
+                                    })} type="button" onClick={this.statusWillChange.bind(this,5)}>Update</button>
                 </div>
             </div>
         )
@@ -176,17 +272,18 @@ class ReportDetails extends Component {
                 {this.showModal()}
                 <div className="row">
                     <div className="col-md-6">
-                        <Link to='/' className="btn btn-link">
+                        <a onClick={this.popBack.bind(this)}className="btn btn-link">
                             <i className="fas fa-arrow-circle-left"></i>
                             Back To Dashboard
-                        </Link>
+                        </a>
                     </div>
                     {access > ACCESS_CODE_READ ? (
                                             <div className="col-md-6">
                                             <div className="btn-group float-right">
                                                 <button className="btn btn-warning" data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,1)}>Set Pending</button>
                                                 <button data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,2)} className="btn btn-success">Set Solved</button>
-                                                <button data-toggle="modal" data-target="#exampleModal" style={{outline:"false"}} onClick= {this.statusWillChange.bind(this,100)} className="btn btn-danger">Flag Report</button>
+                                                <button data-toggle="modal" data-target="#exampleModal" onClick={this.statusWillChange.bind(this,4)} className="btn btn-secondary">Mark Duplicate</button>
+                                                <button onClick= {this.statusWillChange.bind(this,3)} className="btn btn-danger">Flag Report</button>
                                             </div>
                                             <div>
                                             
@@ -277,7 +374,7 @@ ReportDetails.propTypes = {
 export default compose(
     firestoreConnect( props => [
         { collection: REF_REPORTS, storeAs: 'report', doc: props.match.params.id}
-    ]),connect(({ firestore: { ordered } , settings}, props) => ({
+    ]),withFirestore,connect(({ firestore: { ordered } , settings}, props) => ({
         report: ordered.report && ordered.report[0],
         settings: settings
     }))

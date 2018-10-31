@@ -8,6 +8,7 @@
     "firebase": "^5.5.4",
     "moment": "^2.22.2",
     "react": "^16.5.2",
+    "react-bootstrap4-modal": "^1.6.2",
     "react-dom": "^16.5.2",
     "react-google-maps": "^9.4.5",
     "react-redux": "^5.0.7",

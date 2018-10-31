@@ -95,12 +95,14 @@ class AppNavBar extends Component {
     return (
         
         <nav className='navbar navbar-expand-md navbar-dark bg-primary mb-4'>
+            
             <div className='container'>
                 <Link to='/' className='navbar-brand'>
                     <h3>GNALET</h3>
                 </Link>
+                
                 <button className='navbar-toggler' type='button' data-toggle='collapse' data-target='#navbarMain'>
-                    <span navbar-toggler-icon='true'></span>
+                    <span className="navbar-toggler-icon" navbar-toggler-icon='true'></span>
                 </button>
 
                 <div className='collapse navbar-collapse' id='navbarMain'>

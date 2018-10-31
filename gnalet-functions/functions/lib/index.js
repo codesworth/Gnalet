@@ -13,8 +13,9 @@ const admin = require("firebase-admin");
 const cors = require("cors");
 //const cors = require('cors')({origin: true});
 admin.initializeApp();
+const store = admin.firestore();
 const rsettings = { timestampsInSnapshots: true };
-admin.firestore().settings(rsettings);
+store.settings(rsettings);
 // // Start writing Firebase Functions
 // // https://firebase.google.com/docs/functions/typescript
 //
@@ -34,6 +35,7 @@ const FIELD_SUPBODY = "supBody";
 const FIELD_CATEGORY = "category";
 const FIELD_UNSOLVED = "unsolved";
 const FIELD_SOLVED = "solved";
+const FIELD_DUPLICATE = "duplicate";
 const FIELD_PENDING = "pending";
 const FIELD_FLAGGED = "flag";
 const VEHICULAR = "VEHICULAR";
@@ -113,12 +115,12 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
                 const newmref = admin.firestore().doc(`${REF_ANALYTICS}/${afcat}/${REF_MONTHS}/${month}`);
                 const analyticdata = yield transaction.get(aref);
                 const analyticmonth = yield transaction.get(mref);
-                const newanalyticdata = yield transaction.get(aref);
-                const newanalyticmonth = yield transaction.get(mref);
+                const newanalyticdata = yield transaction.get(newaref);
+                const newanalyticmonth = yield transaction.get(newmref);
                 const beforenum = analyticdata.get(sup)[getStatusString(oldstatus)] - 1;
                 const mbeforenum = analyticmonth.get(sup)[getStatusString(oldstatus)] - 1;
-                const afternum = newanalyticdata.get(sup)[getStatusString(oldstatus)] - 1;
-                const mafternum = newanalyticmonth.get(sup)[getStatusString(oldstatus)] - 1;
+                const afternum = newanalyticdata.get(sup)[getStatusString(oldstatus)] + 1;
+                const mafternum = newanalyticmonth.get(sup)[getStatusString(oldstatus)] + 1;
                 const upd = analyticdata.get(sup);
                 const mupd = analyticmonth.get(sup);
                 const newupd = newanalyticdata.get(sup);
@@ -154,6 +156,9 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
             }));
         }
         const tokensnap = yield admin.firestore().collection(REF_TOKENS).doc(uid).get();
+        if (!tokensnap.exists) {
+            return Promise.resolve("Nothing");
+        }
         const token = tokensnap.data().token;
         const status = after.get("status");
         if (status === 1) {
@@ -171,7 +176,7 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
             const payload = {
                 notification: {
                     title: "REPORT UPDATE",
-                    body: `Your reported issue has been Resolved by the ${sup}`,
+                    body: `Your reported issue has been Resolved`,
                     badge: '1',
                     sound: 'default'
                 }
@@ -194,11 +199,11 @@ exports.deletedDocument = functions.firestore.document(`${REF_REPORTS}/{docId}`)
     const sup = snap.get(FIELD_SUPBODY);
     try {
         if (status > 3) {
-            const analytic = yield admin.firestore().doc(`${REF_ANALYTICS}/${category}`).get();
+            const analytic = yield store.doc(`${REF_ANALYTICS}/${category}`).get();
             const supdata = analytic.get(sup);
             const newflagnum = supdata[getStatusString(status)] - 1;
             supdata[getStatusString(status)] = newflagnum;
-            const wr = yield admin.firestore().doc(`${REF_ANALYTICS}/${category}`).update({ [sup]: supdata });
+            const wr = yield store.doc(`${REF_ANALYTICS}/${category}`).update({ [sup]: supdata });
             return Promise.resolve(wr);
         }
         else {
@@ -227,7 +232,6 @@ exports.addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_HOLDE
     }
 }));
 exports.performAnalyticsOnAll = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    const store = admin.firestore();
     const batch = store.batch();
     const allcats = { VEHICULAR: {},
         SANITATION: {},
@@ -259,6 +263,7 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
             // }else{
             // }
             //= typeof(allcats[category][region][getStatusString(status)]) === 'number' ? allcats[category][region][getStatusString(status)] : 0 
+            console.log(`the studd are ${category} and ${region}`);
             allcats[category][region][getStatusString(status)] = numb + 1;
             const mid = returnMonthYear(element.get("ts"));
             let monthnumb = 0;
@@ -268,7 +273,7 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
                         monthnumb = allcats[category][mid][region][getStatusString(status)];
                     }
                     else {
-                        allcats[category][mid] = {};
+                        allcats[category][mid][region] = {};
                     }
                 }
             }
@@ -282,7 +287,8 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
             // }else{
             //     monthnumb = allcats[category][mid][region][getStatusString(status)]; 
             // }
-            // typeof([category][mid][region][getStatusString(status)]) === 'number' ? allcats[category][mid][region][getStatusString(status)] : 0 
+            // typeof([category][mid][region][getStatusString(status)]) === 'number' ? allcats[category][mid][region][getStatusString(status)] : 0
+            console.log(`the studd are ${category} adnn ${mid} and ${region}`);
             allcats[category][mid][region][getStatusString(status)] = monthnumb + 1;
         });
         for (const key in allcats) {
@@ -309,6 +315,7 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
     }
     catch (e) {
         console.log("Error occurred with sig: ", e);
+        //console.log("Object value ", allcats);
         response.status(504).send(`Error occurred with sig: ${e}`);
     }
 }));
@@ -443,6 +450,41 @@ exports.resetToZero = functions.https.onRequest((request, response) => __awaiter
     }
     catch (e) {
         console.log(e);
+        response.status(504).send(e);
+    }
+}));
+exports.test_addDuplicates = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
+    const batch = store.batch();
+    const months = [];
+    try {
+        const snapdata = yield store.collection(REF_ANALYTICS).get();
+        snapdata.docs.forEach(element => {
+            const data = element.data();
+            for (const key in data) {
+                const val = data[key];
+                val[FIELD_DUPLICATE] = 0;
+                data[key] = val;
+            }
+            batch.update(element.ref, data);
+            months.push(store.collection(`${REF_ANALYTICS}/${element.id}/${REF_MONTHS}/`));
+        });
+        for (const colref of months) {
+            const coldata = yield colref.get();
+            coldata.docs.forEach(celement => {
+                const cdata = celement.data();
+                for (const key in cdata) {
+                    const val = cdata[key];
+                    val[FIELD_DUPLICATE] = 0;
+                    cdata[key] = val;
+                }
+                batch.update(celement.ref, cdata);
+            });
+        }
+        const resp = yield batch.commit();
+        response.status(200).send(resp);
+    }
+    catch (e) {
+        console.log("Error occurred with sig: ", e);
         response.status(504).send(e);
     }
 }));

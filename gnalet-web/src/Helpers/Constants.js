@@ -51,6 +51,8 @@ export const ACCESS_CODE_EDIT = 1020;
 export const ACCESS_CODE_READ = 1000;
 export const ACCESS_CODE_MASTER = 2000;
 export const USER_SETTINGS = "userSettings";
+export const AN_YEAR_DATA = "yearly";
+export const AN_TOTALS = "totals";
 
 
 export const category_ids = [
@@ -61,6 +63,7 @@ export const category_ids = [
     "POTHOLES",
     "ECG",
     "HFDA",
+    "GSA",
     "OTHERS",
 ]
 
@@ -83,7 +86,7 @@ export function getStatusFromCode(status){
             return 'Unsolved';
         case 1:
             return 'Pending';
-        case 3:
+        case 2:
             return 'Solved';
         default:
             return 'Flagged';

@@ -8,6 +8,7 @@ import { compose } from 'redux';
 import axios from 'axios'
 
 import { firestoreConnect,withFirestore, firebaseConnect } from 'react-redux-firebase';
+import Analytics from '../Clients/Analytics';
 
 // import {setAllowRegistration, setDisableBalanceOnAdd, setDisableBalanceOnEdit} from '../../actions/settingsAction';
 
@@ -26,8 +27,15 @@ export class Settings extends Component {
       access:0
     },
     authority: null,
-    show:false
+    show:false,
+    index:0
   }
+
+
+  changeIndex = (index) => {
+    this.setState({index:index});
+  }
+
 
   authority = null;
 
@@ -242,6 +250,53 @@ export class Settings extends Component {
     )
   }
 
+
+  manageAUths(){
+    const {authorities} = this.state;
+    return (
+      <div className="col-md-7">
+            <div className="row">
+              <div className="col-md-10">
+              <h3>Registered User Authorities</h3>
+              </div>
+              <div className="col-md-2">
+                <div className="btn btn-outline-primary" data-toggle="modal" data-target="#addAuthority">
+                  <i className="fas fa-plus"></i>
+                   {' '}Add Authority
+                </div>
+              </div>
+            </div>
+            <br/>
+            <table className="table table-bordered table-hover">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">Account Name</th>
+                  <th scope="col">Account Type</th>
+                  <th scope="col">Category</th>
+                  <th scope="col">Regional Jurisdiction</th>
+                </tr>
+              </thead>
+              <tbody>
+                {authorities.map(authority => {
+                  return(
+                    <tr key={authority.id}  style={{cursor: 'pointer'}} onClick={
+                      this.openDetail.bind(this, authority)
+                    }>
+                    <th scope="row"><i className="fas fa-user"/></th>
+                    <td>{authority.username}</td>
+                    <td>{this.configAccType(authority.access)}</td>
+                    <td>{this.configCategory(authority.categories)}</td>
+                    <td>{this.configRegion(authority.region)}</td>
+                  </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+    )
+  }
+
   
 
   static getDerivedStateFromProps(props, state){
@@ -300,8 +355,8 @@ export class Settings extends Component {
     const {settings} = this.props;
     const {access,username,categories, region} = settings;
     if(access === ACCESS_CODE_MASTER){
-      const {authorities} = this.state;
-      //console.log("The authoritues", authorities);
+      const {index} = this.state;
+      
       return (
         <div className="container-main">
         {this.addAuthModal()}
@@ -314,53 +369,18 @@ export class Settings extends Component {
             <div className="card-header">Featured
             </div>
             <ul className="list-group list-group-flush">
-              <li className="list-group-item settings-list-item" >Manage Authorities</li>
-              <li className="list-group-item settings-list-item">Analytics</li>
+              <li className="list-group-item settings-list-item" onClick={this.changeIndex.bind(this, 0)}>Manage Authorities</li>
+              <li className="list-group-item settings-list-item" onClick={this.changeIndex.bind(this, 1)}>Analytics</li>
               <li className="list-group-item settings-list-item">Feed Backs</li>
               <li className="list-group-item settings-list-item">Signout</li>
             </ul>
           </div>
           </div>
-          <div className="col-md-7">
-            <div className="row">
-              <div className="col-md-10">
-              <h3>Registered User Authorities</h3>
-              </div>
-              <div className="col-md-2">
-                <div className="btn btn-outline-primary" data-toggle="modal" data-target="#addAuthority">
-                  <i className="fas fa-plus"></i>
-                   {' '}Add Authority
-                </div>
-              </div>
-            </div>
-            <br/>
-            <table className="table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Account Name</th>
-                  <th scope="col">Account Type</th>
-                  <th scope="col">Category</th>
-                  <th scope="col">Regional Jurisdiction</th>
-                </tr>
-              </thead>
-              <tbody>
-                {authorities.map(authority => {
-                  return(
-                    <tr key={authority.id}  style={{cursor: 'pointer'}} onClick={
-                      this.openDetail.bind(this, authority)
-                    }>
-                    <th scope="row"><i className="fas fa-user"/></th>
-                    <td>{authority.username}</td>
-                    <td>{this.configAccType(authority.access)}</td>
-                    <td>{this.configCategory(authority.categories)}</td>
-                    <td>{this.configRegion(authority.region)}</td>
-                  </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+            {index === 0 ? (
+              this.manageAUths()
+            ) : (
+              <Analytics/>
+            )}
         </div>
       </div> 
       )

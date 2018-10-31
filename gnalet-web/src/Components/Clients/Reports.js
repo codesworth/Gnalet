@@ -14,7 +14,8 @@ class Reports extends Component {
 
     state = {
         issues: [],
-        notFound:false
+        notFound:false,
+        isFetching:true
     }
 
     static getDerivedStateFromProps(props, state){
@@ -34,6 +35,7 @@ class Reports extends Component {
 
     componentDidMount(){
         const issues = [];
+        const isFetching = true;
         const {firestore, settings} = this.props;
         const { categories, region } = settings;
         const {sort,regcat} = this.props.match.params;
@@ -54,16 +56,17 @@ class Reports extends Component {
         }
         
         query.get().then(querysnap => {
+            
             querysnap.forEach(element => {
                 const doc = element.data();
                 issues.push(doc);
                 //console.log("Pushing: ");
             });
 
-            this.setState({issues:issues});
+            this.setState({issues:issues,isFetching:false});
         });
         }else{
-            this.setState({notFound:true});
+            this.setState({notFound:true,isFetching:false});
         }
 
 
@@ -73,17 +76,33 @@ class Reports extends Component {
         const {auth} = this.props;
         const category = this.props.match.params.regcat;
         //console.log("Catwegory is ",category);
-    if (auth.uid){
+    if (auth.uid && !this.state.isFetching){
         const {issues} = this.state;
+        if (issues.length == 0){
+            return (
+                <div className='row mg'>
+                    <div className="col">
+                        <div className="card">
+                            <div className="card-header">
+                                <h3>REPORTS</h3>
+                            </div>
+                            <div className="card-body">
+                                <h1> NO REPORTS AVAILABLE</h1>
+                            </div>
+                        </div>
+                    </div>
+                </div> 
+            )
+        }
         return (
-            <div>
+            <div className="container-main">
                 <div className="row">
-                    <div className='col-md-6'>
+                    <div className='col-md-4'>
                          <h2>{' '}<i className="fas fa-users"></i> REPORTS{' '}</h2>
 
                     </div>
 
-                    <div className='col-md-6'>
+                    <div className='col-md-8'>
                         <h5 className="text-right text-secondary">  {' '}
                             <span className="text-primary">
                                 {issues.length} REPORTS
@@ -91,7 +110,8 @@ class Reports extends Component {
                         </h5>
                     </div>
                 </div>
-                <table className="table table-striped">
+                <div className="col-xs-12">
+                <table className=" table  table-striped">
                     <thead>
                     <tr>
                        <th>Issue</th>
@@ -125,6 +145,7 @@ class Reports extends Component {
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
         )
     }else{

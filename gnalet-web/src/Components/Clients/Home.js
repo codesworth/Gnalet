@@ -166,7 +166,7 @@ class Home extends Component {
   </div>
 
   <div className="row row-dashbord" style={{marginTop: '3%'}}>
-    <div className="col-sm-6">
+    <div className="col-sm-6" style={{marginBottom: '3%'}}>
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">Total Reports This Year</h5>
@@ -175,7 +175,7 @@ class Home extends Component {
         </div>
       </div>
     </div>
-    <div className="col-sm-6">
+    <div className="col-sm-6" >
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">Total Unsolved Issues</h5>
@@ -186,7 +186,7 @@ class Home extends Component {
     </div>
   </div>
   <div className="row row-dashbord-sep">
-    <div className="col-sm-6">
+    <div className="col-sm-6" style={{marginBottom: '3%'}}>
       <div className="card">
         <div className="card-body">
           <h5 className="card-title">Total Solved Issues</h5>
@@ -206,7 +206,7 @@ class Home extends Component {
     </div>
   </div>
   <div className='row mg'>
-      <div className='col-md-6'>
+      <div className='col-md-6' style={{marginBottom: '3%'}}>
         {categories.length > 0 ? (
           <div className="input-group">
           <select className="custom-select" id="inputGroupSelect04" aria-label="" onChange={this.cateChange}>
@@ -252,6 +252,7 @@ class Home extends Component {
 
    makeAnalytics(bigdata){
     //console.log(bigdata);
+    if (bigdata !== null || typeof(bigdata) !== 'undefined'){}else{return}
     let u = 0,p = 0,f = 0,s = 0;
     u = u + bigdata[FIELD_UNSOLVED];
     p = p + bigdata[FIELD_PENDING];

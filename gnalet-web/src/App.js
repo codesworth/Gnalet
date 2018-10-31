@@ -5,9 +5,9 @@ import './App.css';
 import { Provider } from 'react-redux';
 import store from './store';
 import AppNavBar from './Components/layout/AppNavBar';
-import Dashboard from './Components/layout/Dashboard'
+
 import AddClient from './Components/Clients/AddClient';
-import ClientDetails from './Components/Clients/ClientDetails';
+
 import EditClient from './Components/Clients/EditClient';
 import Login from './Components/auth/Login';
 import Register from './Components/auth/Register';
@@ -17,6 +17,7 @@ import Reports from './Components/Clients/Reports';
 import ReportDetail from './Components/Clients/ReportDetail';
 import ReportLocation from './Components/Clients/ReportLocation';
 import AuthBodyDetail from './Components/Clients/AuthBodyDetail';
+
 
 
 
@@ -41,6 +42,7 @@ class App extends Component {
             <Route exact path = '/register' component={UserIsNotAuthenticated(Register)}></Route>
           </Switch>
         </div>
+        
       </div>
       </Router>
       </Provider>
