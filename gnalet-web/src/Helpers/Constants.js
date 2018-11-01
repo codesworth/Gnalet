@@ -21,6 +21,7 @@ export const FIELD_FLAGGED = "flag";
 export const VEHICULAR = "VEHICULAR";
 export const SANITATION = "SANITATION";
 export const CRIMES =   "CRIMES";
+export const REF_FEEDBACK = "USERFEEDBACK";
 
 export const WATER =     "WATER";
 export const POTHOLES = "POTHOLES";
@@ -28,7 +29,7 @@ export const ECG = "ECG";
 export const HFDA =   "HFDA";
 export const OTHERS = "OTHERS";
 export const GSA = "GSA";
-
+export const FIELD_DUPLICATE = "duplicate";
 export const  CASE_EMAIL = "email";
 export const  CASE_PHONE = "phone";
 export const CASE_DESC = "description";

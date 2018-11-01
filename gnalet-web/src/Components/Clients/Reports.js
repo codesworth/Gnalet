@@ -49,7 +49,7 @@ class Reports extends Component {
             const status = this.getStatusFromSort(sort);
             //console.log("We got here: ",fcat);
             
-        let query = firestore.collection(Constants.REF_REPORTS).where(Constants.FIELD_CATEGORY, "==",fcat).where(Constants.FIELD_SUPBODY,"==",freg);
+        let query = firestore.collection(Constants.REF_REPORTS).where(Constants.FIELD_CATEGORY, "==",fcat).where(Constants.FIELD_SUPBODY,"==",freg).where(Constants.CASE_STATUS, "<",4);
         if(status  < 3){
              query = query.where(Constants.CASE_STATUS,"==",status);  
              //console.log("Fetching: ");

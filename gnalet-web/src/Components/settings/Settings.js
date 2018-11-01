@@ -9,6 +9,8 @@ import axios from 'axios'
 
 import { firestoreConnect,withFirestore, firebaseConnect } from 'react-redux-firebase';
 import Analytics from '../Clients/Analytics';
+import classnames from 'classnames';
+import Feedback from '../FeedBack/Feedback';
 
 // import {setAllowRegistration, setDisableBalanceOnAdd, setDisableBalanceOnEdit} from '../../actions/settingsAction';
 
@@ -250,6 +252,23 @@ export class Settings extends Component {
     )
   }
 
+  renderOptions(index){
+    switch (index){
+      case 0:
+        return this.manageAUths();
+      case 1:
+        return (
+          <Analytics/>
+        )
+      case 2:
+          return (
+            <Feedback/>
+          )
+      default:
+            return '';
+    }
+  }
+
 
   manageAUths(){
     const {authorities} = this.state;
@@ -364,23 +383,22 @@ export class Settings extends Component {
           <AuthDetailModal authority={authority}/>
         ) : null} */}
         <div className="row">
-          <div className="col-md-3">
+          <div className={classnames({
+            'col-md-3':index === 0,
+            'col-md-2':index === 1
+          })}>
           <div className="card settings-list">
             <div className="card-header">Featured
             </div>
             <ul className="list-group list-group-flush">
               <li className="list-group-item settings-list-item" onClick={this.changeIndex.bind(this, 0)}>Manage Authorities</li>
               <li className="list-group-item settings-list-item" onClick={this.changeIndex.bind(this, 1)}>Analytics</li>
-              <li className="list-group-item settings-list-item">Feed Backs</li>
+              <li className="list-group-item settings-list-item" onClick={this.changeIndex.bind(this, 2)}>Feed Backs</li>
               <li className="list-group-item settings-list-item">Signout</li>
             </ul>
           </div>
           </div>
-            {index === 0 ? (
-              this.manageAUths()
-            ) : (
-              <Analytics/>
-            )}
+            {this.renderOptions(index)}
         </div>
       </div> 
       )
@@ -388,7 +406,7 @@ export class Settings extends Component {
       return (
         <div className="container-main">
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-7">
                 <h3>
                   <i className="fas fa-cogs"></i>
                     {'  '}Settings 

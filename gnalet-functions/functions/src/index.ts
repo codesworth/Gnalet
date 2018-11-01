@@ -197,7 +197,19 @@ export const reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dc
                 }
             };
             return admin.messaging().sendToDevice(token,payload);
-        }else {
+        }else if(status === 4){
+            const payload = {
+                notification: {
+                    title: "REPORT UPDATE",
+                    body: `Your reported issue has been already filed and pending`,
+                    badge: '1',
+                    sound: 'default'
+
+                }
+            };
+            return admin.messaging().sendToDevice(token,payload); 
+        }
+        else {
             return Promise.resolve("Nothing");
         }
 

@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { firestoreConnect, withFirestore} from 'react-redux-firebase';
-import { REF_ANALYTICS, FIELD_UNSOLVED, FIELD_PENDING, FIELD_SOLVED, FIELD_FLAGGED } from '../../Helpers/Constants';
+import { REF_ANALYTICS, FIELD_UNSOLVED, FIELD_PENDING, FIELD_SOLVED, FIELD_FLAGGED, FIELD_DUPLICATE } from '../../Helpers/Constants';
 import Spinner from '../layout/Spinner';
 
 import { makeBigdataAnalytics } from './AnalyticCalculator';
@@ -37,7 +37,7 @@ class Analytics extends Component {
       if (bigdata){
         const {yearly,totals} = bigdata;
         return (
-            <div className="col-md-9">
+            <div className="col-md-10">
               <div className='row mg'>
                   <div className="col">
                       <div className="card">
@@ -54,6 +54,7 @@ class Analytics extends Component {
                                   <th>PENDING</th>
                                   <th>SOLVED</th>
                                   <th>FLAGGED</th> 
+                                  <th>DUPLICATE</th>
                                   <th>TOTAL</th>
                                   <th>% COMPLETION</th>
                                   </tr>
@@ -73,6 +74,7 @@ class Analytics extends Component {
                                               </td>
                                               <td>{data[FIELD_SOLVED]}</td>
                                               <td>{data[FIELD_FLAGGED]}</td>
+                                              <td>{data[FIELD_DUPLICATE]}</td>
                                               <td>{data.total}</td>
                                               <td>{data.completion}%</td>
                                           </tr>
@@ -83,6 +85,7 @@ class Analytics extends Component {
                                         <td><h5>{totals[FIELD_PENDING]}</h5></td>
                                         <td><h5>{totals[FIELD_SOLVED]}</h5></td>
                                         <td><h5>{totals[FIELD_FLAGGED]}</h5></td>
+                                        <td><h5>{totals[FIELD_DUPLICATE]}</h5></td>
                                         <td><h5>{totals.total}</h5></td>
                                         <td><h5>{totals.completion}%</h5></td>
                                       </tr>

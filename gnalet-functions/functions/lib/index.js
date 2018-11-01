@@ -183,6 +183,17 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
             };
             return admin.messaging().sendToDevice(token, payload);
         }
+        else if (status === 4) {
+            const payload = {
+                notification: {
+                    title: "REPORT UPDATE",
+                    body: `Your reported issue has been already filed and pending`,
+                    badge: '1',
+                    sound: 'default'
+                }
+            };
+            return admin.messaging().sendToDevice(token, payload);
+        }
         else {
             return Promise.resolve("Nothing");
         }
@@ -198,7 +209,7 @@ exports.deletedDocument = functions.firestore.document(`${REF_REPORTS}/{docId}`)
     const category = snap.get(FIELD_CATEGORY);
     const sup = snap.get(FIELD_SUPBODY);
     try {
-        if (status > 3) {
+        if (status === 3) {
             const analytic = yield store.doc(`${REF_ANALYTICS}/${category}`).get();
             const supdata = analytic.get(sup);
             const newflagnum = supdata[getStatusString(status)] - 1;
@@ -396,8 +407,12 @@ function getStatusString(status) {
             return FIELD_PENDING;
         case 2:
             return FIELD_SOLVED;
-        default:
+        case 3:
             return FIELD_FLAGGED;
+        case 4:
+            return FIELD_DUPLICATE;
+        default:
+            return "";
     }
 }
 function fetchDocBy(uid) {
@@ -416,13 +431,15 @@ exports.resetToZero = functions.https.onRequest((request, response) => __awaiter
                 unsolved: 0,
                 pending: 0,
                 solved: 0,
-                flag: 0
+                flag: 0,
+                duplicate: 0
             },
             TMA: {
                 unsolved: 0,
                 pending: 0,
                 solved: 0,
-                flag: 0
+                flag: 0,
+                duplicate: 0
             }
         };
         const cats = [VEHICULAR,

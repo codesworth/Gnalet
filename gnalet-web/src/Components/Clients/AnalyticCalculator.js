@@ -1,9 +1,9 @@
 
-import {AN_TOTALS, AN_YEAR_DATA, FIELD_SOLVED, FIELD_FLAGGED} from '../../Helpers/Constants'
+import {AN_TOTALS, AN_YEAR_DATA, FIELD_SOLVED, FIELD_FLAGGED, FIELD_DUPLICATE} from '../../Helpers/Constants'
 
 function makeAnalyticForCategoryData(category){
     const data = {
-        pending:0,unsolved:0,solved:0,flag:0
+        pending:0,unsolved:0,solved:0,flag:0, duplicate:0
     }
     //console.log("Initial data: ", data);
     let alltotal = 0;
@@ -20,10 +20,10 @@ function makeAnalyticForCategoryData(category){
         data[id] = total;
     }
     data.key = category.key;
-    const {pending,unsolved,solved,flag} = data;
-    alltotal = pending + unsolved + solved + flag;
+    const {pending,unsolved,solved,flag,duplicate} = data;
+    alltotal = pending + unsolved + solved + flag + duplicate;
     let comp = ((solved) / (alltotal - flag)) * 100;
-    if (solved === 0 || (alltotal - flag) === 0){
+    if (solved === 0 || (alltotal - (flag + duplicate)) === 0){
         comp = 0;
     }
     data.completion = comp.toFixed(2)
@@ -35,7 +35,7 @@ function makeAnalyticForCategoryData(category){
 export function makeBigdataAnalytics(bigdata){
     const retdata = {}
     const data = []
-    const totals = {pending:0,unsolved:0,solved:0,flag:0,total:0}
+    const totals = {pending:0,unsolved:0,solved:0,flag:0,total:0, duplicate:0}
     bigdata.forEach(element => {
         //console.log("The eleemt is: ", element);
         const catdata = makeAnalyticForCategoryData(element);
@@ -46,8 +46,8 @@ export function makeBigdataAnalytics(bigdata){
         }
         data.push(catdata);
     });
-    let comp = (totals[FIELD_SOLVED]) / (totals.total - totals[FIELD_FLAGGED]) * 100
-    if ((totals[FIELD_SOLVED]) === 0 || (totals.total - totals[FIELD_FLAGGED]) === 0){
+    let comp = (totals[FIELD_SOLVED]) / (totals.total - (totals[FIELD_FLAGGED] + totals[FIELD_DUPLICATE])) * 100
+    if ((totals[FIELD_SOLVED]) === 0 || (totals.total - (totals[FIELD_FLAGGED] + totals[FIELD_DUPLICATE])) === 0){
         comp = 0
     }
 
