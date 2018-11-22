@@ -24,7 +24,7 @@ store.settings(rsettings);
 // });
 const corsHandler = cors({ origin: true });
 //const corsHandler = cors({origin:true});
-const REQUEST_OPTIONS = 'OPTIONS';
+const REQUEST_OPTIONS = "OPTIONS";
 const REF_REPORTERS = "GN-REPORTERS";
 const REF_DUMMY_HOLDER = "AUTHHOLDER";
 const REF_REPORTS = "GN-REPORTS";
@@ -66,18 +66,22 @@ const REF_ID_USERNAME = "username";
 const REF_ID_IMG_LNK = "link";
 const REF_GC_POINTS = "gcpoints";
 const _DATE = "date";
-exports.analyticsOnAdd = functions.firestore.document(`${REF_REPORTS}/{dcId}`).onCreate((snap, context) => __awaiter(this, void 0, void 0, function* () {
+exports.analyticsOnAdd = functions.firestore
+    .document(`${REF_REPORTS}/{dcId}`)
+    .onCreate((snap, context) => __awaiter(this, void 0, void 0, function* () {
     const category = snap.get(FIELD_CATEGORY);
     const sup = snap.get(FIELD_SUPBODY);
     const month = returnMonthYear(null);
     try {
         return admin.firestore().runTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
             const aref = admin.firestore().doc(`${REF_ANALYTICS}/${category}`);
-            const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
+            const mref = admin
+                .firestore()
+                .doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
             const analyticdata = yield transaction.get(aref);
             const analyticmonth = yield transaction.get(mref);
             if (!analyticdata.exists) {
-                throw ({ message: "Document data does not exist" });
+                throw { message: "Document data does not exist" };
             }
             const supdata = analyticdata.get(sup);
             const msupdata = analyticmonth.get(sup);
@@ -95,7 +99,9 @@ exports.analyticsOnAdd = functions.firestore.document(`${REF_REPORTS}/{dcId}`).o
         return Promise.reject(e);
     }
 }));
-exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`).onUpdate((snap, context) => __awaiter(this, void 0, void 0, function* () {
+exports.reportWasUpdated = functions.firestore
+    .document(`${REF_REPORTS}/{dcId}`)
+    .onUpdate((snap, context) => __awaiter(this, void 0, void 0, function* () {
     const befdoc = snap.before;
     const after = snap.after;
     const uid = befdoc.get("uid");
@@ -104,15 +110,19 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
     const oldcat = befdoc.get(FIELD_CATEGORY);
     const afcat = after.get(FIELD_CATEGORY);
     const sup = after.get(FIELD_SUPBODY);
-    const ts = after.get('ts');
+    const ts = after.get("ts");
     const month = returnMonthYear(ts);
     try {
         if (oldcat !== afcat) {
             yield admin.firestore().runTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
                 const aref = admin.firestore().doc(`${REF_ANALYTICS}/${oldcat}`);
-                const mref = admin.firestore().doc(`${REF_ANALYTICS}/${oldcat}/${REF_MONTHS}/${month}`);
+                const mref = admin
+                    .firestore()
+                    .doc(`${REF_ANALYTICS}/${oldcat}/${REF_MONTHS}/${month}`);
                 const newaref = admin.firestore().doc(`${REF_ANALYTICS}/${afcat}`);
-                const newmref = admin.firestore().doc(`${REF_ANALYTICS}/${afcat}/${REF_MONTHS}/${month}`);
+                const newmref = admin
+                    .firestore()
+                    .doc(`${REF_ANALYTICS}/${afcat}/${REF_MONTHS}/${month}`);
                 const analyticdata = yield transaction.get(aref);
                 const analyticmonth = yield transaction.get(mref);
                 const newanalyticdata = yield transaction.get(newaref);
@@ -138,7 +148,9 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
         if (oldstatus !== newstatus) {
             yield admin.firestore().runTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
                 const aref = admin.firestore().doc(`${REF_ANALYTICS}/${afcat}`);
-                const mref = admin.firestore().doc(`${REF_ANALYTICS}/${oldcat}/${REF_MONTHS}/${month}`);
+                const mref = admin
+                    .firestore()
+                    .doc(`${REF_ANALYTICS}/${oldcat}/${REF_MONTHS}/${month}`);
                 const analyticdata = yield transaction.get(aref);
                 const analyticmonth = yield transaction.get(mref);
                 const beforenum = analyticdata.get(sup)[getStatusString(oldstatus)] - 1;
@@ -155,41 +167,44 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
                 transaction.update(aref, { [sup]: upd });
             }));
         }
-        const tokensnap = yield admin.firestore().collection(REF_TOKENS).doc(uid).get();
+        const tokensnap = yield admin
+            .firestore()
+            .collection(REF_TOKENS)
+            .doc(uid)
+            .get();
+        console.log("This is the token", tokensnap.data());
         if (!tokensnap.exists) {
+            console.log("The token dont exist oo");
             return Promise.resolve("Nothing");
         }
         const token = tokensnap.data().token;
+        console.log("Token is: ", token);
         const status = after.get("status");
         if (status === 1) {
-            const payload = {
+            const message = {
                 notification: {
                     title: "REPORT UPDATE",
-                    body: `Your reported issue has been updated to Pending by the ${sup}`,
-                    badge: '1',
-                    sound: 'default'
-                }
+                    body: `Your reported issue has been updated to Pending by the ${sup}`
+                },
+                token: token
             };
-            return admin.messaging().sendToDevice(token, payload);
+            return admin.messaging().send(message);
         }
         else if (status === 2) {
-            const payload = {
+            const message = {
                 notification: {
                     title: "REPORT UPDATE",
-                    body: `Your reported issue has been Resolved`,
-                    badge: '1',
-                    sound: 'default'
-                }
+                    body: `Your reported issue has been Resolved`
+                },
+                token: token
             };
-            return admin.messaging().sendToDevice(token, payload);
+            return admin.messaging().send(message);
         }
         else if (status === 4) {
             const payload = {
                 notification: {
                     title: "REPORT UPDATE",
-                    body: `Your reported issue has been already filed and pending`,
-                    badge: '1',
-                    sound: 'default'
+                    body: `Your reported issue has been already filed and pending`
                 }
             };
             return admin.messaging().sendToDevice(token, payload);
@@ -204,7 +219,9 @@ exports.reportWasUpdated = functions.firestore.document(`${REF_REPORTS}/{dcId}`)
         return Promise.reject(e);
     }
 }));
-exports.deletedDocument = functions.firestore.document(`${REF_REPORTS}/{docId}`).onDelete((snap, context) => __awaiter(this, void 0, void 0, function* () {
+exports.deletedDocument = functions.firestore
+    .document(`${REF_REPORTS}/{docId}`)
+    .onDelete((snap, context) => __awaiter(this, void 0, void 0, function* () {
     const status = snap.get(CASE_STATUS);
     const category = snap.get(FIELD_CATEGORY);
     const sup = snap.get(FIELD_SUPBODY);
@@ -214,7 +231,9 @@ exports.deletedDocument = functions.firestore.document(`${REF_REPORTS}/{docId}`)
             const supdata = analytic.get(sup);
             const newflagnum = supdata[getStatusString(status)] - 1;
             supdata[getStatusString(status)] = newflagnum;
-            const wr = yield store.doc(`${REF_ANALYTICS}/${category}`).update({ [sup]: supdata });
+            const wr = yield store
+                .doc(`${REF_ANALYTICS}/${category}`)
+                .update({ [sup]: supdata });
             return Promise.resolve(wr);
         }
         else {
@@ -226,13 +245,19 @@ exports.deletedDocument = functions.firestore.document(`${REF_REPORTS}/{docId}`)
         return Promise.reject(e);
     }
 }));
-exports.addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_HOLDER}/{docId}`).onCreate((snapshot, context) => __awaiter(this, void 0, void 0, function* () {
+exports.addNewAuthorityAccount = functions.firestore
+    .document(`${REF_DUMMY_HOLDER}/{docId}`)
+    .onCreate((snapshot, context) => __awaiter(this, void 0, void 0, function* () {
     const data = snapshot.get("data");
     const { email, password } = data;
     const batch = admin.firestore().batch();
     try {
-        const res = yield admin.auth().createUser({ email: email, password: password });
-        batch.set(admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`), data, { merge: true });
+        const res = yield admin
+            .auth()
+            .createUser({ email: email, password: password });
+        batch.set(admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`), data, {
+            merge: true
+        });
         batch.delete(snapshot.ref);
         const final = yield batch.commit();
         return Promise.resolve("Succesfully Added Authority User Account: " + final);
@@ -244,7 +269,8 @@ exports.addNewAuthorityAccount = functions.firestore.document(`${REF_DUMMY_HOLDE
 }));
 exports.performAnalyticsOnAll = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
     const batch = store.batch();
-    const allcats = { VEHICULAR: {},
+    const allcats = {
+        VEHICULAR: {},
         SANITATION: {},
         CRIMES: {},
         WATER: {},
@@ -252,7 +278,8 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
         ECG: {},
         HFDA: {},
         GSA: {},
-        OTHERS: {} };
+        OTHERS: {}
+    };
     const allmonths = {};
     try {
         const alldocs = yield store.collection(REF_REPORTS).get();
@@ -273,7 +300,7 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
             //     numb = 0;
             // }else{
             // }
-            //= typeof(allcats[category][region][getStatusString(status)]) === 'number' ? allcats[category][region][getStatusString(status)] : 0 
+            //= typeof(allcats[category][region][getStatusString(status)]) === 'number' ? allcats[category][region][getStatusString(status)] : 0
             console.log(`the studd are ${category} and ${region}`);
             allcats[category][region][getStatusString(status)] = numb + 1;
             const mid = returnMonthYear(element.get("ts"));
@@ -281,7 +308,8 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
             if (mid in allcats[category]) {
                 if (region in allcats[category][mid]) {
                     if (getStatusString(status) in allcats[category][mid][region]) {
-                        monthnumb = allcats[category][mid][region][getStatusString(status)];
+                        monthnumb =
+                            allcats[category][mid][region][getStatusString(status)];
                     }
                     else {
                         allcats[category][mid][region] = {};
@@ -296,7 +324,7 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
             // if (allcats[category][mid][region][getStatusString(status)] === undefined || allcats[category][mid][region][getStatusString(status)] === 'undefined' || allcats[category][mid][region][getStatusString(status)] === null){
             //     monthnumb = 0;
             // }else{
-            //     monthnumb = allcats[category][mid][region][getStatusString(status)]; 
+            //     monthnumb = allcats[category][mid][region][getStatusString(status)];
             // }
             // typeof([category][mid][region][getStatusString(status)]) === 'number' ? allcats[category][mid][region][getStatusString(status)] : 0
             console.log(`the studd are ${category} adnn ${mid} and ${region}`);
@@ -314,7 +342,9 @@ exports.performAnalyticsOnAll = functions.https.onRequest((request, response) =>
                     monthdata[ikey] = value[ikey];
                 }
             }
-            batch.set(store.doc(`${REF_ANALYTICS}/${key}`), gendata, { merge: true });
+            batch.set(store.doc(`${REF_ANALYTICS}/${key}`), gendata, {
+                merge: true
+            });
             for (const id in monthdata) {
                 const mref = store.doc(`${REF_ANALYTICS}/${key}/${REF_MONTHS}/${id}`);
                 batch.set(mref, monthdata[id], { merge: true });
@@ -334,24 +364,34 @@ exports.addAuthorityAccount = functions.https.onRequest((request, response) => _
     corsHandler(request, response, () => {
         const { data } = request.body;
         const { email, password } = data;
-        admin.auth().createUser({ email: email, password: password }).then(res => {
-            return admin.firestore().doc(`${REF_AUTHORITIES}/${res.uid}`).set(data, { merge: true });
-        }).then(final => {
-            response.status(200).send("Succesfully Added Authority User Account: " + final);
-        }).catch(e => {
+        admin
+            .auth()
+            .createUser({ email: email, password: password })
+            .then(res => {
+            return admin
+                .firestore()
+                .doc(`${REF_AUTHORITIES}/${res.uid}`)
+                .set(data, { merge: true });
+        })
+            .then(final => {
+            response
+                .status(200)
+                .send("Succesfully Added Authority User Account: " + final);
+        })
+            .catch(e => {
             console.log("Error Occurred with sig: ", e);
             response.status(504).send(e);
         });
     });
 }));
 function helperAccess(access) {
-    if (access === '1000') {
+    if (access === "1000") {
         return 1000;
     }
-    else if (access === '1020') {
+    else if (access === "1020") {
         return 1020;
     }
-    else if (access === '2000') {
+    else if (access === "2000") {
         return 2000;
     }
     else {
@@ -382,7 +422,9 @@ function returnMonthYear(ts) {
     }
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    const val = String(year).concat("-").concat(String(month));
+    const val = String(year)
+        .concat("-")
+        .concat(String(month));
     return val;
 }
 function getWeekNumber(d) {
@@ -395,7 +437,7 @@ function getWeekNumber(d) {
     // Get first day of year
     var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
     // Calculate full weeks to nearest Thursday
-    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    var weekNo = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
     // Return array of year and week number
     return [d.getUTCFullYear(), weekNo];
 }
@@ -417,7 +459,10 @@ function getStatusString(status) {
 }
 function fetchDocBy(uid) {
     return __awaiter(this, void 0, void 0, function* () {
-        return admin.firestore().doc(uid).get();
+        return admin
+            .firestore()
+            .doc(uid)
+            .get();
     });
 }
 exports.resetToZero = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
@@ -442,23 +487,50 @@ exports.resetToZero = functions.https.onRequest((request, response) => __awaiter
                 duplicate: 0
             }
         };
-        const cats = [VEHICULAR,
+        const cats = [
+            VEHICULAR,
             SANITATION,
             CRIMES,
             WATER,
             POTHOLES,
             ECG,
-            HFDA, GSA,
-            OTHERS];
+            HFDA,
+            GSA,
+            OTHERS
+        ];
         cats.forEach(cat => {
-            batch.set(admin.firestore().doc(`${REF_ANALYTICS}/${cat}`), data, { merge: true });
+            batch.set(admin.firestore().doc(`${REF_ANALYTICS}/${cat}`), data, {
+                merge: true
+            });
         });
-        const years = ["2018-10", "2018-11", "2018-12", "2019-01", "2019-02", "2019-03", "2019-04", "2019-05", "2019-06", "2019-07", "2019-08", "2019-09", "2019-10"];
-        const docs = yield admin.firestore().collection(REF_ANALYTICS).get();
+        const years = [
+            "2018-10",
+            "2018-11",
+            "2018-12",
+            "2019-01",
+            "2019-02",
+            "2019-03",
+            "2019-04",
+            "2019-05",
+            "2019-06",
+            "2019-07",
+            "2019-08",
+            "2019-09",
+            "2019-10"
+        ];
+        const docs = yield admin
+            .firestore()
+            .collection(REF_ANALYTICS)
+            .get();
         docs.forEach(doc => {
             const id = doc.id;
             years.forEach(key => {
-                let ref = admin.firestore().collection(REF_ANALYTICS).doc(id).collection("Months").doc(key);
+                let ref = admin
+                    .firestore()
+                    .collection(REF_ANALYTICS)
+                    .doc(id)
+                    .collection("Months")
+                    .doc(key);
                 batch.set(ref, data, { merge: true });
             });
         });
@@ -551,5 +623,5 @@ export const callTestFroDate = functions.https.onRequest(async (request,response
    
     
     
-})*/ 
+})*/
 //# sourceMappingURL=index.js.map
