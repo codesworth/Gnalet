@@ -70,6 +70,17 @@
   margin-right: 5%;
 } 
 
+.loadin{
+  display: flex;            /* establish flex container */
+  flex-direction: column;   /* align children vertically (column format) */
+  justify-content: center;  /* center children vertically */
+  align-items: center; 
+  z-Index:100;
+  align-self: center;
+  position:absolute;
+  background-color:chocolate;
+}
+
 .gn-footer {
   position: fixed;
   left: 0;

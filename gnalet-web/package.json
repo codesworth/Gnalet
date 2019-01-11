@@ -11,6 +11,7 @@
     "react-bootstrap4-modal": "^1.6.2",
     "react-dom": "^16.5.2",
     "react-google-maps": "^9.4.5",
+    "react-loader-spinner": "^2.2.0",
     "react-redux": "^5.0.7",
     "react-redux-firebase": "^2.1.8",
     "react-router-dom": "^4.3.1",

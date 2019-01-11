@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import {notifyUser} from '../../actions/notifyActons'
 import Alert from '../layout/Alert'
 import gnaletlogo from './gnalet2.png'
+import Spinner from '../layout/Spinner';
 
 class Login extends Component {
 
@@ -17,14 +18,19 @@ class Login extends Component {
     state = {
         email: '',
         password: '',
+        isLoading:false
     }
 
     onSubmit = (e ) => {
+        this.setState({isLoading:true});
         e.preventDefault();
         const {email, password} = this.state;
         const {firebase, notifyUser} = this.props;
         
-        firebase.login({email, password}).catch(err => notifyUser("Encountered Error",'error'));
+        firebase.login({email, password}).catch(err => {
+            notifyUser("Encountered Error",'error')
+            this.setState({isLoading:false});
+        });
     }
 
     onChange = (e) => this.setState({[e.target.name]: e.target.value} )
@@ -35,8 +41,15 @@ class Login extends Component {
 
     return (
       <div className='row'>
+      
         <div className="col-md-6 mx-auto">
+        {this.state.isLoading ? (
+                        <div style={{display: 'flex', flexDirection: "column", justifyContent:'center', alignItems:'center', height:"100vh"}}>
+                        <Spinner/>
+                    </div>
+                    ): null}
             <div className="card">
+                
                 <div className="card-body">
 
                     { message ? (
