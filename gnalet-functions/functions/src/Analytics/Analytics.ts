@@ -19,8 +19,86 @@ import {
   HFDA,
   GSA,
   OTHERS
-} from "./Constants";
+} from "../Constants";
 import { Firestore } from "@google-cloud/firestore";
+import { Assemblies } from "./Assemblies";
+
+export async function statusDidUpdated(
+  supCode: string,
+  befcat: string,
+  afcat: string,
+  oldstatus: number,
+  newstatus: number
+) {
+  return admin.firestore().runTransaction(async transaction => {
+    const actualAdmin = Assemblies[supCode];
+    const aref = admin.firestore().doc(`${REF_ANALYTICS}/${actualAdmin}`);
+    //const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
+    const analyticdata = await transaction.get(aref);
+    //const analyticmonth = await transaction.get(mref);
+    if (!analyticdata.exists) {
+      //throw { message: "Document data does not exist" };
+      const body = {
+        [afcat]: {
+          unsolved: 0,
+          pending: 0,
+          solved: 0,
+          flag: 0,
+          duplicate: 0
+        }
+      };
+      body[afcat][getStatusString(newstatus)] = 1;
+      transaction.update(aref, body);
+    } else {
+      const father = analyticdata.data();
+      if (befcat === afcat) {
+        if (analyticdata.get(befcat)) {
+          const data = analyticdata.get(afcat);
+          const oldnumb = data[getStatusString(newstatus)];
+          data[getStatusString(newstatus)] = oldnumb + 1;
+          if (oldstatus !== newstatus) {
+            data[getStatusString(oldstatus)] =
+              data[getStatusString(oldstatus)] - 1;
+          }
+          father[afcat] = data;
+          transaction.update(aref, father);
+        } else {
+          father[afcat] = {
+            unsolved: 0,
+            pending: 0,
+            solved: 0,
+            flag: 0,
+            duplicate: 0
+          };
+          father[afcat][getStatusString(newstatus)] = 1;
+          transaction.update(aref, father);
+        }
+      } else {
+        const befdata = analyticdata.get(befcat);
+        const afdata = analyticdata.get(afcat) ? analyticdata.get(afcat) : null;
+        const oldnumb = befdata[getStatusString(oldstatus)];
+        befdata[getStatusString(newstatus)] = oldnumb - 1;
+        father[befcat] = befdata;
+        if (afdata !== null) {
+          afdata[getStatusString(oldstatus)] =
+            afdata[getStatusString(oldstatus)] + 1;
+          father[afcat] = afdata;
+          transaction.update(aref, father);
+        } else {
+          father[afcat] = {
+            unsolved: 0,
+            pending: 0,
+            solved: 0,
+            flag: 0,
+            duplicate: 0
+          };
+          father[afcat][getStatusString(newstatus)] = 1;
+          transaction.update(aref, father);
+        }
+      }
+    }
+  });
+}
 
 export async function performAnalyticsOnAdd(
   category: string,

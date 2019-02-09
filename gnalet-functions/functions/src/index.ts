@@ -3,7 +3,8 @@ import {
   FIELD_CATEGORY,
   CASE_STATUS,
   FIELD_SUPBODY,
-  returnMonthYear
+  returnMonthYear,
+  FIELD_SUP_CODE
 } from "./Constants";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
@@ -14,8 +15,9 @@ import {
   statusWasUpdated,
   documentDeleted,
   performAnalyticsOnAllDocs,
-  resetAnalyticsToZero
-} from "./Analytics";
+  resetAnalyticsToZero,
+  statusDidUpdated
+} from "./Analytics/Analytics";
 import { sendNotification } from "./Notifications";
 import { testDuplicates } from "./Tests";
 import { createAuthority } from "./Auth";
@@ -42,9 +44,9 @@ export const analyticsOnAdd = functions.firestore
   .onCreate(async (snap, context) => {
     const category = snap.get(FIELD_CATEGORY);
     const sup = snap.get(FIELD_SUPBODY);
-    const month = returnMonthYear(null);
+    const status = snap.get(CASE_STATUS);
     try {
-      return performAnalyticsOnAdd(category, month, sup);
+      statusDidUpdated(sup, category, category, status, status);
     } catch (e) {
       console.log("Error happened with sig: ", e);
       return Promise.reject(e);
@@ -61,16 +63,17 @@ export const reportWasUpdated = functions.firestore
     const newstatus: number = after.get(CASE_STATUS);
     const oldcat = befdoc.get(FIELD_CATEGORY);
     const afcat = after.get(FIELD_CATEGORY);
-    const sup = after.get(FIELD_SUPBODY);
+    const sup = after.get(FIELD_SUP_CODE);
     const ts = after.get("ts");
     const month = returnMonthYear(ts);
     try {
-      if (oldcat !== afcat) {
-        updatedCategory(oldcat, month, afcat, oldstatus, sup);
-      }
-      if (oldstatus !== newstatus) {
-        statusWasUpdated(oldcat, month, sup, afcat, oldstatus, newstatus);
-      }
+      // if (oldcat !== afcat) {
+      //   updatedCategory(oldcat, month, afcat, oldstatus, sup);
+      // }
+      // if (oldstatus !== newstatus) {
+      //   statusWasUpdated(oldcat, month, sup, afcat, oldstatus, newstatus);
+      // }
+      statusDidUpdated(sup, oldcat, afcat, oldstatus, newstatus);
       return sendNotification(store, uid, after, admin.messaging(), sup);
     } catch (e) {
       //const ref:admin.firestore.Query = admin.firestore().collection('').where()

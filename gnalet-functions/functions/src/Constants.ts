@@ -7,6 +7,7 @@ export const REF_TOKENS = "TOKENS";
 export const REF_ANALYTICS = "GN-ANALYTICS";
 export const FIELD_SUPBODY = "supBody";
 export const FIELD_CATEGORY = "category";
+export const FIELD_SUP_CODE = "sup_code";
 export const FIELD_UNSOLVED = "unsolved";
 export const FIELD_SOLVED = "solved";
 export const FIELD_DUPLICATE = "duplicate";
