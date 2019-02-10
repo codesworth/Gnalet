@@ -1,7 +1,6 @@
-import { Firestore } from "@google-cloud/firestore";
 import { REF_ANALYTICS, FIELD_DUPLICATE, REF_MONTHS } from "./Constants";
 
-export async function testDuplicates(store: Firestore, response) {
+export async function testDuplicates(store: any, response) {
   const batch = store.batch();
   const months = [];
   try {

@@ -20,7 +20,7 @@ import {
   GSA,
   OTHERS
 } from "../Constants";
-import { Firestore } from "@google-cloud/firestore";
+
 import { Assemblies } from "./Assemblies";
 
 export async function statusDidUpdated(
@@ -198,11 +198,11 @@ export async function statusWasUpdated(
 
 export async function documentDeleted(
   status: number,
-  store: Firestore,
   category: string,
   sup: string
 ) {
   if (status === 3) {
+    const store = admin.firestore();
     const analytic = await store.doc(`${REF_ANALYTICS}/${category}`).get();
     const supdata = analytic.get(sup);
     const newflagnum = supdata[getStatusString(status)] - 1;
@@ -216,9 +216,9 @@ export async function documentDeleted(
   }
 }
 
-export async function performAnalyticsOnAllDocs(store: Firestore, response) {
-  const batch = store.batch();
-
+export async function performAnalyticsOnAllDocs(response) {
+  const batch = admin.firestore().batch();
+  const store = admin.firestore();
   const allcats = {
     VEHICULAR: {},
     SANITATION: {},
@@ -233,7 +233,10 @@ export async function performAnalyticsOnAllDocs(store: Firestore, response) {
   };
   const allmonths = {};
   try {
-    const alldocs = await store.collection(REF_REPORTS).get();
+    const alldocs = await admin
+      .firestore()
+      .collection(REF_REPORTS)
+      .get();
     alldocs.forEach(element => {
       const status = element.get(CASE_STATUS);
       const category = element.get(FIELD_CATEGORY);
@@ -298,8 +301,8 @@ export async function performAnalyticsOnAllDocs(store: Firestore, response) {
   }
 }
 
-export async function resetAnalyticsToZero(store: Firestore, response) {
-  const batch = store.batch();
+export async function resetAnalyticsToZero(response) {
+  const batch = admin.firestore().batch();
   try {
     const data = {
       AMA: {

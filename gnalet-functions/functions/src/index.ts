@@ -43,10 +43,10 @@ export const analyticsOnAdd = functions.firestore
   .document(`${REF_REPORTS}/{dcId}`)
   .onCreate(async (snap, context) => {
     const category = snap.get(FIELD_CATEGORY);
-    const sup = snap.get(FIELD_SUPBODY);
+    const sup = snap.get(FIELD_SUP_CODE);
     const status = snap.get(CASE_STATUS);
     try {
-      statusDidUpdated(sup, category, category, status, status);
+      return statusDidUpdated(sup, category, category, status, status);
     } catch (e) {
       console.log("Error happened with sig: ", e);
       return Promise.reject(e);
@@ -73,7 +73,13 @@ export const reportWasUpdated = functions.firestore
       // if (oldstatus !== newstatus) {
       //   statusWasUpdated(oldcat, month, sup, afcat, oldstatus, newstatus);
       // }
-      statusDidUpdated(sup, oldcat, afcat, oldstatus, newstatus);
+      const resp = await statusDidUpdated(
+        sup,
+        oldcat,
+        afcat,
+        oldstatus,
+        newstatus
+      );
       return sendNotification(store, uid, after, admin.messaging(), sup);
     } catch (e) {
       //const ref:admin.firestore.Query = admin.firestore().collection('').where()
@@ -90,7 +96,7 @@ export const deletedDocument = functions.firestore
     const sup = snap.get(FIELD_SUPBODY);
 
     try {
-      return documentDeleted(status, store, category, sup);
+      return documentDeleted(status, category, sup);
     } catch (e) {
       console.log("Error occurred with sig: ", e);
       return Promise.reject(e);
@@ -99,7 +105,7 @@ export const deletedDocument = functions.firestore
 
 export const performAnalyticsOnAll = functions.https.onRequest(
   async (request, response) => {
-    return performAnalyticsOnAllDocs(store, response);
+    return performAnalyticsOnAllDocs(response);
   }
 );
 
@@ -118,7 +124,7 @@ async function fetchDocBy(uid: string) {
 
 export const resetToZero = functions.https.onRequest(
   async (request, response) => {
-    return resetAnalyticsToZero(store, response);
+    return resetAnalyticsToZero(response);
     //const r = getWeekNumber(new Date());
     //console.log(date+' The week stuff are',r);
   }

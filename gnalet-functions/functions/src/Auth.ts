@@ -1,8 +1,7 @@
-import { Firestore } from "@google-cloud/firestore";
 import { REF_AUTHORITIES } from "./Constants";
 
 export async function createAuthority(
-  store: Firestore,
+  store: any,
   corsHandler,
   request,
   response,

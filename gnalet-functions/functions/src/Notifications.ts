@@ -1,9 +1,9 @@
 import { REF_TOKENS } from "./Constants";
-import { Firestore } from "@google-cloud/firestore";
+
 import { DocumentSnapshot } from "firebase-functions/lib/providers/firestore";
 
 export async function sendNotification(
-  store: Firestore,
+  store: any,
   uid: string,
   after: DocumentSnapshot,
   messaging,
