@@ -32,6 +32,8 @@ export async function statusDidUpdated(
 ) {
   return admin.firestore().runTransaction(async transaction => {
     const actualAdmin = Assemblies[supCode];
+    console.log("The supcode is: " + supCode);
+    console.log("The supcode is: " + actualAdmin);
     const aref = admin.firestore().doc(`${REF_ANALYTICS}/${actualAdmin}`);
     //const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
     const analyticdata = await transaction.get(aref);
