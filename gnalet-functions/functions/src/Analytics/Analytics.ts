@@ -32,8 +32,8 @@ export async function statusDidUpdated(
 ) {
   return admin.firestore().runTransaction(async transaction => {
     const actualAdmin = Assemblies[supCode];
-    console.log("The supcode is: " + supCode);
-    console.log("The supcode is: " + actualAdmin);
+    // console.log("The supcode is: " + supCode);
+    // console.log("The supcode is: " + actualAdmin);
     const aref = admin.firestore().doc(`${REF_ANALYTICS}/${actualAdmin}`);
     //const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
     const analyticdata = await transaction.get(aref);
@@ -201,17 +201,19 @@ export async function statusWasUpdated(
 export async function documentDeleted(
   status: number,
   category: string,
-  sup: string
+  supcode: string
 ) {
   if (status === 3) {
     const store = admin.firestore();
-    const analytic = await store.doc(`${REF_ANALYTICS}/${category}`).get();
-    const supdata = analytic.get(sup);
-    const newflagnum = supdata[getStatusString(status)] - 1;
-    supdata[getStatusString(status)] = newflagnum;
-    const wr = await store
-      .doc(`${REF_ANALYTICS}/${category}`)
-      .update({ [sup]: supdata });
+    const analytic = await store
+      .doc(`${REF_ANALYTICS}/${Assemblies[supcode]}`)
+      .get();
+    const data = analytic.get(category);
+    const bdata = analytic.data();
+    const newflagnum = data[getStatusString(status)] - 1;
+    data[getStatusString(status)] = newflagnum;
+    bdata[category] = data;
+    const wr = await store.doc(`${REF_ANALYTICS}/${category}`).update(data);
     return Promise.resolve(wr);
   } else {
     return Promise.resolve();

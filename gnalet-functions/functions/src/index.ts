@@ -93,10 +93,10 @@ export const deletedDocument = functions.firestore
   .onDelete(async (snap, context) => {
     const status = snap.get(CASE_STATUS);
     const category = snap.get(FIELD_CATEGORY);
-    const sup = snap.get(FIELD_SUPBODY);
+    const supcode = snap.get(FIELD_SUP_CODE);
 
     try {
-      return documentDeleted(status, category, sup);
+      return documentDeleted(status, category, supcode);
     } catch (e) {
       console.log("Error occurred with sig: ", e);
       return Promise.reject(e);
