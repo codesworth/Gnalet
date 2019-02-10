@@ -15,6 +15,8 @@ function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
     return __awaiter(this, void 0, void 0, function* () {
         return admin.firestore().runTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
             const actualAdmin = Assemblies_1.Assemblies[supCode];
+            // console.log("The supcode is: " + supCode);
+            // console.log("The supcode is: " + actualAdmin);
             const aref = admin.firestore().doc(`${Constants_1.REF_ANALYTICS}/${actualAdmin}`);
             //const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
             const analyticdata = yield transaction.get(aref);
@@ -173,17 +175,19 @@ function statusWasUpdated(oldcat, month, sup, afcat, oldstatus, newstatus) {
     });
 }
 exports.statusWasUpdated = statusWasUpdated;
-function documentDeleted(status, category, sup) {
+function documentDeleted(status, category, supcode) {
     return __awaiter(this, void 0, void 0, function* () {
         if (status === 3) {
             const store = admin.firestore();
-            const analytic = yield store.doc(`${Constants_1.REF_ANALYTICS}/${category}`).get();
-            const supdata = analytic.get(sup);
-            const newflagnum = supdata[Constants_1.getStatusString(status)] - 1;
-            supdata[Constants_1.getStatusString(status)] = newflagnum;
-            const wr = yield store
-                .doc(`${Constants_1.REF_ANALYTICS}/${category}`)
-                .update({ [sup]: supdata });
+            const analytic = yield store
+                .doc(`${Constants_1.REF_ANALYTICS}/${Assemblies_1.Assemblies[supcode]}`)
+                .get();
+            const data = analytic.get(category);
+            const bdata = analytic.data();
+            const newflagnum = data[Constants_1.getStatusString(status)] - 1;
+            data[Constants_1.getStatusString(status)] = newflagnum;
+            bdata[category] = data;
+            const wr = yield store.doc(`${Constants_1.REF_ANALYTICS}/${category}`).update(data);
             return Promise.resolve(wr);
         }
         else {

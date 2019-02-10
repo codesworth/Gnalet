@@ -77,9 +77,9 @@ exports.deletedDocument = functions.firestore
     .onDelete((snap, context) => __awaiter(this, void 0, void 0, function* () {
     const status = snap.get(Constants_1.CASE_STATUS);
     const category = snap.get(Constants_1.FIELD_CATEGORY);
-    const sup = snap.get(Constants_1.FIELD_SUPBODY);
+    const supcode = snap.get(Constants_1.FIELD_SUP_CODE);
     try {
-        return Analytics_1.documentDeleted(status, category, sup);
+        return Analytics_1.documentDeleted(status, category, supcode);
     }
     catch (e) {
         console.log("Error occurred with sig: ", e);
