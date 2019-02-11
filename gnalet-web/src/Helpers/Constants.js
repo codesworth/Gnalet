@@ -56,6 +56,8 @@ export const ACCESS_CODE_READ = 1000;
 export const ACCESS_CODE_MASTER = 2000;
 export const USER_SETTINGS = "userSettings";
 export const AN_YEAR_DATA = "yearly";
+export const AN_ADMIN_AREA_DATA = "area";
+export const AN_CATEGORICAL = "categories";
 export const AN_TOTALS = "totals";
 
 export const category_ids = [

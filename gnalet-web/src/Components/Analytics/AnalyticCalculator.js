@@ -4,7 +4,8 @@ import {
   FIELD_SOLVED,
   FIELD_FLAGGED,
   FIELD_DUPLICATE,
-  category_ids
+  category_ids,
+  AN_CATEGORICAL
 } from "../../Helpers/Constants";
 /**
  * Calculates Analytics for various  Adminstrative Jurisdictions irrespective of categories
@@ -122,6 +123,7 @@ export function makeBigdataAnalyticsForCategories(bigdata) {
         console.log("Stat is", stat);
         const old = retdata[id][stat];
         retdata[id][stat] = old + data[stat];
+        totals[stat] = totals[stat] + data[stat];
       }
     }
   });
@@ -136,22 +138,27 @@ export function makeBigdataAnalyticsForCategories(bigdata) {
   //   }
   //   data.push(catdata);
   // });
-  // let comp =
-  //   (totals[FIELD_SOLVED] /
-  //     (totals.total - (totals[FIELD_FLAGGED] + totals[FIELD_DUPLICATE]))) *
-  //   100;
-  // if (
-  //   totals[FIELD_SOLVED] === 0 ||
-  //   totals.total - (totals[FIELD_FLAGGED] + totals[FIELD_DUPLICATE]) === 0
-  // ) {
-  //   comp = 0;
-  // }
+  let comp =
+    (totals[FIELD_SOLVED] /
+      (totals.total - (totals[FIELD_FLAGGED] + totals[FIELD_DUPLICATE]))) *
+    100;
+  if (
+    totals[FIELD_SOLVED] === 0 ||
+    totals.total - (totals[FIELD_FLAGGED] + totals[FIELD_DUPLICATE]) === 0
+  ) {
+    comp = 0;
+  }
+  const returndata = {};
+  for (const key in retdata) {
+    const value = retdata[key];
+    value.key = key;
+    data.push(value);
+  }
+  totals.completion = comp.toFixed(1);
+  returndata[AN_CATEGORICAL] = data;
+  returndata[AN_TOTALS] = totals;
 
-  // totals.completion = comp.toFixed(1);
-  // retdata[AN_YEAR_DATA] = data;
-  // retdata[AN_TOTALS] = totals;
-
-  return retdata;
+  return returndata;
 }
 
 function collapseAllTotals(data) {
