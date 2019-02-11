@@ -1,4 +1,5 @@
 import * as moment from "moment";
+import { Assemblies } from "../Helpers/Assemblies";
 
 export const URL_ADD_AUTH =
   "https://us-central1-gnalet-e91c4.cloudfunctions.net/addAuthorityAccount";
@@ -69,7 +70,34 @@ export const category_ids = [
   "OTHERS"
 ];
 
-export const region_ids = ["AMA", "TMA"];
+export const region_ids = [
+  "ANMC",
+  "AWMC",
+  "GA",
+  "GY",
+  "GX",
+  "GD",
+  "GB",
+  "AEM",
+  "AYNM",
+  "AYWM",
+  "GC",
+  "GE",
+  "GNM",
+  "GS",
+  "GW",
+  "GK",
+  "GKM",
+  "GL",
+  "GM",
+  "GZ",
+  "GN",
+  "GON",
+  "GO",
+  "GT",
+  "GTW",
+  "GWJ"
+];
 
 export function formatDate(date) {
   var md = moment(date).format("MM/DD/YY, h:mm:ss a");
@@ -113,14 +141,9 @@ export function facingCategoryname(symlnk) {
 }
 
 export function publicFacingRegion(region) {
-  switch (region) {
-    case "AMA":
-      return "Accra Metropolitan Assembly";
-    case "TMA":
-      return "Tema Municipal Assembly";
-    default:
-      return region;
-  }
+  const asm =
+    typeof Assemblies[region] === "string" ? Assemblies[region] : Assemblies.GA;
+  return asm;
 }
 
 export function returnMonthYear(ts) {

@@ -10,9 +10,6 @@ import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as cors from "cors";
 import {
-  performAnalyticsOnAdd,
-  updatedCategory,
-  statusWasUpdated,
   documentDeleted,
   performAnalyticsOnAllDocs,
   resetAnalyticsToZero,
