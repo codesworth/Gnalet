@@ -1,5 +1,5 @@
 import * as moment from "moment";
-import { Assemblies } from "../Helpers/Assemblies";
+import { AdminAreas } from "../Helpers/Assemblies";
 
 export const URL_ADD_AUTH =
   "https://us-central1-gnalet-e91c4.cloudfunctions.net/addAuthorityAccount";
@@ -144,7 +144,7 @@ export function facingCategoryname(symlnk) {
 
 export function publicFacingRegion(region) {
   const asm =
-    typeof Assemblies[region] === "string" ? Assemblies[region] : Assemblies.GA;
+    typeof Assemblies[region] === "string" ? AdminAreas[region] : AdminAreas.GA;
   return asm;
 }
 

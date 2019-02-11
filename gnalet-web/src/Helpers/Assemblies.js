@@ -23,7 +23,7 @@ export const GZ = "Ledzokuku Municipal District";
 export const GN = "Ningo Prampram District";
 export const GON = "Okaikwei Municipal District";
 export const GO = "Shai Osudoku District";
-export const GT = "Tema Metropolitan District";
+export const GT = "Tema Metropolis District";
 export const GTW = "Tema West Municipal District";
 export const GWJ = "Weija Municipal District";
 
@@ -54,6 +54,35 @@ export const Assemblies = {
   GT,
   GTW,
   GWJ
+};
+
+export const AdminAreas = {
+  ANMC: "Ablekuma North Municipal District",
+  AWMC: "Ablekuma West Municipal District",
+  GA: "Accra Metropolis District",
+  GY: "Ada East District",
+  GX: "Ada West District",
+  GD: "Adenta Municipal District",
+  GB: "Ashaiman Municipal District",
+  AEM: "Ayawaso East Municipal District",
+  AYNM: "Ayawaso North Municipal District",
+  AYWM: "Ayawaso West Municipal District",
+  GC: "Ga Central District",
+  GE: "Ga East Municipal District",
+  GNM: "Ga North Municipal District",
+  GS: "Ga South Municipal District",
+  GW: "Ga West Municipal District",
+  GK: "Kpone Katamanso Municipal District",
+  GKM: "Krowor Municipal District",
+  GL: "La Dade Kotopon Municipal District",
+  GM: "La Nkwantanang Madina Municipal District",
+  GZ: "Ledzokuku Municipal District",
+  GN: "Ningo Prampram District",
+  GON: "Okaikwei Municipal District",
+  GO: "Shai Osudoku District",
+  GT: "Tema Metropolis District",
+  GTW: "Tema West Municipal District",
+  GWJ: "Weija Municipal District"
 };
 
 /**
