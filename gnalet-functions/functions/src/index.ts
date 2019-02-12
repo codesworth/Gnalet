@@ -137,15 +137,19 @@ export const test_addDuplicates = functions.https.onRequest(
 
 export const alignAuths = functions.https.onRequest(
   async (request, response) => {
-    const batch = store.batch();
+    //const batch = store.batch();
 
     // for (const key in AssemblyKeys) {
     //   data.push(key);
     // }
-    // const resp = await store
-    //   .collection(REF_AUTHORITIES)
-    //   .doc("3HwYYDbiikfFCPsMs9FHaRKJoGB3")
-    //   .update({ region: data });
-    //return response.status(200).send();
+    const data = [];
+    for (const key in AssemblyKeys) {
+      data.push(key);
+    }
+    const resp = await store
+      .collection(REF_AUTHORITIES)
+      .doc("yXG7QRkYBzS8nZUUZqzyZyGz4wI2")
+      .update({ region: data });
+    return response.status(200).send(resp);
   }
 );

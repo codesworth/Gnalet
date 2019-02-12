@@ -16,6 +16,7 @@ const Analytics_1 = require("./Analytics/Analytics");
 const Notifications_1 = require("./Notifications");
 const Tests_1 = require("./Tests");
 const Auth_1 = require("./Auth");
+const Assemblies_1 = require("./Analytics/Assemblies");
 //const cors = require('cors')({origin: true});
 admin.initializeApp();
 const store = admin.firestore();
@@ -109,14 +110,18 @@ exports.test_addDuplicates = functions.https.onRequest((request, response) => __
     return Tests_1.testDuplicates(store, response);
 }));
 exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    const batch = store.batch();
+    //const batch = store.batch();
     // for (const key in AssemblyKeys) {
     //   data.push(key);
     // }
-    // const resp = await store
-    //   .collection(REF_AUTHORITIES)
-    //   .doc("3HwYYDbiikfFCPsMs9FHaRKJoGB3")
-    //   .update({ region: data });
-    //return response.status(200).send();
+    const data = [];
+    for (const key in Assemblies_1.AssemblyKeys) {
+        data.push(key);
+    }
+    const resp = yield store
+        .collection(Constants_1.REF_AUTHORITIES)
+        .doc("yXG7QRkYBzS8nZUUZqzyZyGz4wI2")
+        .update({ region: data });
+    return response.status(200).send(resp);
 }));
 //# sourceMappingURL=index.js.map
