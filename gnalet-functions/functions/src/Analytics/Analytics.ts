@@ -31,10 +31,10 @@ export async function statusDidUpdated(
   newstatus: number
 ) {
   return admin.firestore().runTransaction(async transaction => {
-    const actualAdmin = Assemblies[supCode];
+    //const actualAdmin = Assemblies[supCode];
     // console.log("The supcode is: " + supCode);
     // console.log("The supcode is: " + actualAdmin);
-    const aref = admin.firestore().doc(`${REF_ANALYTICS}/${actualAdmin}`);
+    const aref = admin.firestore().doc(`${REF_ANALYTICS}/${supCode}`);
     //const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
     const analyticdata = await transaction.get(aref);
     //const analyticmonth = await transaction.get(mref);
@@ -50,7 +50,7 @@ export async function statusDidUpdated(
         }
       };
       body[afcat][getStatusString(newstatus)] = 1;
-      transaction.update(aref, body);
+      transaction.set(aref, body, { merge: true });
     } else {
       const father = analyticdata.data();
       if (befcat === afcat) {
@@ -63,7 +63,7 @@ export async function statusDidUpdated(
               data[getStatusString(oldstatus)] - 1;
           }
           father[afcat] = data;
-          transaction.update(aref, father);
+          transaction.set(aref, father, { merge: true });
         } else {
           father[afcat] = {
             unsolved: 0,
@@ -73,7 +73,7 @@ export async function statusDidUpdated(
             duplicate: 0
           };
           father[afcat][getStatusString(newstatus)] = 1;
-          transaction.update(aref, father);
+          transaction.set(aref, father, { merge: true });
         }
       } else {
         const befdata = analyticdata.get(befcat);
@@ -85,7 +85,7 @@ export async function statusDidUpdated(
           afdata[getStatusString(oldstatus)] =
             afdata[getStatusString(oldstatus)] + 1;
           father[afcat] = afdata;
-          transaction.update(aref, father);
+          transaction.set(aref, father, { merge: true });
         } else {
           father[afcat] = {
             unsolved: 0,
@@ -95,7 +95,7 @@ export async function statusDidUpdated(
             duplicate: 0
           };
           father[afcat][getStatusString(newstatus)] = 1;
-          transaction.update(aref, father);
+          transaction.set(aref, father, { merge: true });
         }
       }
     }

@@ -25,7 +25,7 @@ export const VEHICULAR = "VEHICULAR";
 export const SANITATION = "SANITATION";
 export const CRIMES = "CRIMES";
 export const REF_FEEDBACK = "USERFEEDBACK";
-
+export const FIELD_SUPCODE = "sup_code";
 export const WATER = "WATER";
 export const POTHOLES = "POTHOLES";
 export const ECG = "ECG";
