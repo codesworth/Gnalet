@@ -144,7 +144,7 @@ export function facingCategoryname(symlnk) {
 
 export function publicFacingRegion(region) {
   const asm =
-    typeof Assemblies[region] === "string" ? AdminAreas[region] : AdminAreas.GA;
+    typeof AdminAreas[region] === "string" ? AdminAreas[region] : AdminAreas.GA;
   return asm;
 }
 

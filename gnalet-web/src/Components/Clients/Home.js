@@ -92,30 +92,48 @@ class Home extends Component {
     }
   }
 
-  updateRegionAnalysis() {
-    const { selectedregion, data } = this.state;
-    const bigdata = data[selectedregion];
-    const fl = this.makeAnalytics(bigdata);
-    this.setState({ analytics: fl, canFetch: false });
+  updateCategoriesAnalysis() {
+    const { data, selectedcategory } = this.state;
+    if (data === null) return;
+    const catdata = data[selectedcategory];
+    if (catdata) {
+      let catLytics = this.makeAnalytics(catdata);
+      this.setState({ analytics: catLytics });
+    }
   }
+
+  // updateRegionAnalysis() {
+  //   const { selectedregion, data } = this.state;
+  //   const bigdata = data[selectedregion];
+  //   const fl = this.makeAnalytics(bigdata);
+  //   this.setState({ analytics: fl, canFetch: false });
+  // }
 
   updateAnalysis() {
     const { selectedcategory, selectedregion, period } = this.state;
     const { firestore } = this.props;
-    let ref;
-    if (period === 1) {
+    let ref = firestore.doc(`${REF_ANALYTICS}/${selectedregion}`);
+    /*if (period === 1) {
       const id = returnMonthYear(null);
       ref = firestore.doc(
         `${REF_ANALYTICS}/${selectedregion}/${REF_MONTHS}/${id}`
       );
     } else {
-      ref = firestore.doc(`${REF_ANALYTICS}/${selectedcategory}`);
-    }
+      
+    }*/
+
     ref.get().then(analytic => {
       const ndata = analytic.data();
-      const bigdata = ndata[selectedregion];
-      const fl = this.makeAnalytics(bigdata);
-      this.setState({ analytics: fl, data: ndata });
+      console.log("This is the dta: ", analytic);
+      if (!ndata) return;
+      const cat = selectedcategory;
+      const analyticdata = ndata[cat];
+      const fl = this.makeAnalytics(analyticdata);
+      if (fl === null) return;
+      this.setState({
+        analytics: fl,
+        data: analytic.data()
+      });
     });
   }
 
@@ -132,6 +150,7 @@ class Home extends Component {
         .get()
         .then(analytic => {
           if (!analytic.data()) return;
+          console.log("This is the dta: ", analytic);
           const cat = categories[0];
           const analyticdata = analytic.data()[cat];
           const fl = this.makeAnalytics(analyticdata);
@@ -157,31 +176,6 @@ class Home extends Component {
           <div className="row">
             <div className="col-md-6">
               <h4>Summary Of Events</h4>
-            </div>
-            <div className="col-md-6">
-              <div
-                className="input-group marg-left"
-                style={{ float: "right", width: "50%" }}
-              >
-                <select
-                  className="custom-select"
-                  id="inputGroupSelect04"
-                  aria-label="Example select with button addon"
-                  onChange={this.periodChange}
-                >
-                  <option value="0">All Time</option>
-                  <option value="1">This Month</option>
-                </select>
-                <div className="input-group-append">
-                  <button
-                    className="btn btn-outline-info"
-                    type="button"
-                    onClick={this.updatePeriodAnalysis.bind(this)}
-                  >
-                    Update
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -269,7 +263,7 @@ class Home extends Component {
                     <button
                       className="btn btn-outline-secondary"
                       type="button"
-                      onClick={this.updateAnalysis.bind(this)}
+                      onClick={this.updateCategoriesAnalysis.bind(this)}
                     >
                       Update
                     </button>
@@ -322,7 +316,7 @@ class Home extends Component {
     //console.log(bigdata);
     if (bigdata !== null || typeof bigdata !== "undefined") {
     } else {
-      return;
+      return null;
     }
     let u = 0,
       p = 0,
@@ -365,3 +359,32 @@ export default compose(
           })}
         </div>
  */
+
+/**
+  * 
+  *             <div className="col-md-6">
+              <div
+                className="input-group marg-left"
+                style={{ float: "right", width: "50%" }}
+              >
+                <select
+                  className="custom-select"
+                  id="inputGroupSelect04"
+                  aria-label="Example select with button addon"
+                  onChange={this.periodChange}
+                >
+                  <option value="0">All Time</option>
+                  <option value="1">This Month</option>
+                </select>
+                <div className="input-group-append">
+                  <button
+                    className="btn btn-outline-info"
+                    type="button"
+                    onClick={this.updatePeriodAnalysis.bind(this)}
+                  >
+                    Update
+                  </button>
+                </div>
+              </div>
+            </div>
+  */
