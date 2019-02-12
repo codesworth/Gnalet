@@ -110,8 +110,17 @@ class Home extends Component {
   // }
 
   updateAnalysis() {
-    const { selectedcategory, selectedregion, period } = this.state;
+    const { categories, region } = this.props.settings;
+    let { selectedcategory, selectedregion } = this.state;
     const { firestore } = this.props;
+    console.log("Selected cat is: ", selectedregion);
+    if (selectedcategory === "") {
+      selectedcategory = categories[0];
+    }
+
+    if (selectedregion === "") {
+      selectedregion = region[0];
+    }
     let ref = firestore.doc(`${REF_ANALYTICS}/${selectedregion}`);
     /*if (period === 1) {
       const id = returnMonthYear(null);
@@ -128,6 +137,7 @@ class Home extends Component {
       if (!ndata) return;
       const cat = selectedcategory;
       const analyticdata = ndata[cat];
+      if (analyticdata === null || typeof analyticdata === "undefined") return;
       const fl = this.makeAnalytics(analyticdata);
       if (fl === null) return;
       this.setState({
@@ -153,6 +163,8 @@ class Home extends Component {
           console.log("This is the dta: ", analytic);
           const cat = categories[0];
           const analyticdata = analytic.data()[cat];
+          if (analyticdata === undefined || typeof analyticdata === "undefined")
+            return;
           const fl = this.makeAnalytics(analyticdata);
 
           this.setState({
@@ -314,10 +326,6 @@ class Home extends Component {
 
   makeAnalytics(bigdata) {
     //console.log(bigdata);
-    if (bigdata !== null || typeof bigdata !== "undefined") {
-    } else {
-      return null;
-    }
     let u = 0,
       p = 0,
       f = 0,

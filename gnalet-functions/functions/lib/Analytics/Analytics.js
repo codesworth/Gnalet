@@ -14,10 +14,10 @@ const Assemblies_1 = require("./Assemblies");
 function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
     return __awaiter(this, void 0, void 0, function* () {
         return admin.firestore().runTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
-            const actualAdmin = Assemblies_1.Assemblies[supCode];
+            //const actualAdmin = Assemblies[supCode];
             // console.log("The supcode is: " + supCode);
             // console.log("The supcode is: " + actualAdmin);
-            const aref = admin.firestore().doc(`${Constants_1.REF_ANALYTICS}/${actualAdmin}`);
+            const aref = admin.firestore().doc(`${Constants_1.REF_ANALYTICS}/${supCode}`);
             //const mref = admin.firestore().doc(`${REF_ANALYTICS}/${category}/${REF_MONTHS}/${month}`);
             const analyticdata = yield transaction.get(aref);
             //const analyticmonth = await transaction.get(mref);
@@ -33,7 +33,7 @@ function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
                     }
                 };
                 body[afcat][Constants_1.getStatusString(newstatus)] = 1;
-                transaction.update(aref, body);
+                transaction.set(aref, body, { merge: true });
             }
             else {
                 const father = analyticdata.data();
@@ -47,7 +47,7 @@ function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
                                 data[Constants_1.getStatusString(oldstatus)] - 1;
                         }
                         father[afcat] = data;
-                        transaction.update(aref, father);
+                        transaction.set(aref, father, { merge: true });
                     }
                     else {
                         father[afcat] = {
@@ -58,7 +58,7 @@ function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
                             duplicate: 0
                         };
                         father[afcat][Constants_1.getStatusString(newstatus)] = 1;
-                        transaction.update(aref, father);
+                        transaction.set(aref, father, { merge: true });
                     }
                 }
                 else {
@@ -71,7 +71,7 @@ function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
                         afdata[Constants_1.getStatusString(oldstatus)] =
                             afdata[Constants_1.getStatusString(oldstatus)] + 1;
                         father[afcat] = afdata;
-                        transaction.update(aref, father);
+                        transaction.set(aref, father, { merge: true });
                     }
                     else {
                         father[afcat] = {
@@ -82,7 +82,7 @@ function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
                             duplicate: 0
                         };
                         father[afcat][Constants_1.getStatusString(newstatus)] = 1;
-                        transaction.update(aref, father);
+                        transaction.set(aref, father, { merge: true });
                     }
                 }
             }
