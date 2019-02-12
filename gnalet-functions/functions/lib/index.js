@@ -108,4 +108,34 @@ exports.resetToZero = functions.https.onRequest((request, response) => __awaiter
 exports.test_addDuplicates = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
     return Tests_1.testDuplicates(store, response);
 }));
+exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
+    const batch = store.batch();
+    const allreports = yield store.collection(Constants_1.REF_REPORTS).get();
+    allreports.forEach(result => {
+        const data = result.data();
+        const sup = data[Constants_1.FIELD_SUP_CODE];
+        if (sup === "GA") {
+            //data[FIELD_SUPBODY] = Assemblies.GA;
+            data[Constants_1.FIELD_SUP_CODE] = "GA";
+        }
+        else if (sup === "GT") {
+            //data[FIELD_SUPBODY] = Assemblies.GT;
+            data[Constants_1.FIELD_SUP_CODE] = "GT";
+        }
+        else {
+            //data[FIELD_SUPBODY] = Assemblies.GW;
+            data[Constants_1.FIELD_SUP_CODE] = "GW";
+        }
+        batch.update(result.ref, data);
+    });
+    const resp = batch.commit();
+    // for (const key in AssemblyKeys) {
+    //   data.push(key);
+    // }
+    // const resp = await store
+    //   .collection(REF_AUTHORITIES)
+    //   .doc("3HwYYDbiikfFCPsMs9FHaRKJoGB3")
+    //   .update({ region: data });
+    return response.status(200).send(resp);
+}));
 //# sourceMappingURL=index.js.map

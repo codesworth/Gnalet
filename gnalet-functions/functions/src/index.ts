@@ -19,7 +19,7 @@ import {
 import { sendNotification } from "./Notifications";
 import { testDuplicates } from "./Tests";
 import { createAuthority } from "./Auth";
-import { AssemblyKeys } from "./Analytics/Assemblies";
+import { AssemblyKeys, Assemblies } from "./Analytics/Assemblies";
 
 //const cors = require('cors')({origin: true});
 
@@ -137,14 +137,15 @@ export const test_addDuplicates = functions.https.onRequest(
 
 export const alignAuths = functions.https.onRequest(
   async (request, response) => {
-    const data = [];
-    for (const key in AssemblyKeys) {
-      data.push(key);
-    }
-    const resp = await store
-      .collection(REF_AUTHORITIES)
-      .doc("3HwYYDbiikfFCPsMs9FHaRKJoGB3")
-      .update({ region: data });
-    return response.status(200).send(resp);
+    const batch = store.batch();
+
+    // for (const key in AssemblyKeys) {
+    //   data.push(key);
+    // }
+    // const resp = await store
+    //   .collection(REF_AUTHORITIES)
+    //   .doc("3HwYYDbiikfFCPsMs9FHaRKJoGB3")
+    //   .update({ region: data });
+    //return response.status(200).send();
   }
 );
