@@ -124,4 +124,21 @@ exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(
         .update({ region: data });
     return response.status(200).send(resp);
 }));
+exports.listAllAnonymous = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
+    let nextPageToken = "next";
+    try {
+        const list = yield admin.auth().listUsers(1000, nextPageToken);
+        const data = [];
+        for (const user of list.users) {
+            if (user.providerData.length === 0) {
+                const del = yield admin.auth().deleteUser(user.uid);
+                data.push(del);
+            }
+        }
+        response.status(200).send(data);
+    }
+    catch (e) {
+        response.status(500).send(e);
+    }
+}));
 //# sourceMappingURL=index.js.map

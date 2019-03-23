@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const admin = require("firebase-admin");
 const Constants_1 = require("../Constants");
-const Assemblies_1 = require("./Assemblies");
+const Regions_1 = require("./Regions");
 function statusDidUpdated(supCode, befcat, afcat, oldstatus, newstatus) {
     return __awaiter(this, void 0, void 0, function* () {
         return admin.firestore().runTransaction((transaction) => __awaiter(this, void 0, void 0, function* () {
@@ -180,7 +180,7 @@ function documentDeleted(status, category, supcode) {
         if (status === 3) {
             const store = admin.firestore();
             const analytic = yield store
-                .doc(`${Constants_1.REF_ANALYTICS}/${Assemblies_1.Assemblies[supcode]}`)
+                .doc(`${Constants_1.REF_ANALYTICS}/${Regions_1.Regions[supcode]}`)
                 .get();
             const data = analytic.get(category);
             const bdata = analytic.data();

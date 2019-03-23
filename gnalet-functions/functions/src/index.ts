@@ -153,3 +153,23 @@ export const alignAuths = functions.https.onRequest(
     return response.status(200).send(resp);
   }
 );
+
+export const listAllAnonymous = functions.https.onRequest(
+  async (request, response) => {
+    let nextPageToken = "next";
+    try {
+      const list = await admin.auth().listUsers(1000, nextPageToken);
+      const data = [];
+
+      for (const user of list.users) {
+        if (user.providerData.length === 0) {
+          const del = await admin.auth().deleteUser(user.uid);
+          data.push(del);
+        }
+      }
+      response.status(200).send(data);
+    } catch (e) {
+      response.status(500).send(e);
+    }
+  }
+);
