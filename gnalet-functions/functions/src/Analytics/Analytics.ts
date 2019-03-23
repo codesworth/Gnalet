@@ -21,7 +21,7 @@ import {
   OTHERS
 } from "../Constants";
 
-import { Assemblies } from "./Assemblies";
+import { Regions } from "./Regions";
 
 export async function statusDidUpdated(
   supCode: string,
@@ -206,7 +206,7 @@ export async function documentDeleted(
   if (status === 3) {
     const store = admin.firestore();
     const analytic = await store
-      .doc(`${REF_ANALYTICS}/${Assemblies[supcode]}`)
+      .doc(`${REF_ANALYTICS}/${Regions[supcode]}`)
       .get();
     const data = analytic.get(category);
     const bdata = analytic.data();
