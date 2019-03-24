@@ -19,7 +19,7 @@ import {
 import { sendNotification } from "./Notifications";
 import { testDuplicates } from "./Tests";
 import { createAuthority } from "./Auth";
-import { AssemblyKeys, Assemblies } from "./Analytics/Assemblies";
+import { Regions } from "./Analytics/Regions";
 
 //const cors = require('cors')({origin: true});
 
@@ -143,7 +143,7 @@ export const alignAuths = functions.https.onRequest(
     //   data.push(key);
     // }
     const data = [];
-    for (const key in AssemblyKeys) {
+    for (const key in Regions) {
       data.push(key);
     }
     const resp = await store
@@ -151,25 +151,5 @@ export const alignAuths = functions.https.onRequest(
       .doc("yXG7QRkYBzS8nZUUZqzyZyGz4wI2")
       .update({ region: data });
     return response.status(200).send(resp);
-  }
-);
-
-export const listAllAnonymous = functions.https.onRequest(
-  async (request, response) => {
-    let nextPageToken = "next";
-    try {
-      const list = await admin.auth().listUsers(1000, nextPageToken);
-      const data = [];
-
-      for (const user of list.users) {
-        if (user.providerData.length === 0) {
-          const del = await admin.auth().deleteUser(user.uid);
-          data.push(del);
-        }
-      }
-      response.status(200).send(data);
-    } catch (e) {
-      response.status(500).send(e);
-    }
   }
 );

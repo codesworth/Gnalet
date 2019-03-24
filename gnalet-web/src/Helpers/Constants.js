@@ -1,5 +1,5 @@
 import * as moment from "moment";
-import { AdminAreas } from "../Helpers/Assemblies";
+import { Regions } from "../Helpers/Assemblies";
 
 export const URL_ADD_AUTH =
   "https://us-central1-gnalet-e91c4.cloudfunctions.net/addAuthorityAccount";
@@ -72,35 +72,6 @@ export const category_ids = [
   "OTHERS"
 ];
 
-export const region_ids = [
-  "ANMC",
-  "AWMC",
-  "GA",
-  "GY",
-  "GX",
-  "GD",
-  "GB",
-  "AEM",
-  "AYNM",
-  "AYWM",
-  "GC",
-  "GE",
-  "GNM",
-  "GS",
-  "GW",
-  "GK",
-  "GKM",
-  "GL",
-  "GM",
-  "GZ",
-  "GN",
-  "GON",
-  "GO",
-  "GT",
-  "GTW",
-  "GWJ"
-];
-
 export function formatDate(date) {
   var md = moment(date).format("MM/DD/YY, h:mm:ss a");
   return md;
@@ -144,7 +115,7 @@ export function facingCategoryname(symlnk) {
 
 export function publicFacingRegion(region) {
   const asm =
-    typeof AdminAreas[region] === "string" ? AdminAreas[region] : AdminAreas.GA;
+    typeof AdminAreas[region] === "string" ? Regions[region] : Regions.GAR;
   return asm;
 }
 

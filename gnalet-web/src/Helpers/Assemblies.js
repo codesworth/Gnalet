@@ -27,8 +27,29 @@ export const GT = "Tema Metropolis District";
 export const GTW = "Tema West Municipal District";
 export const GWJ = "Weija Municipal District";
 
-export const Assemblies = {
-  ANMC,
+export const Regions = {
+
+OR,
+BER,
+AHR,
+BR,
+NER,
+SR,
+WNR,
+WR,
+VR,
+GAR,
+ER,
+AR,
+CR,
+NR,
+UER,
+UWR
+}
+  
+
+
+  /*ANMC,
   AWMC,
   GA,
   GY,
@@ -53,38 +74,59 @@ export const Assemblies = {
   GO,
   GT,
   GTW,
-  GWJ
-};
+  GWJ*/
+
+
+
 
 export const AdminAreas = {
-  ANMC: "Ablekuma North Municipal District",
-  AWMC: "Ablekuma West Municipal District",
-  GA: "Accra Metropolis District",
-  GY: "Ada East District",
-  GX: "Ada West District",
-  GD: "Adenta Municipal District",
-  GB: "Ashaiman Municipal District",
-  AEM: "Ayawaso East Municipal District",
-  AYNM: "Ayawaso North Municipal District",
-  AYWM: "Ayawaso West Municipal District",
-  GC: "Ga Central District",
-  GE: "Ga East Municipal District",
-  GNM: "Ga North Municipal District",
-  GS: "Ga South Municipal District",
-  GW: "Ga West Municipal District",
-  GK: "Kpone Katamanso Municipal District",
-  GKM: "Krowor Municipal District",
-  GL: "La Dade Kotopon Municipal District",
-  GM: "La Nkwantanang Madina Municipal District",
-  GZ: "Ledzokuku Municipal District",
-  GN: "Ningo Prampram District",
-  GON: "Okaikwei Municipal District",
-  GO: "Shai Osudoku District",
-  GT: "Tema Metropolis District",
-  GTW: "Tema West Municipal District",
-  GWJ: "Weija Municipal District"
+  ANMC  : "Ablekuma North Municipal District",
+  AWMC  : "Ablekuma West Municipal District",
+  GA:   "Accra Metropolis District",
+  GY:   "Ada East District",
+  GX:   "Ada West District",
+  GD:   "Adenta Municipal District",
+  GB:   "Ashaiman Municipal District",
+  AEM:   "Ayawaso East Municipal District",
+  AYNM  : "Ayawaso North Municipal District",
+  AYWM  : "Ayawaso West Municipal District",
+  GC:   "Ga Central District",
+  GE:   "Ga East Municipal District",
+  GNM:   "Ga North Municipal District",
+  GS:   "Ga South Municipal District",
+  GW:   "Ga West Municipal District",
+  GK:   "Kpone Katamanso Municipal District",
+  GKM:   "Krowor Municipal District",
+  GL:   "La Dade Kotopon Municipal District",
+  GM:   "La Nkwantanang Madina Municipal District",
+  GZ:   "Ledzokuku Municipal District",
+  GN:   "Ningo Prampram District",
+  GON:   "Okaikwei Municipal District",
+  GO:   "Shai Osudoku District",
+  GT:   "Tema Metropolis District",
+  GTW:   "Tema West Municipal District",
+  GWJ:   "Weija Municipal District"
 };
 
+
+export const Regions = {
+  "OR" :   "Oti Region",           
+  "BER": "Bono East Region",     
+  "AHR": "Ahafo Region",         
+   "BR": "Bono Region",          
+  "NER": "North East Region",    
+   "SR": "Savannah Region",     
+  "WNR": "Western North Region", 
+   "WR": "Western Region",       
+   "VR": "Volta Region",        
+  "GAR": "Greater Accra Region", 
+   "ER": "Eastern Region",       
+   "AR": "Ashanti Region",       
+   "CR": "Central Region",       
+   "NR": "Northern Region",      
+  "UER": "Upper East Region",    
+  "UWR": "Upper West Region"     
+}
 /**
  * export const Assemblies = {
     ANM : "Ablekuma North Municipal District",
