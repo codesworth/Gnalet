@@ -115,7 +115,7 @@ export function facingCategoryname(symlnk) {
 
 export function publicFacingRegion(region) {
   const asm =
-    typeof AdminAreas[region] === "string" ? Regions[region] : Regions.GAR;
+    typeof Regions[region] === "string" ? Regions[region] : Regions.GAR;
   return asm;
 }
 

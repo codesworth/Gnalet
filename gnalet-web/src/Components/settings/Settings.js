@@ -10,9 +10,9 @@ import {
   ACCESS_CODE_READ,
   ACCESS_CODE_EDIT,
   category_ids,
-  region_ids,
   URL_ADD_AUTH
 } from "../../Helpers/Constants";
+import { RegionKeys } from "../../Helpers/Assemblies";
 import { compose } from "redux";
 import axios from "axios";
 
@@ -309,7 +309,7 @@ export class Settings extends Component {
                 </div>
                 <div className="form-group">
                   <label htmlFor="cats">Issue Categories</label>
-                  {region_ids.map(reg => {
+                  {RegionKeys.map(reg => {
                     return (
                       <div className="form-check" key={reg}>
                         <input

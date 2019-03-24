@@ -16,7 +16,7 @@ const Analytics_1 = require("./Analytics/Analytics");
 const Notifications_1 = require("./Notifications");
 const Tests_1 = require("./Tests");
 const Auth_1 = require("./Auth");
-const Assemblies_1 = require("./Analytics/Assemblies");
+const Regions_1 = require("./Analytics/Regions");
 //const cors = require('cors')({origin: true});
 admin.initializeApp();
 const store = admin.firestore();
@@ -115,7 +115,7 @@ exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(
     //   data.push(key);
     // }
     const data = [];
-    for (const key in Assemblies_1.AssemblyKeys) {
+    for (const key in Regions_1.Regions) {
         data.push(key);
     }
     const resp = yield store
@@ -123,22 +123,5 @@ exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(
         .doc("yXG7QRkYBzS8nZUUZqzyZyGz4wI2")
         .update({ region: data });
     return response.status(200).send(resp);
-}));
-exports.listAllAnonymous = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    let nextPageToken = "next";
-    try {
-        const list = yield admin.auth().listUsers(1000, nextPageToken);
-        const data = [];
-        for (const user of list.users) {
-            if (user.providerData.length === 0) {
-                const del = yield admin.auth().deleteUser(user.uid);
-                data.push(del);
-            }
-        }
-        response.status(200).send(data);
-    }
-    catch (e) {
-        response.status(500).send(e);
-    }
 }));
 //# sourceMappingURL=index.js.map
