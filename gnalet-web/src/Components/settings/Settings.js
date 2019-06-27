@@ -95,7 +95,7 @@ export class Settings extends Component {
             <div className="modal-body">
               <div className="row">
                 <div className="col-md-10">
-                  <div className="card">
+                  <div className="card shadow p-3 mb-5 bg-white rounded">
                     <div className="card-body">
                       <h6 className="card-title">Account Name: {username}</h6>
                       <hr />
@@ -401,9 +401,9 @@ export class Settings extends Component {
           <div className="col-md-10">
             <h3>Registered User Authorities</h3>
           </div>
-          <div className="col-md-2">
+          <div className="col-md-2 ">
             <div
-              className="btn btn-outline-primary"
+              className="btn btn-outline-primary shadow p-3 mb-5 bg-white rounded"
               data-toggle="modal"
               data-target="#addAuthority"
             >
@@ -412,7 +412,7 @@ export class Settings extends Component {
           </div>
         </div>
         <br />
-        <table className="table table-bordered table-hover">
+        <table className="table table-bordered table-hover shadow p-3 mb-5 bg-white rounded">
           <thead>
             <tr>
               <th scope="col">#</th>
@@ -513,7 +513,7 @@ export class Settings extends Component {
                 "col-md-2": index === 1
               })}
             >
-              <div className="card settings-list">
+              <div className="card settings-list shadow p-3 mb-5 bg-white rounded">
                 <div className="card-header">Featured</div>
                 <ul className="list-group list-group-flush">
                   <li
@@ -557,7 +557,7 @@ export class Settings extends Component {
           </div>
           <div className="row">
             <div className="col-md-10">
-              <div className="card">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-header">
                   <h4>ACCOUNT DETAILS</h4>
                 </div>

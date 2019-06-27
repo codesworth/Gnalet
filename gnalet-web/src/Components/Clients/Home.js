@@ -193,7 +193,7 @@ class Home extends Component {
 
           <div className="row row-dashbord" style={{ marginTop: "3%" }}>
             <div className="col-sm-6" style={{ marginBottom: "3%" }}>
-              <div className="card">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
                   <h5 className="card-title">Total Reports This Year</h5>
                   <h6 className="card-text">
@@ -209,7 +209,7 @@ class Home extends Component {
               </div>
             </div>
             <div className="col-sm-6">
-              <div className="card">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
                   <h5 className="card-title">Total Unsolved Issues</h5>
                   <h6 className="card-text">{unsolved} Unsolved Reports.</h6>
@@ -225,7 +225,7 @@ class Home extends Component {
           </div>
           <div className="row row-dashbord-sep">
             <div className="col-sm-6" style={{ marginBottom: "3%" }}>
-              <div className="card">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
                   <h5 className="card-title">Total Solved Issues</h5>
                   <h6 className="card-text">{solved} Solved Reports</h6>
@@ -239,7 +239,7 @@ class Home extends Component {
               </div>
             </div>
             <div className="col-sm-6">
-              <div className="card">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
                   <h5 className="card-title">Total Pending Issues</h5>
                   <h6>{pending} Pending Reports</h6>
@@ -256,7 +256,7 @@ class Home extends Component {
           <div className="row mg">
             <div className="col-md-6" style={{ marginBottom: "3%" }}>
               {categories.length > 0 ? (
-                <div className="input-group">
+                <div className="input-group shadow p-3 mb-5 bg-white rounded">
                   <select
                     className="custom-select"
                     id="inputGroupSelect04"
@@ -285,7 +285,7 @@ class Home extends Component {
             </div>
             <div className="col-md-6">
               {region.length > 0 ? (
-                <div className="input-group">
+                <div className="input-group shadow p-3 mb-5 bg-white rounded">
                   <select
                     className="custom-select"
                     id="inputGroupSelect04"
