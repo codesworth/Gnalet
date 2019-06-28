@@ -58,7 +58,6 @@ export function makeBigdataAnalytics(bigdata) {
     duplicate: 0
   };
   bigdata.forEach(element => {
-    //console.log("The eleemt is: ", element);
     const catdata = makeAnalyticForRegionData(element);
     for (const key in totals) {
       let val = totals[key];

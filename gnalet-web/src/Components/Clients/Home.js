@@ -181,6 +181,8 @@ class Home extends Component {
   render() {
     const { auth } = this.props;
     const { categories, region } = this.props.settings;
+    region.sort();
+    categories.sort();
     const { unsolved, pending, solved } = this.state.analytics;
     if (auth.uid) {
       return (

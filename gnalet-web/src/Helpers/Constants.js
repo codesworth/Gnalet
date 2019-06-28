@@ -37,8 +37,8 @@ export const CASE_EMAIL = "email";
 export const CASE_PHONE = "phone";
 export const CASE_DESC = "description";
 export const CASE_LOCATION = "location";
-export const CASE_LONGITUDE = "longitude";
-export const CASE_LATITUDE = "latitude";
+export const FIELD_LONGITUDE = "longitude";
+export const FIELD_LATITUDE = "latitude";
 export const CASE_IMGLNK = "link";
 export const CASE_SUP_BODY = "supBody";
 export const CASE_STATUS = "status";
@@ -108,6 +108,8 @@ export function facingCategoryname(symlnk) {
       return "Food/Drugs Board";
     case "GSA":
       return "Ghana Standards Authority";
+    case "INDISCIPLINE":
+      return "Indiscipline Behaviour";
     default:
       return "OTHERS";
   }

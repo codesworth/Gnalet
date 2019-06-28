@@ -114,6 +114,11 @@ class AppNavBar extends Component {
             </ul>
             {isAuthenticated ? (
               <ul className="navbar-nav ml-auto">
+                <li>
+                  <Link to="/maps" className="nav-link">
+                    Maps
+                  </Link>
+                </li>
                 <li className="nav-item">
                   <a href="#!" className="nav-link">
                     {username}

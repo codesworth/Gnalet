@@ -227,7 +227,7 @@ export async function performAnalyticsOnAllDocs(response) {
     VEHICULAR: {},
     SANITATION: {},
     CRIMES: {},
-
+    INDISCIPLINE:{},
     WATER: {},
     POTHOLES: {},
     ECG: {},
