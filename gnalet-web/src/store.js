@@ -1,17 +1,36 @@
-import { createStore, combineReducers, compose } from "redux";
+import { createStore, combineReducers, compose, applyMiddleware } from "redux";
 import firebase from "firebase";
 import "firebase/firestore";
-import { reactReduxFirebase, firebaseReducer } from "react-redux-firebase";
+
 import { reduxFirestore, firestoreReducer } from "redux-firestore";
 import NotifyReducer from "./reducers/NotifyReducer";
 import settingReducer from "./reducers/settingReducer";
 import { USER_SETTINGS } from "./Helpers/Constants";
 import ProjectConfig from "./config/config";
+import thunk from "redux-thunk";
+import rootReducers from "./reducers/index";
+
+const middleware = [thunk];
+
+const initialState = {};
+
+const store = createStore(
+  rootReducers,
+  initialState,
+  compose(
+    applyMiddleware(...middleware),
+    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
+);
+
+export default store;
+
 //Reducers
 //@todo
 
 //react-redux firebase config
 
+/*
 const rrfConfig = {
   userProfile: "GN-Authorities",
   useFirestoreForProfile: true // Firestore for Profile instead of Realtime DB
@@ -70,7 +89,7 @@ if (
 
 //create Initial State
 const initialState = {
-  settings: JSON.parse(localStorage.getItem(USER_SETTINGS))
+  //settings: JSON.parse(localStorage.getItem(USER_SETTINGS))
 };
 
 //Create store
@@ -85,3 +104,4 @@ const store = createStoreWithFirebase(
 );
 
 export default store;
+*/

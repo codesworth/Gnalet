@@ -6,3 +6,8 @@ export const ACCESS = "ACCESS";
 export const USERNAME = "username";
 export const RELOAD = "reload";
 export const MAPS_GET_LATEST = "get_latest";
+
+export const AUTH_DISPATCH = "AUTH_DISPATCH";
+export const LOGOUT_DISPATCH = "LOGOUT_DISPATCH";
+export const GET_ERRORS = "GET_ERRORS";
+export const GET_REQUEST = "GET_REQUEST";
