@@ -13,7 +13,8 @@ class Login extends Component {
   state = {
     email: "",
     password: "",
-    isLoading: false
+    isLoading: false,
+    errors: {}
   };
 
   onSubmit = e => {
@@ -28,6 +29,16 @@ class Login extends Component {
             this.setState({isLoading:false});
         });*/
   };
+
+  componentWillReceiveProps(nextProps) {
+    const { auth } = nextProps;
+
+    if (auth.isAuthenticated) {
+      this.props.history.push("/");
+    } else {
+      this.setState({ errors: nextProps.errors });
+    }
+  }
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
   render() {

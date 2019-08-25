@@ -19,6 +19,7 @@ import ReportLocation from "./Components/Clients/ReportLocation";
 import AuthBodyDetail from "./Components/Clients/AuthBodyDetail";
 import Maps from "./Components/Maps/Maps";
 import { initialize } from "./backend/firebase";
+import PrivateRoute from "./Components/Security/PrivateRoute";
 
 initialize();
 
@@ -30,57 +31,36 @@ class App extends Component {
           <div className="Appp">
             <AppNavBar />
             <div className="container">
+              <Route exact path="/login" component={Login} />
               <Switch>
-                <Route exact path="/" component={UserIsAuthenticated(Home)} />
-                <Route
-                  exact
-                  path="/maps"
-                  component={UserIsAuthenticated(Maps)}
-                />
-                <Route
+                <PrivateRoute exact path="/" component={Home} />
+                <PrivateRoute exact path="/maps" component={Maps} />
+                <PrivateRoute
                   exact
                   path="/reports/:regcat/:sort"
-                  component={UserIsAuthenticated(Reports)}
+                  component={Reports}
                 />
-                <Route
-                  exact
-                  path="/client/add"
-                  component={UserIsAuthenticated(AddClient)}
-                />
-                <Route
+                <PrivateRoute exact path="/client/add" component={AddClient} />
+                <PrivateRoute
                   exact
                   path="/report/:category/:id"
-                  component={UserIsAuthenticated(ReportDetail)}
+                  component={ReportDetail}
                 />
-                <Route
+                <PrivateRoute
                   exact
                   path="/report/:category/location/:coordinate"
-                  component={UserIsAuthenticated(ReportLocation)}
+                  component={ReportLocation}
                 />
-                <Route
-                  exact
-                  path="/settings"
-                  component={UserIsAuthenticated(Settings)}
-                />
-                <Route
+                <PrivateRoute exact path="/settings" component={Settings} />
+                <PrivateRoute
                   exact
                   path="/settings/master/:id"
-                  component={UserIsAuthenticated(AuthBodyDetail)}
+                  component={AuthBodyDetail}
                 />
-                <Route
+                <PrivateRoute
                   exact
                   path="/client/edit/:id"
                   component={UserIsAuthenticated(EditClient)}
-                />
-                <Route
-                  exact
-                  path="/login"
-                  component={UserIsNotAuthenticated(Login)}
-                />
-                <Route
-                  exact
-                  path="/register"
-                  component={UserIsNotAuthenticated(Register)}
                 />
               </Switch>
             </div>
