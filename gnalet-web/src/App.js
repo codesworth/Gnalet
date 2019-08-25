@@ -18,6 +18,9 @@ import ReportDetail from "./Components/Clients/ReportDetail";
 import ReportLocation from "./Components/Clients/ReportLocation";
 import AuthBodyDetail from "./Components/Clients/AuthBodyDetail";
 import Maps from "./Components/Maps/Maps";
+import { initialize } from "./backend/firebase";
+
+initialize();
 
 class App extends Component {
   render() {
