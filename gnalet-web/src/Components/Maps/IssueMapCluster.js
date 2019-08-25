@@ -54,7 +54,7 @@ export const IssuesMap = compose(
         }}
         marker={props.activeMarker}
         visible={props.showingInfoWindow}
-        //onCloseClick={() => props.openDetail(props.activeMarker)}
+        onCloseClick={() => props.openDetail(props.activeMarker)}
       >
         <div>
           <Link

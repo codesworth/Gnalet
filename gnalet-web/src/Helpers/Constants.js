@@ -69,7 +69,8 @@ export const category_ids = [
   "ECG",
   "HFDA",
   "GSA",
-  "OTHERS"
+  "OTHERS",
+  "INDISCIPLINE"
 ];
 
 export function formatDate(date) {

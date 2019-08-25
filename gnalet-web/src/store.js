@@ -6,17 +6,9 @@ import { reduxFirestore, firestoreReducer } from "redux-firestore";
 import NotifyReducer from "./reducers/NotifyReducer";
 import settingReducer from "./reducers/settingReducer";
 import { USER_SETTINGS } from "./Helpers/Constants";
+import ProjectConfig from "./config/config";
 //Reducers
 //@todo
-
-const config = {
-  apiKey: "AIzaSyDK06vnoYsjRLRbZKsKd4zpS72SbVydXqg",
-  authDomain: "gnalet-e91c4.firebaseapp.com",
-  databaseURL: "https://gnalet-e91c4.firebaseio.com",
-  projectId: "gnalet-e91c4",
-  storageBucket: "gnalet-e91c4.appspot.com",
-  messagingSenderId: "1026593999626"
-};
 
 //react-redux firebase config
 
@@ -27,7 +19,8 @@ const rrfConfig = {
 
 //Initialize firebase
 
-firebase.initializeApp(config);
+firebase.initializeApp(ProjectConfig.default);
+const citifirebase = firebase.initializeApp(ProjectConfig.citifm, "citifm");
 
 //Init firestore
 

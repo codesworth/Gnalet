@@ -43,9 +43,9 @@ class Maps extends Component {
   }
 
   openDetail(marker) {
-    const category = marker.report[FIELD_CATEGORY];
-    const id = marker.report.id;
-    window.history.push(`/report/${category}/${id}`);
+    // const category = marker.report[FIELD_CATEGORY];
+    // const id = marker.report.id;
+    // window.history.push(`/report/${category}/${id}`);
   }
 
   markerClicked(marker) {
