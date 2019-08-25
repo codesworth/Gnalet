@@ -1,12 +1,5 @@
 import { createStore, combineReducers, compose, applyMiddleware } from "redux";
-import firebase from "firebase";
-import "firebase/firestore";
 
-import { reduxFirestore, firestoreReducer } from "redux-firestore";
-import NotifyReducer from "./reducers/NotifyReducer";
-import settingReducer from "./reducers/settingReducer";
-import { USER_SETTINGS } from "./Helpers/Constants";
-import ProjectConfig from "./config/config";
 import thunk from "redux-thunk";
 import rootReducers from "./reducers/index";
 

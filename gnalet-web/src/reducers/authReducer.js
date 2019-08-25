@@ -2,7 +2,7 @@ import { AUTH_DISPATCH, LOGOUT_DISPATCH } from "../actions/types";
 
 const initialState = {
   isAuthenticated: false,
-  user: nil
+  user: null
 };
 
 export default function(state = initialState, action) {

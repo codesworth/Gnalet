@@ -1,36 +1,37 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import { compose } from "redux";
+
 import { connect } from "react-redux";
-import { firebaseConnect, withFirestore } from "react-redux-firebase";
+
 import PropTypes from "prop-types";
-import {
-  setCategories,
-  setRegions,
-  setUid,
-  setAccess,
-  setReload
-} from "../../actions/settingsAction";
 import * as Constants from "../../Helpers/Constants";
 
 class AppNavBar extends Component {
   state = {
     isAuthenticated: false,
-    call: false,
-    username: ""
+    user: null
   };
 
   componentDidMount() {
     //console.log("componentDidMount");
   }
 
-  componentDidUpdate() {
-    //console.log("componentDidUpdate");
-    if (this.state.username === "") {
-      //console.log("functionWillBeCalled");
-      this.loadusername(this.props.auth.uid);
+  // componentDidUpdate() {
+  //   //console.log("componentDidUpdate");
+  //   if (this.state.username === "") {
+  //     //console.log("functionWillBeCalled");
+  //     this.loadusername(this.props.auth.uid);
+  //   }
+  // }
+
+  componentWillReceiveProps(nextProps) {
+    const { auth } = nextProps;
+    if (auth) {
+      this.setState({ isAuthenticated: auth.isAuthenticated, user: auth.user });
     }
   }
+
+  /*
 
   loadusername(uid) {
     const { firestore } = this.props;
@@ -54,38 +55,27 @@ class AppNavBar extends Component {
       //
     });
   }
+  */
 
   static getDerivedStateFromProps(props, state) {
-    const { auth } = props;
-
-    if (auth.uid) {
-      return { isAuthenticated: true, call: true };
-    } else {
-      return { isAuthenticated: false };
-    }
+    //const { auth } = props;
+    // if (auth.uid) {
+    //   return { isAuthenticated: true, call: true };
+    // } else {
+    //   return { isAuthenticated: false };
+    // }
   }
 
   onLogoutClick = e => {
     e.preventDefault();
 
-    const { firebase } = this.props;
-    setCategories([]);
-    setRegions([]);
-    setUid(null);
-    setAccess(0);
-    setReload(true);
     //console.log("The settings ois, :",this.props);
 
-    firebase.logout();
-    this.setState({ username: "" });
-
-    window.location.reload();
+    //window.location.reload();
   };
 
   render() {
-    const { isAuthenticated, username } = this.state;
-
-    //const { allowRegistration} = this.props.settings;
+    const { isAuthenticated, user } = this.state;
     return (
       <nav className="navbar navbar-expand-md navbar-dark bg-primary mb-4">
         <div className="container">
@@ -121,7 +111,7 @@ class AppNavBar extends Component {
                 </li>
                 <li className="nav-item">
                   <a href="#!" className="nav-link">
-                    {username}
+                    {user.username}
                   </a>
                 </li>
                 <li>
@@ -148,19 +138,11 @@ class AppNavBar extends Component {
 }
 
 AppNavBar.propTypes = {
-  firebase: PropTypes.object.isRequired,
-  auth: PropTypes.object.isRequired,
-  settings: PropTypes.object.isRequired
+  auth: PropTypes.object.isRequired
 };
 
-export default compose(
-  firebaseConnect(),
-  withFirestore,
-  connect(
-    (state, props) => ({
-      auth: state.firebase.auth,
-      settings: state.settings
-    }),
-    { setCategories, setRegions, setUid, setAccess, setReload }
-  )
-)(AppNavBar);
+const mapStateToProps = state => ({
+  auth: state.auth
+});
+
+export default connect(mapStateToProps)(AppNavBar);

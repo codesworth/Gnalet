@@ -3,12 +3,18 @@ import * as firebase from "firebase";
 
 const backends = {};
 
-export const initialize = () => {
-  const defaultconfig = ProjectConfig.default;
-  const citifm = ProjectConfig.citifm;
-  firebase.initializeApp(defaultconfig);
-  const citifm = firebase.initializeApp(citifm, "citifm");
-  backends.citifm = citifm;
+const citifmFirebase = () => {
+  const citifmConfig = ProjectConfig.citifm;
+  const citifm = firebase.initializeApp(citifmConfig, "citifm");
+  return citifm;
 };
+
+const defaultFirebase = () => {
+  const defaultconfig = ProjectConfig.default;
+  return firebase.initializeApp(defaultconfig);
+};
+
+backends.defaultFirebase = defaultFirebase();
+backends.citifmFirebase = citifmFirebase();
 
 export default backends;

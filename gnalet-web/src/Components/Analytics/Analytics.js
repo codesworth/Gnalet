@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { compose } from "redux";
 import { connect } from "react-redux";
-import { firestoreConnect, withFirestore } from "react-redux-firebase";
+
 import {
   REF_ANALYTICS,
   AN_CATEGORICAL,

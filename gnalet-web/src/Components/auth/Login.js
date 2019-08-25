@@ -14,7 +14,7 @@ class Login extends Component {
     email: "",
     password: "",
     isLoading: false,
-    errors: {}
+    errors: null
   };
 
   onSubmit = e => {
@@ -36,13 +36,13 @@ class Login extends Component {
     if (auth.isAuthenticated) {
       this.props.history.push("/");
     } else {
-      this.setState({ errors: nextProps.errors });
+      this.setState({ errors: nextProps.errors, isLoading: false });
     }
   }
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
   render() {
-    const { message, messageType } = this.props.notify;
+    const { errors } = this.state;
 
     return (
       <div className="row">
@@ -62,8 +62,8 @@ class Login extends Component {
           ) : null}
           <div className="card">
             <div className="card-body">
-              {message ? (
-                <Alert message={message} messageType={messageType} />
+              {errors ? (
+                <Alert message={errors.email} messageType={"error"} />
               ) : null}
               <h1 className="text-center pb-4 pt-3">
                 <span className="text-primary">

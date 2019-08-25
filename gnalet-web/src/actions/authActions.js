@@ -1,9 +1,9 @@
-import * as firebase from "firebase";
+import backends from "../backend/firebase";
 import { AUTH_DISPATCH, LOGOUT_DISPATCH, GET_ERRORS } from "./types";
 import { REF_GNALET_CLIENT } from "../Helpers/Constants";
 
-const auth = firebase.auth();
-const store = firebase.firestore();
+const auth = backends.defaultFirebase.auth();
+const store = backends.defaultFirebase.firestore();
 
 export const login = data => dispatch => {
   const { email, password } = data;
