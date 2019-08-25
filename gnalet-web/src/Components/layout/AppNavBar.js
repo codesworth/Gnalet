@@ -57,14 +57,14 @@ class AppNavBar extends Component {
   }
   */
 
-  static getDerivedStateFromProps(props, state) {
-    //const { auth } = props;
-    // if (auth.uid) {
-    //   return { isAuthenticated: true, call: true };
-    // } else {
-    //   return { isAuthenticated: false };
-    // }
-  }
+  // static getDerivedStateFromProps(props, state) {
+  //   const { auth } = props;
+  //   if (auth) {
+  //     return { isAuthenticated: true, user: auth.user };
+  //   } else {
+  //     return { isAuthenticated: false };
+  //   }
+  // }
 
   onLogoutClick = e => {
     e.preventDefault();
@@ -111,7 +111,7 @@ class AppNavBar extends Component {
                 </li>
                 <li className="nav-item">
                   <a href="#!" className="nav-link">
-                    {user.username}
+                    {user ? user.username : ""}
                   </a>
                 </li>
                 <li>
