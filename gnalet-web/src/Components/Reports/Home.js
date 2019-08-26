@@ -33,21 +33,6 @@ class Home extends Component {
     data: null
   };
 
-  static getDerivedStateFromProps(props, state) {
-    // const {clients} = props;
-
-    // if(clients){
-
-    //     //Add total
-    //     const total = clients.reduce((total, client) => {
-    //         return total + parseFloat(client.balance.toString());
-    //     },0);
-    //     return {totalowed: total};
-    // }
-
-    return null;
-  }
-
   onclicked = path => {
     //e.preventDefault()
     const { history } = this.props;
@@ -148,10 +133,8 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    const { firestore, settings } = this.props;
-    //console.log("This is the auth", auth);
-    //console.log("This is the settings", settings);
-    const { categories, region } = settings;
+    const { categories, regions } = this.state.auth.user;
+
     if (region.length > 0) {
       const primeregion = region[0];
       firestore
@@ -179,7 +162,6 @@ class Home extends Component {
   }
 
   render() {
-    const { auth } = this.props;
     const { categories, region } = this.props.settings;
     region.sort();
     categories.sort();
@@ -351,6 +333,10 @@ Home.propTypes = {
   firestore: PropTypes.object.isRequired,
   clients: PropTypes.array
 };
+
+const mapStatetoProps = state => ({
+  auth: state.auth
+});
 
 export default compose(
   firestoreConnect(),

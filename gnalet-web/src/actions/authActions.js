@@ -2,8 +2,8 @@ import backends from "../backend/firebase";
 import { AUTH_DISPATCH, LOGOUT_DISPATCH, GET_ERRORS } from "./types";
 import { REF_GNALET_CLIENT } from "../Helpers/Constants";
 
-const auth = backends.defaultFirebase.auth();
-const store = backends.defaultFirebase.firestore();
+const auth = backends.default.auth();
+const store = backends.default.firestore();
 
 export const login = data => dispatch => {
   const { email, password } = data;
@@ -35,4 +35,21 @@ export const login = data => dispatch => {
         });
       });
   });
+};
+
+export const logout = () => dispatch => {
+  auth
+    .signOut()
+    .then(x => {
+      dispatch({
+        type: LOGOUT_DISPATCH,
+        payload: {}
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: { error: "Unable to signout. Internal Error" }
+      });
+    });
 };

@@ -14,7 +14,7 @@ const defaultFirebase = () => {
   return firebase.initializeApp(defaultconfig);
 };
 
-backends.defaultFirebase = defaultFirebase();
-backends.citifmFirebase = citifmFirebase();
+backends.default = defaultFirebase();
+backends.citifm = citifmFirebase();
 
 export default backends;

@@ -1,12 +1,12 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
+import * as moment from 'moment'
 import {
   REF_ANALYTICS,
   REF_MONTHS,
   FIELD_UNSOLVED,
   REF_REPORTS,
-  CASE_STATUS,
-  CASE_SUP_BODY,
+  FIELD_SUP_BODY,
   FIELD_CATEGORY,
   getStatusString,
   returnMonthYear,
@@ -18,10 +18,15 @@ import {
   ECG,
   HFDA,
   GSA,
-  OTHERS
+  OTHERS,
+  FIELD_STATUS,
+  FIELD_SUPBODY
 } from "../Constants";
 
 import { Regions } from "./Regions";
+import { DocumentSnapshot } from "@google-cloud/firestore";
+
+const store = admin.firestore();
 
 export async function statusDidUpdated(
   supCode: string,
@@ -242,9 +247,9 @@ export async function performAnalyticsOnAllDocs(response) {
       .collection(REF_REPORTS)
       .get();
     alldocs.forEach(element => {
-      const status = element.get(CASE_STATUS);
+      const status = element.get(FIELD_STATUS);
       const category = element.get(FIELD_CATEGORY);
-      const region = element.get(CASE_SUP_BODY);
+      const region = element.get(FIELD_SUP_BODY);
       let numb = 0;
       if (region in allcats[category]) {
         if (getStatusString(status) in allcats[category][region]) {
@@ -381,4 +386,24 @@ export async function resetAnalyticsToZero(response) {
     console.log(e);
     response.status(504).send(e);
   }
+}
+
+
+
+
+/**
+ * New Analytics . More Efficient
+ */
+
+export const analyse = async (snapshot:DocumentSnapshot) =>  {
+  const batch = store.batch();
+  const status = snapshot.get(FIELD_STATUS);
+  const category = snapshot.get(FIELD_CATEGORY);
+  const region = snapshot.get(FIELD_SUPBODY)
+
+  const year = moment().format('YYYY');
+
+  const allexistingAnalyticSnap = await store.doc(`${REF_ANALYTICS}/${}`)
+  
+
 }
