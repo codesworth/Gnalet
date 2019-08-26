@@ -20,7 +20,8 @@ import {
   GSA,
   OTHERS,
   FIELD_STATUS,
-  FIELD_SUPBODY
+  FIELD_SUPBODY,
+  FIELD_SUP_CODE
 } from "../Constants";
 
 import { Regions } from "./Regions";
@@ -399,11 +400,37 @@ export const analyse = async (snapshot:DocumentSnapshot) =>  {
   const batch = store.batch();
   const status = snapshot.get(FIELD_STATUS);
   const category = snapshot.get(FIELD_CATEGORY);
-  const region = snapshot.get(FIELD_SUPBODY)
+  const region = snapshot.get(FIELD_SUP_CODE)
 
   const year = moment().format('YYYY');
+  const day_of_year = moment().dayOfYear();
+  const allAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}`)
+  const allexistingAnalyticSnap = await allAnalyticRef.get()
+  const todayAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}/${year}/${day_of_year}`)
+  const todayAnalytics = await todayAnalyticRef.get();
+  const all_analytics_for_category = allexistingAnalyticSnap.get(category);
 
-  const allexistingAnalyticSnap = await store.doc(`${REF_ANALYTICS}/${}`)
+  if (all_analytics_for_category){
+    let val = all_analytics_for_category[getStatusString(status)]
+    val = val + 1
+    all_analytics_for_category[getStatusString(status)] = val
+    batch.set(allAnalyticRef,{[category]:all_analytics_for_category},{merge:true})
+
+  }else{
+    const new_analytics = {
+      unsolved: 0,
+      pending: 0,
+      solved: 0,
+      flag: 0,
+      duplicate: 0
+    }
+    
+    new_analytics[getStatusString(status)] = 1
+    batch.set(allAnalyticRef,{[category]:new_analytics})
+
+  }
+
+
   
 
 }
