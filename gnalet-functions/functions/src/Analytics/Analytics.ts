@@ -1,6 +1,6 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import * as moment from 'moment'
+import * as moment from "moment";
 import {
   REF_ANALYTICS,
   REF_MONTHS,
@@ -26,6 +26,7 @@ import {
 
 import { Regions } from "./Regions";
 import { DocumentSnapshot } from "@google-cloud/firestore";
+import { AnalyticData } from "./DataTrack";
 
 const store = admin.firestore();
 
@@ -233,7 +234,7 @@ export async function performAnalyticsOnAllDocs(response) {
     VEHICULAR: {},
     SANITATION: {},
     CRIMES: {},
-    INDISCIPLINE:{},
+    INDISCIPLINE: {},
     WATER: {},
     POTHOLES: {},
     ECG: {},
@@ -389,48 +390,78 @@ export async function resetAnalyticsToZero(response) {
   }
 }
 
-
-
-
 /**
  * New Analytics . More Efficient
  */
 
-export const analyse = async (snapshot:DocumentSnapshot) =>  {
+export const analyse = async (
+  snapshot: DocumentSnapshot,
+  initialSnapshot?: DocumentSnapshot
+) => {
   const batch = store.batch();
   const status = snapshot.get(FIELD_STATUS);
   const category = snapshot.get(FIELD_CATEGORY);
-  const region = snapshot.get(FIELD_SUP_CODE)
+  const region = snapshot.get(FIELD_SUP_CODE);
 
-  const year = moment().format('YYYY');
+  const year = moment().format("YYYY");
   const day_of_year = moment().dayOfYear();
-  const allAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}`)
-  const allexistingAnalyticSnap = await allAnalyticRef.get()
-  const todayAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}/${year}/${day_of_year}`)
+  const allAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}`);
+  const allexistingAnalyticSnap = await allAnalyticRef.get();
+  const todayAnalyticRef = store.doc(
+    `${REF_ANALYTICS}/${region}/${year}/${day_of_year}`
+  );
   const todayAnalytics = await todayAnalyticRef.get();
   const all_analytics_for_category = allexistingAnalyticSnap.get(category);
+  const td_ana_cat = todayAnalytics.get(category);
 
-  if (all_analytics_for_category){
-    let val = all_analytics_for_category[getStatusString(status)]
-    val = val + 1
-    all_analytics_for_category[getStatusString(status)] = val
-    batch.set(allAnalyticRef,{[category]:all_analytics_for_category},{merge:true})
-
-  }else{
-    const new_analytics = {
-      unsolved: 0,
-      pending: 0,
-      solved: 0,
-      flag: 0,
-      duplicate: 0
+  if (all_analytics_for_category) {
+    const analyticData = new AnalyticData(all_analytics_for_category);
+    if (initialSnapshot) {
+      const initialStatus = initialSnapshot.get(FIELD_STATUS);
+      analyticData.updatedStatus(status, initialStatus);
+    } else {
+      analyticData.updatedStatus(status);
     }
-    
-    new_analytics[getStatusString(status)] = 1
-    batch.set(allAnalyticRef,{[category]:new_analytics})
 
+    batch.set(
+      allAnalyticRef,
+      { [category]: analyticData.data() },
+      { merge: true }
+    );
+  } else {
+    const new_analytics = new AnalyticData();
+
+    new_analytics.updatedStatus(status);
+    batch.set(
+      allAnalyticRef,
+      { [category]: new_analytics.data() },
+      { merge: true }
+    );
   }
 
+  if (td_ana_cat) {
+    const t_analysis = new AnalyticData(td_ana_cat);
+    if (initialSnapshot) {
+      const initialStatus = initialSnapshot.get(FIELD_STATUS);
+      t_analysis.updatedStatus(status, initialStatus);
+    } else {
+      t_analysis.updatedStatus(status);
+    }
 
-  
+    batch.set(
+      todayAnalyticRef,
+      { [category]: t_analysis.data() },
+      { merge: true }
+    );
+  } else {
+    const td_analysis = new AnalyticData();
+    td_analysis.updatedStatus(status);
+    batch.set(
+      todayAnalyticRef,
+      { [category]: td_analysis.data() },
+      { merge: true }
+    );
+  }
 
-}
+  return batch.commit();
+};
