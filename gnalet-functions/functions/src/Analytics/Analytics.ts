@@ -411,6 +411,34 @@ export const analyse = async (
     `${REF_ANALYTICS}/${region}/${year}/${day_of_year}`
   );
   const todayAnalytics = await todayAnalyticRef.get();
+
+  if (initialSnapshot) {
+    const initialCat = initialSnapshot.get(FIELD_CATEGORY);
+    const finalCat = snapshot.get(FIELD_CATEGORY);
+    if (initialCat !== finalCat) {
+      const prevStatus = initialSnapshot.get(FIELD_STATUS);
+      const newStatus = snapshot.get(FIELD_STATUS);
+      const data = changedCategory(
+        allexistingAnalyticSnap,
+        todayAnalytics,
+        initialCat,
+        finalCat,
+        prevStatus,
+        newStatus
+      );
+      batch.set(
+        allAnalyticRef,
+        { [initialCat]: data.previous[0], [finalCat]: data.current[0] },
+        { merge: true }
+      );
+      batch.set(
+        todayAnalyticRef,
+        { [initialCat]: data.previous[1], [finalCat]: data.current[1] },
+        { merge: true }
+      );
+      return batch.commit();
+    }
+  }
   const all_analytics_for_category = allexistingAnalyticSnap.get(category);
   const td_ana_cat = todayAnalytics.get(category);
 
@@ -464,4 +492,48 @@ export const analyse = async (
   }
 
   return batch.commit();
+};
+
+const changedCategory = (
+  all_analytics: DocumentSnapshot,
+  td_analytics: DocumentSnapshot,
+  prevCat,
+  newCat,
+  prevStatus,
+  newStatus
+) => {
+  const prevData = [];
+  const newData = [];
+  const an_data_allPrev = all_analytics.get(prevCat);
+  const prevAnaData = new AnalyticData(an_data_allPrev);
+  prevAnaData.categoryChange(prevStatus);
+  prevData.push(prevAnaData.data());
+  const an_data_allNew = all_analytics.get(newCat);
+  if (an_data_allNew) {
+    const newAnaData = new AnalyticData(an_data_allNew);
+    newAnaData.updatedStatus(newStatus);
+    newData.push(newAnaData.data());
+  } else {
+    const newAnaData = new AnalyticData();
+    newAnaData.updatedStatus(newStatus);
+    newData.push(newAnaData.data());
+  }
+
+  const an_data_tdPrev = td_analytics.get(prevCat);
+  const prevtdAna = new AnalyticData(an_data_tdPrev);
+  prevtdAna.categoryChange(prevStatus);
+  prevData.push(prevtdAna.data());
+  const an_data_tdNew = td_analytics.get(newCat);
+
+  if (an_data_tdNew) {
+    const newTDana = new AnalyticData(an_data_tdNew);
+    newTDana.updatedStatus(newStatus);
+    newData.push(newTDana.data());
+  } else {
+    const newTDana = new AnalyticData();
+    newTDana.updatedStatus(newStatus);
+    newData.push(newTDana.data());
+  }
+
+  return { previous: prevData, current: newData };
 };

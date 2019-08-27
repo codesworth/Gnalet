@@ -50,6 +50,28 @@ export class AnalyticData {
     }
   }
 
+  categoryChange(status) {
+    switch (status) {
+      case 0:
+        this.unsolved--;
+        break;
+      case 1:
+        this.pending--;
+        break;
+      case 2:
+        this.solved--;
+        break;
+      case 3:
+        this.flag--;
+        break;
+      case 4:
+        this.duplicate--;
+        break;
+      default:
+        break;
+    }
+  }
+
   updatedStatus(final: number, initial?: number) {
     if (initial !== null) {
       switch (initial) {
