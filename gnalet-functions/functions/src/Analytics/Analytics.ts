@@ -3,25 +3,11 @@ import * as admin from "firebase-admin";
 import * as moment from "moment";
 import {
   REF_ANALYTICS,
-  REF_MONTHS,
-  FIELD_UNSOLVED,
-  REF_REPORTS,
-  FIELD_SUP_BODY,
   FIELD_CATEGORY,
-  getStatusString,
-  returnMonthYear,
-  VEHICULAR,
-  SANITATION,
-  CRIMES,
-  WATER,
-  POTHOLES,
-  ECG,
-  HFDA,
-  GSA,
-  OTHERS,
   FIELD_STATUS,
-  FIELD_SUPBODY,
-  FIELD_SUP_CODE
+  REF_ANALYTICS_YEAR,
+  FIELD_SUP_CODE,
+  REF_ANALYTICS_DAY_OF_YEAR
 } from "../Constants";
 
 import { Regions } from "./Regions";
@@ -30,6 +16,155 @@ import { AnalyticData } from "./DataTrack";
 
 const store = admin.firestore();
 
+/**
+ * New Analytics . More Efficient
+ */
+
+export const analyse = async (
+  snapshot: DocumentSnapshot,
+  initialSnapshot?: DocumentSnapshot
+) => {
+  const batch = store.batch();
+  const status = snapshot.get(FIELD_STATUS);
+  const category = snapshot.get(FIELD_CATEGORY);
+  const region = snapshot.get(FIELD_SUP_CODE);
+
+  const year = moment().format("YYYY");
+  const day_of_year = moment().dayOfYear();
+  const allAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}`);
+  const allexistingAnalyticSnap = await allAnalyticRef.get();
+  const thisYearRef = store.doc(
+    `${REF_ANALYTICS}/${region}/${REF_ANALYTICS_YEAR}/${year}`
+  );
+  const thisYearSnap = await thisYearRef.get();
+  const todayAnalyticRef = store.doc(
+    `${REF_ANALYTICS}/${region}/${REF_ANALYTICS_YEAR}/${year}/${REF_ANALYTICS_DAY_OF_YEAR}/${day_of_year}`
+  );
+  const todayAnalytics = await todayAnalyticRef.get();
+
+  if (initialSnapshot) {
+    const initialCat = initialSnapshot.get(FIELD_CATEGORY);
+    const finalCat = snapshot.get(FIELD_CATEGORY);
+    if (initialCat !== finalCat) {
+      const prevStatus = initialSnapshot.get(FIELD_STATUS);
+      const newStatus = snapshot.get(FIELD_STATUS);
+      const data = changedCategory(
+        allexistingAnalyticSnap,
+        todayAnalytics,
+        initialCat,
+        finalCat,
+        prevStatus,
+        newStatus
+      );
+      batch.set(
+        allAnalyticRef,
+        { [initialCat]: data.previous[0], [finalCat]: data.current[0] },
+        { merge: true }
+      );
+      batch.set(
+        todayAnalyticRef,
+        { [initialCat]: data.previous[1], [finalCat]: data.current[1] },
+        { merge: true }
+      );
+      return batch.commit();
+    }
+  }
+  const all_analytics_for_category = allexistingAnalyticSnap.get(category);
+  const td_ana_cat = todayAnalytics.get(category);
+  const thisYearAnacat = thisYearSnap.get(category);
+  const alldata = updateAnalytics(
+    all_analytics_for_category,
+    status,
+    category,
+    initialSnapshot
+  );
+  batch.set(allAnalyticRef, alldata, { merge: true });
+  const yeardata = updateAnalytics(
+    thisYearAnacat,
+    status,
+    category,
+    initialSnapshot
+  );
+  batch.set(thisYearRef, yeardata, { merge: true });
+  const td_data = updateAnalytics(
+    td_ana_cat,
+    status,
+    category,
+    initialSnapshot
+  );
+  batch.set(todayAnalyticRef, td_data, { merge: true });
+
+  return batch.commit();
+};
+
+const changedCategory = (
+  all_analytics: DocumentSnapshot,
+  td_analytics: DocumentSnapshot,
+  prevCat,
+  newCat,
+  prevStatus,
+  newStatus
+) => {
+  const prevData = [];
+  const newData = [];
+  const an_data_allPrev = all_analytics.get(prevCat);
+  const prevAnaData = new AnalyticData(an_data_allPrev);
+  prevAnaData.categoryChange(prevStatus);
+  prevData.push(prevAnaData.data());
+  const an_data_allNew = all_analytics.get(newCat);
+  if (an_data_allNew) {
+    const newAnaData = new AnalyticData(an_data_allNew);
+    newAnaData.updatedStatus(newStatus);
+    newData.push(newAnaData.data());
+  } else {
+    const newAnaData = new AnalyticData();
+    newAnaData.updatedStatus(newStatus);
+    newData.push(newAnaData.data());
+  }
+
+  const an_data_tdPrev = td_analytics.get(prevCat);
+  const prevtdAna = new AnalyticData(an_data_tdPrev);
+  prevtdAna.categoryChange(prevStatus);
+  prevData.push(prevtdAna.data());
+  const an_data_tdNew = td_analytics.get(newCat);
+
+  if (an_data_tdNew) {
+    const newTDana = new AnalyticData(an_data_tdNew);
+    newTDana.updatedStatus(newStatus);
+    newData.push(newTDana.data());
+  } else {
+    const newTDana = new AnalyticData();
+    newTDana.updatedStatus(newStatus);
+    newData.push(newTDana.data());
+  }
+
+  return { previous: prevData, current: newData };
+};
+
+const updateAnalytics = (
+  categoryAnalytics,
+  status,
+  category,
+  initialSnapshot: DocumentSnapshot
+) => {
+  if (categoryAnalytics) {
+    const analyticData = new AnalyticData(categoryAnalytics);
+    if (initialSnapshot.exists) {
+      const initialStatus = initialSnapshot.get(FIELD_STATUS);
+      analyticData.updatedStatus(status, initialStatus);
+    } else {
+      analyticData.updatedStatus(status);
+    }
+
+    return { [category]: analyticData.data() };
+  } else {
+    const new_analytics = new AnalyticData();
+    new_analytics.updatedStatus(status);
+    return { [category]: new_analytics.data() };
+  }
+};
+
+/*
 export async function statusDidUpdated(
   supCode: string,
   befcat: string,
@@ -227,6 +362,9 @@ export async function documentDeleted(
   }
 }
 
+
+/*
+
 export async function performAnalyticsOnAllDocs(response) {
   const batch = admin.firestore().batch();
   const store = admin.firestore();
@@ -312,6 +450,8 @@ export async function performAnalyticsOnAllDocs(response) {
   }
 }
 
+/*
+
 export async function resetAnalyticsToZero(response) {
   const batch = admin.firestore().batch();
   try {
@@ -389,151 +529,4 @@ export async function resetAnalyticsToZero(response) {
     response.status(504).send(e);
   }
 }
-
-/**
- * New Analytics . More Efficient
- */
-
-export const analyse = async (
-  snapshot: DocumentSnapshot,
-  initialSnapshot?: DocumentSnapshot
-) => {
-  const batch = store.batch();
-  const status = snapshot.get(FIELD_STATUS);
-  const category = snapshot.get(FIELD_CATEGORY);
-  const region = snapshot.get(FIELD_SUP_CODE);
-
-  const year = moment().format("YYYY");
-  const day_of_year = moment().dayOfYear();
-  const allAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}`);
-  const allexistingAnalyticSnap = await allAnalyticRef.get();
-  const todayAnalyticRef = store.doc(
-    `${REF_ANALYTICS}/${region}/${year}/${day_of_year}`
-  );
-  const todayAnalytics = await todayAnalyticRef.get();
-
-  if (initialSnapshot) {
-    const initialCat = initialSnapshot.get(FIELD_CATEGORY);
-    const finalCat = snapshot.get(FIELD_CATEGORY);
-    if (initialCat !== finalCat) {
-      const prevStatus = initialSnapshot.get(FIELD_STATUS);
-      const newStatus = snapshot.get(FIELD_STATUS);
-      const data = changedCategory(
-        allexistingAnalyticSnap,
-        todayAnalytics,
-        initialCat,
-        finalCat,
-        prevStatus,
-        newStatus
-      );
-      batch.set(
-        allAnalyticRef,
-        { [initialCat]: data.previous[0], [finalCat]: data.current[0] },
-        { merge: true }
-      );
-      batch.set(
-        todayAnalyticRef,
-        { [initialCat]: data.previous[1], [finalCat]: data.current[1] },
-        { merge: true }
-      );
-      return batch.commit();
-    }
-  }
-  const all_analytics_for_category = allexistingAnalyticSnap.get(category);
-  const td_ana_cat = todayAnalytics.get(category);
-
-  if (all_analytics_for_category) {
-    const analyticData = new AnalyticData(all_analytics_for_category);
-    if (initialSnapshot) {
-      const initialStatus = initialSnapshot.get(FIELD_STATUS);
-      analyticData.updatedStatus(status, initialStatus);
-    } else {
-      analyticData.updatedStatus(status);
-    }
-
-    batch.set(
-      allAnalyticRef,
-      { [category]: analyticData.data() },
-      { merge: true }
-    );
-  } else {
-    const new_analytics = new AnalyticData();
-
-    new_analytics.updatedStatus(status);
-    batch.set(
-      allAnalyticRef,
-      { [category]: new_analytics.data() },
-      { merge: true }
-    );
-  }
-
-  if (td_ana_cat) {
-    const t_analysis = new AnalyticData(td_ana_cat);
-    if (initialSnapshot) {
-      const initialStatus = initialSnapshot.get(FIELD_STATUS);
-      t_analysis.updatedStatus(status, initialStatus);
-    } else {
-      t_analysis.updatedStatus(status);
-    }
-
-    batch.set(
-      todayAnalyticRef,
-      { [category]: t_analysis.data() },
-      { merge: true }
-    );
-  } else {
-    const td_analysis = new AnalyticData();
-    td_analysis.updatedStatus(status);
-    batch.set(
-      todayAnalyticRef,
-      { [category]: td_analysis.data() },
-      { merge: true }
-    );
-  }
-
-  return batch.commit();
-};
-
-const changedCategory = (
-  all_analytics: DocumentSnapshot,
-  td_analytics: DocumentSnapshot,
-  prevCat,
-  newCat,
-  prevStatus,
-  newStatus
-) => {
-  const prevData = [];
-  const newData = [];
-  const an_data_allPrev = all_analytics.get(prevCat);
-  const prevAnaData = new AnalyticData(an_data_allPrev);
-  prevAnaData.categoryChange(prevStatus);
-  prevData.push(prevAnaData.data());
-  const an_data_allNew = all_analytics.get(newCat);
-  if (an_data_allNew) {
-    const newAnaData = new AnalyticData(an_data_allNew);
-    newAnaData.updatedStatus(newStatus);
-    newData.push(newAnaData.data());
-  } else {
-    const newAnaData = new AnalyticData();
-    newAnaData.updatedStatus(newStatus);
-    newData.push(newAnaData.data());
-  }
-
-  const an_data_tdPrev = td_analytics.get(prevCat);
-  const prevtdAna = new AnalyticData(an_data_tdPrev);
-  prevtdAna.categoryChange(prevStatus);
-  prevData.push(prevtdAna.data());
-  const an_data_tdNew = td_analytics.get(newCat);
-
-  if (an_data_tdNew) {
-    const newTDana = new AnalyticData(an_data_tdNew);
-    newTDana.updatedStatus(newStatus);
-    newData.push(newTDana.data());
-  } else {
-    const newTDana = new AnalyticData();
-    newTDana.updatedStatus(newStatus);
-    newData.push(newTDana.data());
-  }
-
-  return { previous: prevData, current: newData };
-};
+*/

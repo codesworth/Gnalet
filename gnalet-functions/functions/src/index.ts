@@ -1,21 +1,15 @@
 import {
   REF_REPORTS,
   FIELD_CATEGORY,
-  CASE_STATUS,
-  FIELD_SUPBODY,
-  returnMonthYear,
+  FIELD_STATUS,
   FIELD_SUP_CODE,
-  REF_AUTHORITIES
+  REF_AUTHORITIES,
+  FIELD_SUPBODY
 } from "./Constants";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import * as cors from "cors";
-import {
-  documentDeleted,
-  performAnalyticsOnAllDocs,
-  resetAnalyticsToZero,
-  statusDidUpdated
-} from "./Analytics/Analytics";
+import { analyse } from "./Analytics/Analytics";
 import { sendNotification } from "./Notifications";
 import { testDuplicates } from "./Tests";
 import { createAuthority } from "./Auth";
@@ -29,23 +23,14 @@ const store = admin.firestore();
 const rsettings = { timestampsInSnapshots: true };
 store.settings(rsettings);
 
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
 const corsHandler = cors({ origin: true });
 //const corsHandler = cors({origin:true});
 
 export const analyticsOnAdd = functions.firestore
   .document(`${REF_REPORTS}/{dcId}`)
   .onCreate(async (snap, context) => {
-    const category = snap.get(FIELD_CATEGORY);
-    const sup = snap.get(FIELD_SUP_CODE);
-    const status = snap.get(CASE_STATUS);
     try {
-      return statusDidUpdated(sup, category, category, status, status);
+      return analyse(snap);
     } catch (e) {
       console.log("Error happened with sig: ", e);
       return Promise.reject(e);
@@ -58,28 +43,19 @@ export const reportWasUpdated = functions.firestore
     const befdoc = snap.before;
     const after = snap.after;
     const uid = befdoc.get("uid");
-    const oldstatus: number = befdoc.get(CASE_STATUS);
-    const newstatus: number = after.get(CASE_STATUS);
+    const oldstatus: number = befdoc.get(FIELD_STATUS);
+    const newstatus: number = after.get(FIELD_STATUS);
+    const sup = after.get(FIELD_SUPBODY);
     const oldcat = befdoc.get(FIELD_CATEGORY);
     const afcat = after.get(FIELD_CATEGORY);
-    const sup = after.get(FIELD_SUP_CODE);
-    const ts = after.get("ts");
-    const month = returnMonthYear(ts);
     try {
-      // if (oldcat !== afcat) {
-      //   updatedCategory(oldcat, month, afcat, oldstatus, sup);
-      // }
-      // if (oldstatus !== newstatus) {
-      //   statusWasUpdated(oldcat, month, sup, afcat, oldstatus, newstatus);
-      // }
-      const resp = await statusDidUpdated(
-        sup,
-        oldcat,
-        afcat,
-        oldstatus,
-        newstatus
-      );
-      return sendNotification(store, uid, after, admin.messaging(), sup);
+      if (oldstatus == newstatus && oldcat === afcat) {
+        return Promise.resolve("Nothing");
+      }
+      const promises = [];
+      const resp = analyse(after, befdoc);
+      const notif = sendNotification(store, uid, after, admin.messaging(), sup);
+      return Promise.all([resp, notif]);
     } catch (e) {
       //const ref:admin.firestore.Query = admin.firestore().collection('').where()
       console.log("Error occurred with signature", e);
@@ -87,10 +63,11 @@ export const reportWasUpdated = functions.firestore
     }
   });
 
+/*
 export const deletedDocument = functions.firestore
   .document(`${REF_REPORTS}/{docId}`)
   .onDelete(async (snap, context) => {
-    const status = snap.get(CASE_STATUS);
+    const status = snap.get(FIELD_STATUS);
     const category = snap.get(FIELD_CATEGORY);
     const supcode = snap.get(FIELD_SUP_CODE);
 
@@ -127,7 +104,7 @@ export const resetToZero = functions.https.onRequest(
     //const r = getWeekNumber(new Date());
     //console.log(date+' The week stuff are',r);
   }
-);
+);*/
 
 export const test_addDuplicates = functions.https.onRequest(
   async (request, response) => {
