@@ -2,9 +2,9 @@ import React, { Component } from "react";
 
 import { compose } from "redux";
 import { connect } from "react-redux";
-import { firestoreConnect, withFirestore } from "react-redux-firebase";
 import PropTypes from "prop-types";
 import Spinner from "../layout/Spinner";
+import { getRportAnalytics } from "../../actions/Reports/ReportActions";
 import {
   REF_ANALYTICS,
   FIELD_UNSOLVED,
@@ -14,23 +14,17 @@ import {
   returnMonthYear,
   REF_MONTHS,
   facingCategoryname,
-  publicFacingRegion
+  publicFacingRegion,
+  CLIENT_KEY
 } from "../../Helpers/Constants";
+import { AnalyticParser } from "../../actions/Reports/ReportParser";
 
 class Home extends Component {
   state = {
-    analytics: {
-      unsolved: 0,
-      pending: 0,
-      flag: 0,
-      solved: 0
-    },
+    snapshot: null,
     canFetch: false,
-    selectedcategory: "",
-    selectedregion: "",
-    period: 0,
 
-    data: null
+    period: 0
   };
 
   onclicked = path => {
@@ -58,17 +52,17 @@ class Home extends Component {
     }
   };
 
-  regionChange = e => {
-    e.preventDefault();
-    const value = e.target.value;
-    this.setState({ selectedregion: value });
-  };
+  // regionChange = e => {
+  //   e.preventDefault();
+  //   const value = e.target.value;
+  //   this.setState({ selectedregion: value });
+  // };
 
-  cateChange = e => {
-    e.preventDefault();
-    const value = e.target.value;
-    this.setState({ selectedcategory: value });
-  };
+  // cateChange = e => {
+  //   e.preventDefault();
+  //   const value = e.target.value;
+  //   this.setState({ selectedcategory: value });
+  // };
 
   updatePeriodAnalysis() {
     const { canFetch } = this.state;
@@ -77,87 +71,20 @@ class Home extends Component {
     }
   }
 
-  updateCategoriesAnalysis() {
-    const { data, selectedcategory } = this.state;
-    if (data === null) return;
-    const catdata = data[selectedcategory];
-    if (catdata) {
-      let catLytics = this.makeAnalytics(catdata);
-      this.setState({ analytics: catLytics });
-    }
-  }
-
-  // updateRegionAnalysis() {
-  //   const { selectedregion, data } = this.state;
-  //   const bigdata = data[selectedregion];
-  //   const fl = this.makeAnalytics(bigdata);
-  //   this.setState({ analytics: fl, canFetch: false });
-  // }
-
-  updateAnalysis() {
-    const { categories, region } = this.props.settings;
-    let { selectedcategory, selectedregion } = this.state;
-    const { firestore } = this.props;
-    console.log("Selected cat is: ", selectedregion);
-    if (selectedcategory === "") {
-      selectedcategory = categories[0];
-    }
-
-    if (selectedregion === "") {
-      selectedregion = region[0];
-    }
-    let ref = firestore.doc(`${REF_ANALYTICS}/${selectedregion}`);
-    /*if (period === 1) {
-      const id = returnMonthYear(null);
-      ref = firestore.doc(
-        `${REF_ANALYTICS}/${selectedregion}/${REF_MONTHS}/${id}`
-      );
-    } else {
-      
-    }*/
-
-    ref.get().then(analytic => {
-      const ndata = analytic.data();
-      console.log("This is the dta: ", analytic);
-      if (!ndata) return;
-      const cat = selectedcategory;
-      const analyticdata = ndata[cat];
-      if (analyticdata === null || typeof analyticdata === "undefined") return;
-      const fl = this.makeAnalytics(analyticdata);
-      if (fl === null) return;
-      this.setState({
-        analytics: fl,
-        data: analytic.data()
-      });
-    });
-  }
+  updateAnalysis() {}
 
   componentDidMount() {
-    const { categories, regions } = this.state.auth.user;
+    const { auth } = this.state;
+    const { getRportAnalytics } = this.props;
 
-    if (region.length > 0) {
-      const primeregion = region[0];
-      firestore
-        .collection(REF_ANALYTICS)
-        .doc(primeregion)
-        .get()
-        .then(analytic => {
-          if (!analytic.data()) return;
-          console.log("This is the dta: ", analytic);
-          const cat = categories[0];
-          const analyticdata = analytic.data()[cat];
-          if (analyticdata === undefined || typeof analyticdata === "undefined")
-            return;
-          const fl = this.makeAnalytics(analyticdata);
+    getRportAnalytics(auth[CLIENT_KEY]);
+  }
 
-          this.setState({
-            analytics: fl,
-            selectedcategory: categories[0],
-            selectedregion: region[0],
-            data: analytic.data()
-          });
-          // console.log(this.state);
-        });
+  componentWillReceiveProps(nextProps) {
+    const { snapshot } = nextProps;
+    const { allTime } = this.state;
+    if (snapshot) {
+      let parser = new AnalyticParser(snapshot, allTime);
     }
   }
 
@@ -335,16 +262,13 @@ Home.propTypes = {
 };
 
 const mapStatetoProps = state => ({
-  auth: state.auth
+  auth: state.auth,
+  reports: state.auth
 });
 
-export default compose(
-  firestoreConnect(),
-  withFirestore,
-  connect((state, props) => ({
-    auth: state.firebase.auth,
-    settings: state.settings
-  }))
+export default connect(
+  mapStatetoProps,
+  { getRportAnalytics }
 )(Home);
 
 /**

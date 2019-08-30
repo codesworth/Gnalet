@@ -8,7 +8,7 @@ import {
 } from "../../Helpers/Constants";
 import * as moment from "moment";
 
-const getRportAnalytics = (client, options) => dispatch => {
+export const getRportAnalytics = client => dispatch => {
   const store = backends[client].firestore();
   const year = moment().year();
   const yearRef = store.doc(`${REF_ANALYTICS}/${year}`);

@@ -62,6 +62,7 @@ export const AN_ADMIN_AREA_DATA = "area";
 export const AN_CATEGORICAL = "categories";
 export const AN_TOTALS = "totals";
 export const REF_GNALET_CLIENT = "GN-CLIENTS";
+export const CLIENT_KEY = "backendkey";
 
 export const category_ids = [
   "VEHICULAR",
