@@ -1,23 +1,29 @@
-import backends from "../backend/firebase";
-import { ANALYTIC_REPORT_ALL_GET } from "./types";
-import { Duration } from "../Helpers/Assemblies";
-import { REF_ANALYTICS, REF_ANALYTICS_YEAR, REF_ANALYTICS_DAY_OF_YEAR } from "../Helpers/Constants";
-import moment = require("moment");
+import backends from "../../backend/firebase";
+import { ANALYTIC_REPORT_ALL_GET, GET_ERRORS } from "../types";
+import { Duration } from "../../Helpers/Assemblies";
+import {
+  REF_ANALYTICS,
+  REF_ANALYTICS_YEAR,
+  REF_ANALYTICS_DAY_OF_YEAR
+} from "../../Helpers/Constants";
+import * as moment from "moment";
 
 const getRportAnalytics = (client, options) => dispatch => {
   const store = backends[client].firestore();
-
-  const { category, region,duration } = options;
-  let query = null
-  if (category && region){
-      const newDuration = Duration[duration]
-      const year = moment().year()
-    if (newDuration){
-      switch (newDuration){
-        case Duration.today:
-          const day = moment().dayOfYear()
-          query = store.doc(`${REF_ANALYTICS}/${region}/${REF_ANALYTICS_YEAR}/${year}/${REF_ANALYTICS_DAY_OF_YEAR}/${day}`)
-      }
-    }
-  }
+  const year = moment().year();
+  const yearRef = store.doc(`${REF_ANALYTICS}/${year}`);
+  yearRef
+    .get()
+    .then(data => {
+      dispatch({
+        type: ANALYTIC_REPORT_ALL_GET,
+        payload: data
+      });
+    })
+    .catch(err => {
+      dispatch({
+        type: GET_ERRORS,
+        payload: { report: "Unable to Fetch Data" }
+      });
+    });
 };

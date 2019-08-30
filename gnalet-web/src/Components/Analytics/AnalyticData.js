@@ -17,6 +17,19 @@ export class AnalyticData {
     this.total = this.solved + this.unsolved + this.pending;
   }
 
+  add = data => {
+    if (typeof data.unsolved === "number") {
+      this.unsolved = this.unsolved + data.unsolved;
+    }
+    if (typeof data.solved === "number") {
+      this.solved = this.solved + data.solved;
+    }
+    if (typeof data.pending === "number") {
+      this.pending = this.pending + data.pending;
+    }
+    this.total = this.solved + this.unsolved + this.pending;
+  };
+
   data = () => {
     return {
       unsolved: this.unsolved,
