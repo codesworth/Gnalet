@@ -186,3 +186,11 @@ export const Regions = {
     GWJ : "Weija Municipal District",                
 }
  */
+
+export const Duration = {
+  today,
+  thisWeek,
+  thisMonth,
+  thisYear,
+  allTime
+};
