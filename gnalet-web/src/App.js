@@ -31,7 +31,7 @@ class App extends Component {
             <div className="container">
               <Route exact path="/login" component={Login} />
               <Switch>
-                <PrivateRoute exact path="/" component={DummyHome} />
+                <PrivateRoute exact path="/" component={Home} />
               </Switch>
             </div>
           </div>

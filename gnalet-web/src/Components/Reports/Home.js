@@ -18,12 +18,14 @@ import {
   CLIENT_KEY
 } from "../../Helpers/Constants";
 import { AnalyticParser } from "../../actions/Reports/ReportParser";
+import { Duration } from "../../Helpers/Assemblies";
 
 class Home extends Component {
   state = {
     snapshot: null,
     canFetch: false,
-
+    allTime: false,
+    data: null,
     period: 0
   };
 
@@ -85,15 +87,14 @@ class Home extends Component {
     const { allTime } = this.state;
     if (snapshot) {
       let parser = new AnalyticParser(snapshot, allTime);
+      const data = parser.analyticsForPeriod(Duration.today);
+      this.setState({ snapshot, data });
     }
   }
 
   render() {
-    const { categories, region } = this.props.settings;
-    region.sort();
-    categories.sort();
-    const { unsolved, pending, solved } = this.state.analytics;
-    if (auth.uid) {
+    const { data } = this.state;
+    if (data) {
       return (
         <div className="container main">
           <div className="row">
@@ -107,9 +108,7 @@ class Home extends Component {
               <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
                   <h5 className="card-title">Total Reports This Year</h5>
-                  <h6 className="card-text">
-                    {unsolved + solved + pending} Total Reports
-                  </h6>
+                  <h6 className="card-text">{data.total} Total Reports</h6>
                   <button
                     className="btn btn-primary btn-block"
                     onClick={this.onclicked.bind(this, "all")}
@@ -123,7 +122,9 @@ class Home extends Component {
               <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
                   <h5 className="card-title">Total Unsolved Issues</h5>
-                  <h6 className="card-text">{unsolved} Unsolved Reports.</h6>
+                  <h6 className="card-text">
+                    {data.unsolved} Unsolved Reports.
+                  </h6>
                   <button
                     className="btn btn-primary btn-block"
                     onClick={this.onclicked.bind(this, "unsolved")}
@@ -132,96 +133,6 @@ class Home extends Component {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-          <div className="row row-dashbord-sep">
-            <div className="col-sm-6" style={{ marginBottom: "3%" }}>
-              <div className="card shadow p-3 mb-5 bg-white rounded">
-                <div className="card-body">
-                  <h5 className="card-title">Total Solved Issues</h5>
-                  <h6 className="card-text">{solved} Solved Reports</h6>
-                  <button
-                    className="btn btn-primary btn-block"
-                    onClick={this.onclicked.bind(this, "solved")}
-                  >
-                    See All
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-6">
-              <div className="card shadow p-3 mb-5 bg-white rounded">
-                <div className="card-body">
-                  <h5 className="card-title">Total Pending Issues</h5>
-                  <h6>{pending} Pending Reports</h6>
-                  <button
-                    className="btn btn-primary btn-block"
-                    onClick={this.onclicked.bind(this, "pending")}
-                  >
-                    See All
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="row mg">
-            <div className="col-md-6" style={{ marginBottom: "3%" }}>
-              {categories.length > 0 ? (
-                <div className="input-group shadow p-3 mb-5 bg-white rounded">
-                  <select
-                    className="custom-select"
-                    id="inputGroupSelect04"
-                    aria-label=""
-                    onChange={this.cateChange}
-                  >
-                    {categories.map(cat => {
-                      return (
-                        <option key={cat} value={cat}>
-                          {facingCategoryname(cat)}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={this.updateCategoriesAnalysis.bind(this)}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-            <div className="col-md-6">
-              {region.length > 0 ? (
-                <div className="input-group shadow p-3 mb-5 bg-white rounded">
-                  <select
-                    className="custom-select"
-                    id="inputGroupSelect04"
-                    aria-label=""
-                    onChange={this.regionChange}
-                  >
-                    {region.map(reg => {
-                      return (
-                        <option key={reg} value={reg}>
-                          {publicFacingRegion(reg)}
-                        </option>
-                      );
-                    })}
-                  </select>
-                  <div className="input-group-append">
-                    <button
-                      className="btn btn-outline-secondary"
-                      type="button"
-                      onClick={this.updateAnalysis.bind(this)}
-                    >
-                      Update
-                    </button>
-                  </div>
-                </div>
-              ) : null}
             </div>
           </div>
         </div>
@@ -308,3 +219,95 @@ export default connect(
               </div>
             </div>
   */
+
+/**
+   *           <div className="row row-dashbord-sep">
+            <div className="col-sm-6" style={{ marginBottom: "3%" }}>
+              <div className="card shadow p-3 mb-5 bg-white rounded">
+                <div className="card-body">
+                  <h5 className="card-title">Total Solved Issues</h5>
+                  <h6 className="card-text">{data.solved} Solved Reports</h6>
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={this.onclicked.bind(this, "solved")}
+                  >
+                    See All
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="col-sm-6">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
+                <div className="card-body">
+                  <h5 className="card-title">Total Pending Issues</h5>
+                  <h6>{data.pending} Pending Reports</h6>
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={this.onclicked.bind(this, "pending")}
+                  >
+                    See All
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="row mg">
+            <div className="col-md-6" style={{ marginBottom: "3%" }}>
+              {categories.length > 0 ? (
+                <div className="input-group shadow p-3 mb-5 bg-white rounded">
+                  <select
+                    className="custom-select"
+                    id="inputGroupSelect04"
+                    aria-label=""
+                    onChange={this.cateChange}
+                  >
+                    {categories.map(cat => {
+                      return (
+                        <option key={cat} value={cat}>
+                          {facingCategoryname(cat)}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="input-group-append">
+                    <button
+                      className="btn btn-outline-secondary"
+                      type="button"
+                      onClick={this.updateCategoriesAnalysis.bind(this)}
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            <div className="col-md-6">
+              {region.length > 0 ? (
+                <div className="input-group shadow p-3 mb-5 bg-white rounded">
+                  <select
+                    className="custom-select"
+                    id="inputGroupSelect04"
+                    aria-label=""
+                    onChange={this.regionChange}
+                  >
+                    {region.map(reg => {
+                      return (
+                        <option key={reg} value={reg}>
+                          {publicFacingRegion(reg)}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  <div className="input-group-append">
+                    <button
+                      className="btn btn-outline-secondary"
+                      type="button"
+                      onClick={this.updateAnalysis.bind(this)}
+                    >
+                      Update
+                    </button>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+   */
