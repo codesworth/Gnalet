@@ -11,10 +11,6 @@ import {
   FIELD_PENDING,
   FIELD_FLAGGED,
   FIELD_SOLVED,
-  returnMonthYear,
-  REF_MONTHS,
-  facingCategoryname,
-  publicFacingRegion,
   CLIENT_KEY
 } from "../../Helpers/Constants";
 import { AnalyticParser } from "../../actions/Reports/ReportParser";
@@ -23,6 +19,7 @@ import { Duration } from "../../Helpers/Assemblies";
 class Home extends Component {
   state = {
     snapshot: null,
+    alltimeSnap: null,
     canFetch: false,
     allTime: false,
     data: null,
@@ -42,29 +39,10 @@ class Home extends Component {
     e.preventDefault();
     const value = e.target.value;
     const vals = {};
-    if (parseInt(value, 10) !== this.state.period) {
-      vals.canFetch = true;
-    }
-    if (value === "1") {
-      vals.period = 1;
-      this.setState(vals);
-    } else {
-      vals.period = 0;
-      this.setState(vals);
-    }
+
+    const num = parseInt(value, 10);
+    this.runAnalysisForPeriod(num);
   };
-
-  // regionChange = e => {
-  //   e.preventDefault();
-  //   const value = e.target.value;
-  //   this.setState({ selectedregion: value });
-  // };
-
-  // cateChange = e => {
-  //   e.preventDefault();
-  //   const value = e.target.value;
-  //   this.setState({ selectedcategory: value });
-  // };
 
   updatePeriodAnalysis() {
     const { canFetch } = this.state;
@@ -76,24 +54,61 @@ class Home extends Component {
   updateAnalysis() {}
 
   componentDidMount() {
-    const { auth } = this.state;
-    const { getRportAnalytics } = this.props;
+    const { getRportAnalytics, auth } = this.props;
 
-    getRportAnalytics(auth[CLIENT_KEY]);
+    getRportAnalytics(auth.user[CLIENT_KEY], false);
   }
 
   componentWillReceiveProps(nextProps) {
-    const { snapshot } = nextProps;
-    const { allTime } = this.state;
+    const { snapshot } = nextProps.reports;
+    const { allTime, period } = this.state;
+
     if (snapshot) {
+      console.log(`The sanpshot is: ${snapshot.data()}`);
       let parser = new AnalyticParser(snapshot, allTime);
-      const data = parser.analyticsForPeriod(Duration.today);
-      this.setState({ snapshot, data });
+      const data = parser.analyticsForPeriod(period);
+      //console.log(`Data is: ${data}`);
+      if (allTime) {
+        this.setState({ alltimeSnap: snapshot, data });
+      } else {
+        this.setState({ snapshot, data });
+      }
     }
   }
 
+  runAnalysisForPeriod = period => {
+    const { snapshot, allTime, alltimeSnap } = this.state;
+    if (period === Duration.allTime) {
+      if (allTime && alltimeSnap) {
+        const parser = new AnalyticParser(alltimeSnap, true);
+        const data = parser.analyticsForPeriod(Duration.allTime);
+        this.setState({ data });
+      } else {
+        const { getRportAnalytics, auth } = this.props;
+        getRportAnalytics(auth.user[CLIENT_KEY], true);
+        this.setState({ allTime: true });
+      }
+    } else {
+      if (snapshot) {
+        console.log("Please parse");
+
+        const parser = new AnalyticParser(snapshot, false);
+        const data = parser.analyticsForPeriod(period);
+        console.log(`New data is: ${data}`);
+
+        this.setState({ data });
+      } else {
+        const { getRportAnalytics, auth } = this.props;
+        getRportAnalytics(auth.user[CLIENT_KEY], false);
+        this.setState({ allTime: false });
+      }
+    }
+  };
+
   render() {
     const { data } = this.state;
+    //console.log(`DATA IS : ${data}`);
+
     if (data) {
       return (
         <div className="container main">
@@ -101,6 +116,7 @@ class Home extends Component {
             <div className="col-md-6">
               <h4>Summary Of Events</h4>
             </div>
+            {this.periodSelect()}
           </div>
 
           <div className="row row-dashbord" style={{ marginTop: "3%" }}>
@@ -135,6 +151,36 @@ class Home extends Component {
               </div>
             </div>
           </div>
+          <div className="row row-dashbord-sep">
+            <div className="col-sm-6" style={{ marginBottom: "3%" }}>
+              <div className="card shadow p-3 mb-5 bg-white rounded">
+                <div className="card-body">
+                  <h5 className="card-title">Total Solved Issues</h5>
+                  <h6 className="card-text">{data.solved} Solved Reports</h6>
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={this.onclicked.bind(this, "solved")}
+                  >
+                    See All
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div className="col-sm-6">
+              <div className="card shadow p-3 mb-5 bg-white rounded">
+                <div className="card-body">
+                  <h5 className="card-title">Total Pending Issues</h5>
+                  <h6>{data.pending} Pending Reports</h6>
+                  <button
+                    className="btn btn-primary btn-block"
+                    onClick={this.onclicked.bind(this, "pending")}
+                  >
+                    See All
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       );
     } else {
@@ -142,6 +188,39 @@ class Home extends Component {
     }
   }
 
+  periodSelect = () => {
+    return (
+      <div className="col-md-6">
+        <div
+          className="input-group marg-left"
+          style={{ float: "right", width: "50%" }}
+        >
+          <select
+            className="custom-select"
+            id="inputGroupSelect04"
+            aria-label="Example select with button addon"
+            onChange={this.periodChange}
+          >
+            <option value="0">Today</option>
+            <option value="1">Yesterday</option>
+            <option value="2">Week</option>
+            <option value="3">Month</option>
+            <option value="4">2019</option>
+            <option value="5">All Time</option>
+          </select>
+          <div className="input-group-append">
+            <button
+              className="btn btn-outline-info"
+              type="button"
+              onClick={this.updatePeriodAnalysis.bind(this)}
+            >
+              Update
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
   /**
    * Helper Functions Necessary For This Class only
    */
@@ -174,7 +253,7 @@ Home.propTypes = {
 
 const mapStatetoProps = state => ({
   auth: state.auth,
-  reports: state.auth
+  reports: state.reports
 });
 
 export default connect(

@@ -4,6 +4,10 @@ import { REF_GNALET_CLIENT } from "../Helpers/Constants";
 
 const auth = backends.default.auth();
 const store = backends.default.firestore();
+const settings = {
+  timestampsInSnapshots: true
+};
+store.settings = settings;
 
 export const login = data => dispatch => {
   const { email, password } = data;

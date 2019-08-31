@@ -12,6 +12,7 @@ export const REF_REPORTS = "GN-REPORTS";
 export const REF_AUTHORITIES = "GN-Authorities";
 export const REF_TOKENS = "TOKENS";
 export const REF_ANALYTICS = "GN-ANALYTICS";
+export const DOC_ALL_REPORTS = "GN-AllReports";
 export const REF_ANALYTICS_YEAR = "GN-Year";
 export const REF_ANALYTICS_DAY_OF_YEAR = "GN-DayOfYear";
 export const FIELD_SUPBODY = "supBody";

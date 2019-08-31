@@ -5,6 +5,7 @@ export class AnalyticData {
   total = 0;
 
   constructor(data) {
+    if (data === null) data = {};
     typeof data.unsolved === "number"
       ? (this.unsolved = data.unsolved)
       : (this.unsolved = 0);

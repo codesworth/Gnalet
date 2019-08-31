@@ -188,9 +188,10 @@ export const Regions = {
  */
 
 export const Duration = {
-  today,
-  thisWeek,
-  thisMonth,
-  thisYear,
-  allTime
+  today: 0,
+  yesterday: 1,
+  thisWeek: 2,
+  thisMonth: 3,
+  thisYear: 4,
+  allTime: 5
 };
