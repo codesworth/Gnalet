@@ -29,10 +29,8 @@ class Home extends Component {
   onclicked = path => {
     //e.preventDefault()
     const { history } = this.props;
-    const ucat = this.state.selectedcategory;
-    const reg = this.state.selectedregion;
-    const uctr = reg.concat("&").concat(ucat);
-    history.push(`/reports/${uctr}/${path}`);
+    const { period } = this.state;
+    history.push(`/reports/${period}`);
   };
 
   periodChange = e => {

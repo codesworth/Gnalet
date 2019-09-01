@@ -10,7 +10,7 @@ import Login from "./Components/auth/Login";
 // import Register from "./Components/auth/Register";
 // import Settings from "./Components/settings/Settings";
 import Home from "./Components/Reports/Home";
-// import Reports from "./Components/Clients/Reports";
+import Reports from "./Components/Reports/Reports";
 // import ReportDetail from "./Components/Clients/ReportDetail";
 // import ReportLocation from "./Components/Clients/ReportLocation";
 // import AuthBodyDetail from "./Components/Clients/AuthBodyDetail";
@@ -32,6 +32,11 @@ class App extends Component {
               <Route exact path="/login" component={Login} />
               <Switch>
                 <PrivateRoute exact path="/" component={Home} />
+                <PrivateRoute
+                  exact
+                  path="/reports/:period"
+                  component={Reports}
+                />
               </Switch>
             </div>
           </div>

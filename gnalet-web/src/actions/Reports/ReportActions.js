@@ -9,7 +9,8 @@ import {
   REF_REPORTS,
   FIELD_CATEGORY,
   FIELD_SUPCODE,
-  _DATE
+  _DATE,
+  FIELD_DAY_OF_YEAR
 } from "../../Helpers/Constants";
 import * as moment from "moment";
 
@@ -50,6 +51,7 @@ export const getRportAnalytics = (client, allTime = false) => dispatch => {
 };
 
 export const fetchReport = (client, options) => dispatch => {
+  options = {};
   const { category, region, last } = options;
   const store = backends[client].firestore();
   const settings = {
@@ -73,25 +75,23 @@ export const fetchReport = (client, options) => dispatch => {
       .where(FIELD_SUPCODE, "==", region)
       .orderBy(_DATE);
   } else {
-    query = store.doc(`${REF_REPORTS}`).orderBy(_DATE);
+    const day = moment().dayOfYear() - 1;
+    query = store
+      .collection(`${REF_REPORTS}`)
+      .where(FIELD_DAY_OF_YEAR, "==", day)
+      .orderBy(_DATE);
   }
   if (last) {
     query.startAfter(last).limit(20);
+  } else {
+    query.limit(20);
   }
-  query
-    .onSnapshot()
-    .then(data => {
-      if (data) {
-        dispatch({
-          type: REPOPRTS_QUERY,
-          payload: data
-        });
-      }
-    })
-    .catch(err => {
+  query.onSnapshot(querysnap => {
+    if (querysnap) {
       dispatch({
-        type: GET_ERRORS,
-        payload: { report: "Error with Query Fetch: " + err }
+        type: REPOPRTS_QUERY,
+        payload: querysnap
       });
-    });
+    }
+  });
 };

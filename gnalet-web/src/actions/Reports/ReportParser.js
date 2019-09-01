@@ -4,11 +4,14 @@ export class ReportParser {
 
   constructor(qsnaps) {
     this.querySnapshot = qsnaps;
+    this.mapQuerytoSnap();
   }
 
   mapQuerytoSnap = () => {
     this.querySnapshot.forEach(doc => {
-      this.documents.push(doc.data());
+      const data = doc.data();
+      data.id = doc.id;
+      this.documents.push(data);
     });
   };
 }

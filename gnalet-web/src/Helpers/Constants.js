@@ -64,6 +64,7 @@ export const AN_CATEGORICAL = "categories";
 export const AN_TOTALS = "totals";
 export const REF_GNALET_CLIENT = "GN-CLIENTS";
 export const CLIENT_KEY = "backendkey";
+export const FIELD_DAY_OF_YEAR = "dayOfYear";
 
 export const category_ids = [
   "VEHICULAR",
@@ -76,6 +77,25 @@ export const category_ids = [
   "GSA",
   "OTHERS",
   "INDISCIPLINE"
+];
+
+export const regionArray = [
+  "OR",
+  "BER",
+  "AHR",
+  "BR",
+  "NER",
+  "SR",
+  "WNR",
+  "WR",
+  "VR",
+  "GAR",
+  "ER",
+  "AR",
+  "CR",
+  "NR",
+  "UER",
+  "UWR"
 ];
 
 export function formatDate(date) {
@@ -141,3 +161,22 @@ export function returnMonthYear(ts) {
     .concat(String(month));
   return val;
 }
+
+export const Regions = {
+  OR: "Oti Region",
+  BER: "Bono East Region",
+  AHR: "Ahafo Region",
+  BR: "Bono Region",
+  NER: "North East Region",
+  SR: "Savannah Region",
+  WNR: "Western North Region",
+  WR: "Western Region",
+  VR: "Volta Region",
+  GAR: "Greater Accra Region",
+  ER: "Eastern Region",
+  AR: "Ashanti Region",
+  CR: "Central Region",
+  NR: "Northern Region",
+  UER: "Upper East Region",
+  UWR: "Upper West Region"
+};
