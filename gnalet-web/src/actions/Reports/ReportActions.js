@@ -50,37 +50,33 @@ export const getRportAnalytics = (client, allTime = false) => dispatch => {
     });
 };
 
-export const fetchReport = (client, options) => dispatch => {
-  options = {};
-  const { category, region, last } = options;
+export const fetchReport = (client, options, last) => dispatch => {
+  const { category, region, period } = options;
+  const pval = parseInt(period, 10);
   const store = backends[client].firestore();
   const settings = {
     timestampsInSnapshots: true
   };
   store.settings = settings;
   let query = null;
+
   if (category && region) {
     query = store
-      .doc(`${REF_REPORTS}`)
+      .collection(`${REF_REPORTS}`)
       .where(FIELD_CATEGORY, "==", category)
       .where(FIELD_SUPCODE, "==", region);
   } else if (category && !region) {
     query = store
-      .doc(`${REF_REPORTS}`)
-      .where(FIELD_CATEGORY, "==", category)
-      .orderBy(_DATE);
+      .collection(`${REF_REPORTS}`)
+      .where(FIELD_CATEGORY, "==", category);
   } else if (!category && region) {
     query = store
-      .doc(`${REF_REPORTS}`)
-      .where(FIELD_SUPCODE, "==", region)
-      .orderBy(_DATE);
-  } else {
-    const day = moment().dayOfYear() - 1;
-    query = store
       .collection(`${REF_REPORTS}`)
-      .where(FIELD_DAY_OF_YEAR, "==", day)
-      .orderBy(_DATE);
+      .where(FIELD_SUPCODE, "==", region);
   }
+
+  query = matchPeriodQuery(query, pval, store);
+
   if (last) {
     query.startAfter(last).limit(20);
   } else {
@@ -94,4 +90,58 @@ export const fetchReport = (client, options) => dispatch => {
       });
     }
   });
+};
+
+const matchPeriodQuery = (query, pval, store) => {
+  const day = moment().dayOfYear();
+  switch (pval) {
+    case Duration.today:
+      return query
+        ? query.where(FIELD_DAY_OF_YEAR, "==", day).orderBy(_DATE)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, "==", day);
+    case Duration.yesterday:
+      return query
+        ? query.where(FIELD_DAY_OF_YEAR, "==", day).orderBy(_DATE)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, "==", day)
+            .orderBy(_DATE);
+    case Duration.thisWeek:
+      const start = day - 6 > 0 ? day - 6 : 1;
+      return query
+        ? query
+            .where(FIELD_DAY_OF_YEAR, ">=", start)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(_DATE)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, ">=", start)
+            .where(FIELD_DAY_OF_YEAR, "<=", day);
+
+    case Duration.thisMonth:
+      const start = day - 29 > 1 ? day - 29 : 1;
+      return query
+        ? query
+            .where(FIELD_DAY_OF_YEAR, ">=", start)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(_DATE)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, ">=", start)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(_DATE);
+
+    case Duration.thisYear:
+      const year = moment().year();
+      return query
+        ? query.where("year", "==", year).orderBy(_DATE)
+        : store.collection(`${REF_REPORTS}`).query.where("year", "==", year);
+    default:
+      return query
+        ? query.orderBy(_DATE)
+        : store.collection(`${REF_REPORTS}`).orderBy(_DATE);
+      break;
+  }
 };

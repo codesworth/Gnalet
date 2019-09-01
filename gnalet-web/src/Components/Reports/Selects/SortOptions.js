@@ -8,11 +8,6 @@ import {
 export default class SortOptions extends React.Component {
   constructor() {
     super();
-    this.state = {
-      region: "All",
-      category: "All",
-      period: 0
-    };
   }
 
   onChange = e => {
@@ -22,6 +17,7 @@ export default class SortOptions extends React.Component {
   };
 
   render() {
+    //const {periodVal} = this.props
     return (
       <div className="row mg">
         <div className="col-md-4" style={{ marginBottom: "3%" }}>
