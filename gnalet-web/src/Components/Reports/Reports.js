@@ -5,76 +5,27 @@ import { connect } from "react-redux";
 import { firestoreConnect, withFirestore } from "react-redux-firebase";
 import PropTypes from "prop-types";
 import Spinner from "../layout/Spinner";
-import * as Constants from "../../Helpers/Constants";
-
+import { CLIENT_KEY } from "../../Helpers/Constants";
+import { fetchReport } from "../../actions/Reports/ReportActions";
 class Reports extends Component {
   state = {
-    issues: [],
+    reports: [],
     notFound: false,
     isFetching: true
   };
 
-  static getDerivedStateFromProps(props, state) {
-    // const {clients} = props;
-
-    // if(clients){
-
-    //     //Add total
-    //     const total = clients.reduce((total, client) => {
-    //         return total + parseFloat(client.balance.toString());
-    //     },0);
-    //     return {totalowed: total};
-    // }
-
-    return null;
-  }
-
   componentDidMount() {
-    const issues = [];
-    const isFetching = true;
-    const { firestore, settings } = this.props;
-    const { categories, region } = settings;
-    const { sort, regcat } = this.props.match.params;
-    const regcarray = regcat.split("&");
-    let freg = "";
-    let fcat = "";
-    if (regcarray.length === 2) {
-      let reg = regcarray[0];
-      let cat = regcarray[1];
-      region.includes(reg) ? (freg = reg) : (freg = region[0]);
-      categories.includes(cat) ? (fcat = cat) : (fcat = categories[0]);
-      const status = this.getStatusFromSort(sort);
-      //console.log("We got here: ",fcat);
-
-      let query = firestore
-        .collection(Constants.REF_REPORTS)
-        .where(Constants.FIELD_CATEGORY, "==", fcat)
-        .where(Constants.FIELD_SUPCODE, "==", freg)
-        .where(Constants.CASE_STATUS, "<", 4);
-      if (status < 3) {
-        query = query.where(Constants.CASE_STATUS, "==", status);
-        //console.log("Fetching: ");
-      }
-
-      query.get().then(querysnap => {
-        querysnap.forEach(element => {
-          const doc = element.data();
-          issues.push(doc);
-          //console.log("Pushing: ");
-        });
-
-        this.setState({ issues: issues, isFetching: false });
-      });
-    } else {
-      this.setState({ notFound: true, isFetching: false });
+    const { fetchReport, auth } = this.props;
+    if (auth.user) {
+      fetchReport(auth.user[CLIENT_KEY]);
     }
   }
 
   render() {
     const { auth } = this.props;
     const category = this.props.match.params.regcat;
-    //console.log("Catwegory is ",category);
-    if (auth.uid && !this.state.isFetching) {
+
+    if (auth && !this.state.isFetching) {
       const { issues } = this.state;
       if (issues.length == 0) {
         return (
@@ -172,11 +123,12 @@ Reports.propTypes = {
   clients: PropTypes.array
 };
 
-export default compose(
-  firestoreConnect(),
-  withFirestore,
-  connect((state, props) => ({
-    auth: state.firebase.auth,
-    settings: state.settings
-  }))
+const mapStateToProps = state => ({
+  auth: state.auth,
+  reports: state.reports
+});
+
+export default connect(
+  mapStateToProps,
+  { fetchReport }
 )(Reports);

@@ -13,7 +13,7 @@ import {
   FIELD_SOLVED,
   CLIENT_KEY
 } from "../../Helpers/Constants";
-import { AnalyticParser } from "../../actions/Reports/ReportParser";
+import { AnalyticParser } from "../../actions/Reports/AnalyticParser";
 import { Duration } from "../../Helpers/Assemblies";
 
 class Home extends Component {

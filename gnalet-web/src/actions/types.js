@@ -13,3 +13,4 @@ export const GET_ERRORS = "GET_ERRORS";
 export const GET_REQUEST = "GET_REQUEST";
 
 export const ANALYTIC_REPORT_ALL_GET = "analytix_get_all_report";
+export const REPOPRTS_QUERY = "reportQuery";
