@@ -13,7 +13,7 @@ export default class SortOptions extends React.Component {
   onChange = e => {
     const { updateSorts } = this.props;
     //this.setState({ [e.target.name]: e.target.value })
-    updateSorts({ [e.target.name]: e.target.value });
+    updateSorts(e.target.name, e.target.value);
   };
 
   render() {
@@ -22,7 +22,7 @@ export default class SortOptions extends React.Component {
       <div className="row mg">
         <div className="col-md-4" style={{ marginBottom: "3%" }}>
           {category_ids.length > 0 ? (
-            <div className="input-group shadow p-3 mb-5 bg-white rounded">
+            <div className="input-group shadow p-3  bg-white rounded">
               <select
                 className="custom-select"
                 id="inputGroupSelect04"
@@ -43,7 +43,7 @@ export default class SortOptions extends React.Component {
         </div>
         <div className="col-md-4">
           {regionArray.length > 0 ? (
-            <div className="input-group shadow p-3 mb-5 bg-white rounded">
+            <div className="input-group shadow p-3  bg-white rounded">
               <select
                 className="custom-select"
                 id="inputGroupSelect04"
@@ -63,7 +63,7 @@ export default class SortOptions extends React.Component {
           ) : null}
         </div>
         <div className="col-md-4">
-          <div className="input-group shadow p-3 mb-5 bg-white rounded">
+          <div className="input-group shadow p-3  bg-white rounded">
             <select
               className="custom-select"
               id="inputGroupSelect04"

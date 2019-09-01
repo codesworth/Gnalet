@@ -9,7 +9,8 @@ import {
   CLIENT_KEY,
   formatDate,
   getStatusFromCode,
-  FIELD_SUPBODY
+  FIELD_SUPBODY,
+  _DATE
 } from "../../Helpers/Constants";
 import { fetchReport } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
@@ -19,8 +20,8 @@ class Reports extends Component {
     reports: [],
     notFound: false,
     isFetching: true,
-    region: "All",
-    category: "All",
+    region: "BR",
+    category: "ECG",
     period: 0
   };
 
@@ -31,7 +32,7 @@ class Reports extends Component {
     const { fetchReport, auth } = this.props;
     if (auth.user) {
       let options = {};
-      const { category, region, period } = this.state;
+      const { category, region } = this.state;
       if (category === "All" && region == "All") {
         options = { period };
       } else {
@@ -65,6 +66,7 @@ class Reports extends Component {
     } else {
       options = { category, region, period };
     }
+    console.log(options);
     fetchReport(auth.user[CLIENT_KEY], options);
   };
 
@@ -92,11 +94,11 @@ class Reports extends Component {
       return (
         <div className="container-main">
           <div className="row">
-            <div className="col-md-2">
-              <h2>
+            <div className="col-md-2 pt-4">
+              <h3>
                 {" "}
                 <i className="fas fa-copy" /> REPORTS{" "}
-              </h2>
+              </h3>
             </div>
 
             <div className="col-md-8">
@@ -105,18 +107,19 @@ class Reports extends Component {
                 periodval={this.props.match.params.period}
               ></SortOptions>
             </div>
+            <div className="col-md-2">
+              <button
+                className="btn btn-outline-info"
+                type="button"
+                onClick={this.refetchReports.bind(this)}
+              >
+                Update
+              </button>
+            </div>
           </div>
-          <div className="col-md-2">
-            <button
-              className="btn btn-outline-info"
-              type="button"
-              onClick={this.refetchReports.bind(this)}
-            >
-              Update
-            </button>
-          </div>
-          <div className="col-xs-12">
-            <table className=" table  table-striped">
+
+          <div className="col-xs-12 rounded ">
+            <table className=" table  table-striped table-bordered table-hover ">
               <thead>
                 <tr>
                   <th>Report</th>
@@ -136,7 +139,7 @@ class Reports extends Component {
                     </td>
                     <td>{report.Reporter}</td>
                     <td>{report[FIELD_SUPBODY]}</td>
-                    <td>{formatDate(report.ts)}</td>
+                    <td>{formatDate(report[_DATE])}</td>
                     <td>{getStatusFromCode(report.status)}</td>
                     <td>
                       <Link

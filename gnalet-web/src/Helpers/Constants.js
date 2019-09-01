@@ -34,6 +34,7 @@ export const POTHOLES = "POTHOLES";
 export const ECG = "ECG";
 export const HFDA = "HFDA";
 export const OTHERS = "OTHERS";
+export const QUERY_LIMIT = 20;
 export const GSA = "GSA";
 export const FIELD_DUPLICATE = "duplicate";
 export const CASE_EMAIL = "email";
@@ -162,21 +163,21 @@ export function returnMonthYear(ts) {
   return val;
 }
 
-export const Regions = {
-  OR: "Oti Region",
-  BER: "Bono East Region",
-  AHR: "Ahafo Region",
-  BR: "Bono Region",
-  NER: "North East Region",
-  SR: "Savannah Region",
-  WNR: "Western North Region",
-  WR: "Western Region",
-  VR: "Volta Region",
-  GAR: "Greater Accra Region",
-  ER: "Eastern Region",
-  AR: "Ashanti Region",
-  CR: "Central Region",
-  NR: "Northern Region",
-  UER: "Upper East Region",
-  UWR: "Upper West Region"
-};
+// export const Regions = {
+//   OR: "Oti Region",
+//   BER: "Bono East Region",
+//   AHR: "Ahafo Region",
+//   BR: "Bono Region",
+//   NER: "North East Region",
+//   SR: "Savannah Region",
+//   WNR: "Western North Region",
+//   WR: "Western Region",
+//   VR: "Volta Region",
+//   GAR: "Greater Accra Region",
+//   ER: "Eastern Region",
+//   AR: "Ashanti Region",
+//   CR: "Central Region",
+//   NR: "Northern Region",
+//   UER: "Upper East Region",
+//   UWR: "Upper West Region"
+// };
