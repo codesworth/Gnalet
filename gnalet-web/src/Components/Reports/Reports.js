@@ -10,7 +10,8 @@ import {
   formatDate,
   getStatusFromCode,
   FIELD_SUPBODY,
-  _DATE
+  _DATE,
+  FIELD_CATEGORY
 } from "../../Helpers/Constants";
 import { fetchReport } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
@@ -20,7 +21,7 @@ class Reports extends Component {
     reports: [],
     notFound: false,
     isFetching: true,
-    region: "BR",
+    region: "All",
     category: "ECG",
     period: 0
   };
@@ -50,6 +51,8 @@ class Reports extends Component {
       const data = parser.documents;
       console.log(`Data are: ${data}`);
       this.setState({ reports: data, isFetching: false });
+    } else {
+      this.setState({ isFetching: false });
     }
   }
 
@@ -75,7 +78,7 @@ class Reports extends Component {
 
     if (auth && !this.state.isFetching) {
       const { reports } = this.state;
-      if (reports.length == 0) {
+      if (reports.length == -1) {
         return (
           <div className="row mg">
             <div className="col">
@@ -94,22 +97,23 @@ class Reports extends Component {
       return (
         <div className="container-main">
           <div className="row">
-            <div className="col-md-2 pt-4">
+            <div className="col-md-6 pt-4">
               <h3>
                 {" "}
                 <i className="fas fa-copy" /> REPORTS{" "}
               </h3>
             </div>
-
+          </div>
+          <div className="row">
             <div className="col-md-8">
               <SortOptions
                 updateSorts={this.updateSorts}
                 periodval={this.props.match.params.period}
               ></SortOptions>
             </div>
-            <div className="col-md-2">
+            <div className="col-md-2 mx-auto">
               <button
-                className="btn btn-outline-info"
+                className="btn btn-outline-info mt-4"
                 type="button"
                 onClick={this.refetchReports.bind(this)}
               >
@@ -117,7 +121,6 @@ class Reports extends Component {
               </button>
             </div>
           </div>
-
           <div className="col-xs-12 rounded ">
             <table className=" table  table-striped table-bordered table-hover ">
               <thead>
@@ -127,6 +130,7 @@ class Reports extends Component {
                   <th>Region</th>
                   <th>Date And Time</th>
                   <th>Status</th>
+                  <th>Category</th>
                   <th>Details</th>
                 </tr>
               </thead>
@@ -141,6 +145,11 @@ class Reports extends Component {
                     <td>{report[FIELD_SUPBODY]}</td>
                     <td>{formatDate(report[_DATE])}</td>
                     <td>{getStatusFromCode(report.status)}</td>
+                    <td>
+                      <span className="badge badge-pill badge-primary">
+                        {report[FIELD_CATEGORY]}
+                      </span>
+                    </td>
                     <td>
                       <Link
                         to={`/report/`}

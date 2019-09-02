@@ -1,4 +1,8 @@
-import { ANALYTIC_REPORT_ALL_GET, REPOPRTS_QUERY } from "../actions/types";
+import {
+  ANALYTIC_REPORT_ALL_GET,
+  REPOPRTS_QUERY,
+  DETAILS_REPORT
+} from "../actions/types";
 
 const initialState = { snapshot: null, reports: null };
 
@@ -14,6 +18,12 @@ export default function(state = initialState, action) {
       return {
         ...state,
         reports: action.payload
+      };
+
+    case DETAILS_REPORT:
+      return {
+        ...state,
+        selected: action.payload
       };
     default:
       return initialState;

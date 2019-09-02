@@ -19,17 +19,14 @@ class ReportDetails extends Component {
         showImage: false,
         category: '',
         show: false,
-        st:0
+        st:0,
+        selected:null
     }
 
-    
-    static  getDerivedStateFromProps(props, state){
 
-        // const cat = props.match.params.regcat;
-        console.log("Props are: ", props);
-        console.log("Thus url: ", window.document.referrer);
-        
-         return null;
+    componentDidMount(){
+
+        const 
     }
 
     // statusChanged = () => {
@@ -231,11 +228,11 @@ class ReportDetails extends Component {
 
   render() {
 
-    const { report, settings } = this.props;
+    const { report, auth } = this.props;
     const {showImage,canupdate} = this.state;
-    const {access} = settings;
+    const access =  10000;
     let balanceform = '';
-    const category = this.props.match.params.category;
+    const category = report.category;
     if(showImage){
 
         balanceform = (
@@ -371,11 +368,9 @@ ReportDetails.propTypes = {
     firestore: PropTypes.object.isRequired
 }
 
-export default compose(
-    firestoreConnect( props => [
-        { collection: REF_REPORTS, storeAs: 'report', doc: props.match.params.id}
-    ]),withFirestore,connect(({ firestore: { ordered } , settings}, props) => ({
-        report: ordered.report && ordered.report[0],
-        settings: settings
-    }))
-)(ReportDetails)
+export const mapStateToProps = state = ({
+    auth:state.auth,
+    report:state.reports.selected
+})
+
+export default connect()(ReportDetails)
