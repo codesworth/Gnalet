@@ -1,45 +1,67 @@
 import React, { Component } from "react";
 import { compose } from "redux";
-import { firestoreConnect, withFirestore } from "react-redux-firebase";
 import PropTypes from "prop-types";
 import { IssuesMap } from "./IssueMapCluster";
-import {
-  getlast20Issues,
-  markerIcoForCategory
-} from "../../actions/firestoreActions";
+import { markerIcoForCategory } from "../../actions/firestoreActions";
 import { connect } from "react-redux";
 import Spinner from "../layout/Spinner";
-import { FIELD_CATEGORY, REF_REPORTS, _DATE } from "../../Helpers/Constants";
+import {
+  FIELD_CATEGORY,
+  REF_REPORTS,
+  _DATE,
+  CLIENT_KEY
+} from "../../Helpers/Constants";
+import { fetchReport } from "../../actions/Reports/ReportActions";
+import { ReportParser } from "../../actions/Reports/ReportParser";
+
 class Maps extends Component {
   constructor() {
     super();
     this.state = {
       markers: null,
+      period: 0,
       showingInfoWindow: false,
-      activeMarker: null
+      activeMarker: null,
+      category: "All",
+      region: "All"
     };
   }
 
   componentDidMount() {
-    const { firestore } = this.props;
-    firestore
-      .collection(REF_REPORTS)
-      .orderBy(_DATE, "desc")
-      .limit(20)
-      .get()
-      .then(bigquery => {
-        const markers = [];
-        bigquery.docs.forEach(doc => {
-          const cat = doc.get(FIELD_CATEGORY);
-          const ico = markerIcoForCategory(cat);
-          const marker = { ico, report: doc.data() };
-          markers.push(marker);
-        });
-        console.log("These are the issues: " + markers);
-        this.setState({ markers });
-      });
+    const { fetchReport, auth } = this.props;
+
+    if (auth.user) {
+      let options = {};
+      const { category, region, period } = this.state;
+      if (category === "All" && region == "All") {
+        options = { period };
+      } else {
+        options = { category, region, period };
+      }
+      fetchReport(auth.user[CLIENT_KEY], options);
+    }
 
     //this.props.getlast20Issues("hello");
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { reports } = nextProps.reports;
+    console.log(`reports are: ${reports}`);
+    if (reports) {
+      const parser = new ReportParser(reports);
+      const data = parser.documents;
+
+      const markers = [];
+      reports.forEach(doc => {
+        const cat = doc.get(FIELD_CATEGORY);
+        const ico = markerIcoForCategory(cat);
+        const marker = { ico, report: doc.data() };
+        markers.push(marker);
+      });
+      this.setState({ markers });
+    } else {
+      //this.setState({ isFetching: false });
+    }
   }
 
   openDetail(marker) {
@@ -82,27 +104,14 @@ class Maps extends Component {
   }
 }
 
-Maps.propTypes = {
-  firestore: PropTypes.object.isRequired,
-  clients: PropTypes.array
-};
+Maps.propTypes = {};
 
-export default compose(
-  firestoreConnect(),
-  withFirestore,
-  connect((state, props) => ({
-    auth: state.firebase.auth,
-    settings: state.settings
-  }))
-)(Maps);
-
-/** 
 const mapStateToProps = state => ({
-  markers: state.fstore.markers
+  auth: state.auth,
+  reports: state.reports
 });
 
 export default connect(
   mapStateToProps,
-  { getlast20Issues }
+  { fetchReport }
 )(Maps);
-*/

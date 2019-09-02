@@ -11,10 +11,10 @@ import Login from "./Components/auth/Login";
 // import Settings from "./Components/settings/Settings";
 import Home from "./Components/Reports/Home";
 import Reports from "./Components/Reports/Reports";
-// import ReportDetail from "./Components/Clients/ReportDetail";
+import ReportDetail from "./Components/Reports/ReportDetail";
 // import ReportLocation from "./Components/Clients/ReportLocation";
 // import AuthBodyDetail from "./Components/Clients/AuthBodyDetail";
-// import Maps from "./Components/Maps/Maps";
+import Maps from "./Components/Maps/Maps";
 //import { initialize } from "./backend/firebase";
 import PrivateRoute from "./Components/Security/PrivateRoute";
 import DummyHome from "./Components/Reports/DummyHome";
@@ -37,6 +37,16 @@ class App extends Component {
                   path="/reports/:period"
                   component={Reports}
                 />
+                <PrivateRoute
+                  exact
+                  path="/report/detail"
+                  component={ReportDetail}
+                ></PrivateRoute>
+                <PrivateRoute
+                  exact
+                  path="/maps"
+                  component={Maps}
+                ></PrivateRoute>
               </Switch>
             </div>
           </div>

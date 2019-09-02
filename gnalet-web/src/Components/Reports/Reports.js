@@ -13,7 +13,7 @@ import {
   _DATE,
   FIELD_CATEGORY
 } from "../../Helpers/Constants";
-import { fetchReport } from "../../actions/Reports/ReportActions";
+import { fetchReport, detailsFor } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "./Selects/SortOptions";
 class Reports extends Component {
@@ -22,7 +22,7 @@ class Reports extends Component {
     notFound: false,
     isFetching: true,
     region: "All",
-    category: "ECG",
+    category: "All",
     period: 0
   };
 
@@ -34,7 +34,7 @@ class Reports extends Component {
     if (auth.user) {
       let options = {};
       const { category, region } = this.state;
-      if (category === "All" && region == "All") {
+      if (category === "All" && region === "All") {
         options = { period };
       } else {
         options = { category, region, period };
@@ -42,6 +42,11 @@ class Reports extends Component {
       fetchReport(auth.user[CLIENT_KEY], options);
     }
   }
+
+  showDetail = report => {
+    this.props.detailsFor(report);
+    this.props.history.push("/report/detail");
+  };
 
   componentWillReceiveProps(nextProps) {
     const { reports } = nextProps.reports;
@@ -151,13 +156,13 @@ class Reports extends Component {
                       </span>
                     </td>
                     <td>
-                      <Link
-                        to={`/report/`}
+                      <button
+                        onClick={this.showDetail.bind(this, report)}
                         className="btn btn-secondary btn-sm"
                       >
                         <i className="fas fa-arrow-circle-right" />
                         Details
-                      </Link>
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -197,5 +202,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { fetchReport }
+  { fetchReport, detailsFor }
 )(Reports);

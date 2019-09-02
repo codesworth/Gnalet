@@ -83,11 +83,6 @@ export const fetchReport = (client, options, last) => dispatch => {
 
   query = matchPeriodQuery(query, pval, store);
 
-  if (last) {
-    query.startAfter(last).limit(5);
-  } else {
-    query.limit(3);
-  }
   console.log(query);
 
   query

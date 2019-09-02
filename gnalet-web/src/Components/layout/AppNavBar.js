@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 
 import PropTypes from "prop-types";
 import * as Constants from "../../Helpers/Constants";
+import { logout } from "../../actions/authActions";
 
 class AppNavBar extends Component {
   state = {
@@ -13,16 +14,11 @@ class AppNavBar extends Component {
   };
 
   componentDidMount() {
-    //console.log("componentDidMount");
+    const { auth } = this.props;
+    if (auth) {
+      this.setState({ isAuthenticated: auth.isAuthenticated, user: auth.user });
+    }
   }
-
-  // componentDidUpdate() {
-  //   //console.log("componentDidUpdate");
-  //   if (this.state.username === "") {
-  //     //console.log("functionWillBeCalled");
-  //     this.loadusername(this.props.auth.uid);
-  //   }
-  // }
 
   componentWillReceiveProps(nextProps) {
     const { auth } = nextProps;
@@ -69,9 +65,8 @@ class AppNavBar extends Component {
   onLogoutClick = e => {
     e.preventDefault();
 
-    //console.log("The settings ois, :",this.props);
-
-    //window.location.reload();
+    this.props.logout();
+    //this.props.history.push();
   };
 
   render() {
@@ -145,4 +140,7 @@ const mapStateToProps = state => ({
   auth: state.auth
 });
 
-export default connect(mapStateToProps)(AppNavBar);
+export default connect(
+  mapStateToProps,
+  { logout }
+)(AppNavBar);

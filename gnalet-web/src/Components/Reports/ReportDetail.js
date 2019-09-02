@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import { compose } from 'redux';
+
 import { connect } from 'react-redux';
-import { firestoreConnect, withFirestore} from 'react-redux-firebase';
 import PropTypes from 'prop-types'
 import Spinner from '../layout/Spinner'
 import Modal from 'react-bootstrap4-modal';
+import ReportLocation from './ReportLocation'
 
 import classnames from 'classnames'
 import {REF_REPORTS, CASE_SUP_BODY, formatDate, getStatusFromCode, facingCategoryname, ACCESS_CODE_READ} from '../../Helpers/Constants';
-import { firestore } from 'firebase';
+
 
 
 
@@ -23,11 +23,6 @@ class ReportDetails extends Component {
         selected:null
     }
 
-
-    componentDidMount(){
-
-        const 
-    }
 
     // statusChanged = () => {
     //     // const newStatus = this.state.st;
@@ -198,29 +193,7 @@ class ReportDetails extends Component {
         }
     }
 
-    // showModalsss(){
-    //     return (
-    //         <div className="modal fade" id="exampleModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    //             <div className="modal-dialog" role="document">
-    //                 <div className="modal-content">
-    //                 <div className="modal-header">
-    //                     <h5 className="modal-title" id="exampleModalLabel">Update Report</h5>
-    //                     <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-    //                     <span aria-hidden="true">&times;</span>
-    //                     </button>
-    //                 </div>
-    //                 <div className="modal-body">
-    //                     You are about to change the status of this Report. Please confirm that the report has been identified and addressed 
-    //                 </div>
-    //                 <div className="modal-footer">
-    //                     <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-    //                     <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={this.statusChanged.bind(this)}>Update Status</button>
-    //                 </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     )
-    // }
+
 
     popBack = () => {
         window.history.back();
@@ -353,6 +326,7 @@ class ReportDetails extends Component {
                         </div>
                     </div>
                 </div>
+                <ReportLocation showsMarker={true} lat={report.latitude} lng={report.longitude}></ReportLocation>
             </div>
         )
     }else{
@@ -365,12 +339,12 @@ class ReportDetails extends Component {
 }
 
 ReportDetails.propTypes = {
-    firestore: PropTypes.object.isRequired
+    
 }
 
-export const mapStateToProps = state = ({
+export const mapStateToProps = state => ({
     auth:state.auth,
     report:state.reports.selected
 })
 
-export default connect()(ReportDetails)
+export default connect(mapStateToProps)(ReportDetails)
