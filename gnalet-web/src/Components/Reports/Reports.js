@@ -21,8 +21,8 @@ class Reports extends Component {
     reports: [],
     notFound: false,
     isFetching: true,
-    region: "All",
-    category: "All",
+    region: "ALL",
+    category: "ALL",
     period: 0
   };
 
@@ -34,7 +34,7 @@ class Reports extends Component {
     if (auth.user) {
       let options = {};
       const { category, region } = this.state;
-      if (category === "All" && region === "All") {
+      if (category === "ALL" && region === "ALL") {
         options = { period };
       } else {
         options = { category, region, period };
@@ -52,6 +52,7 @@ class Reports extends Component {
     const { reports } = nextProps.reports;
     console.log(`reports are: ${reports}`);
     if (reports) {
+      console.log(reports);
       const parser = new ReportParser(reports);
       const data = parser.documents;
       console.log(`Data are: ${data}`);
@@ -65,11 +66,15 @@ class Reports extends Component {
     this.setState({ [args]: val });
   };
 
+  updateQueries = () => {
+    this.refetchReports();
+  };
+
   refetchReports = () => {
     const { auth, fetchReport } = this.props;
     let options = {};
     const { category, region, period } = this.state;
-    if (category === "All" && region == "All") {
+    if (category === "ALL" && region == "ALL") {
       options = { period };
     } else {
       options = { category, region, period };
@@ -114,16 +119,8 @@ class Reports extends Component {
               <SortOptions
                 updateSorts={this.updateSorts}
                 periodval={this.props.match.params.period}
+                updateQueries={this.updateQueries}
               ></SortOptions>
-            </div>
-            <div className="col-md-2 mx-auto">
-              <button
-                className="btn btn-outline-info mt-4"
-                type="button"
-                onClick={this.refetchReports.bind(this)}
-              >
-                Update
-              </button>
             </div>
           </div>
           <div className="col-xs-12 rounded ">

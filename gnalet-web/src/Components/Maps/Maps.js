@@ -13,6 +13,7 @@ import {
 } from "../../Helpers/Constants";
 import { fetchReport } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
+import SortOptions from "../Reports/Selects/SortOptions";
 
 class Maps extends Component {
   constructor() {
@@ -22,8 +23,8 @@ class Maps extends Component {
       period: 0,
       showingInfoWindow: false,
       activeMarker: null,
-      category: "All",
-      region: "All"
+      category: "ALL",
+      region: "ALL"
     };
   }
 
@@ -33,16 +34,29 @@ class Maps extends Component {
     if (auth.user) {
       let options = {};
       const { category, region, period } = this.state;
-      if (category === "All" && region == "All") {
+      if (category === "ALL" && region === "ALL") {
         options = { period };
       } else {
         options = { category, region, period };
       }
       fetchReport(auth.user[CLIENT_KEY], options);
     }
-
-    //this.props.getlast20Issues("hello");
   }
+
+  awakeFromFetch = () => {
+    const { fetchReport, auth } = this.props;
+
+    if (auth.user) {
+      let options = {};
+      const { category, region, period } = this.state;
+      if (category === "ALL" && region === "ALL") {
+        options = { period };
+      } else {
+        options = { category, region, period };
+      }
+      fetchReport(auth.user[CLIENT_KEY], options);
+    }
+  };
 
   componentWillReceiveProps(nextProps) {
     const { reports } = nextProps.reports;
@@ -64,6 +78,14 @@ class Maps extends Component {
     }
   }
 
+  updateSorts = (args, val) => {
+    this.setState({ [args]: val });
+  };
+
+  updateQueries = () => {
+    this.awakeFromFetch();
+  };
+
   openDetail(marker) {
     // const category = marker.report[FIELD_CATEGORY];
     // const id = marker.report.id;
@@ -79,7 +101,17 @@ class Maps extends Component {
     const { markers, activeMarker, showingInfoWindow } = this.state;
     return (
       <div>
-        <h1>Maps</h1>
+        <div className="row">
+          <div className="col-md-3 col-xl-2 col-sm-3">
+            <h1>Maps</h1>
+          </div>
+          <div className="col-md-9 col-xl-12 col-sm-9">
+            <SortOptions
+              updateSorts={this.updateSorts}
+              updateQueries={this.updateQueries}
+            ></SortOptions>
+          </div>
+        </div>
         <div className="row">
           <div className="col-xl-12 col-lg-12 col-md-12 col-sm-12">
             <div className="card">

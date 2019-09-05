@@ -68,6 +68,7 @@ export const CLIENT_KEY = "backendkey";
 export const FIELD_DAY_OF_YEAR = "dayOfYear";
 
 export const category_ids = [
+  "ALL",
   "VEHICULAR",
   "SANITATION",
   "CRIMES",
@@ -81,6 +82,7 @@ export const category_ids = [
 ];
 
 export const regionArray = [
+  "ALL",
   "OR",
   "BER",
   "AHR",
@@ -119,6 +121,8 @@ export function getStatusFromCode(status) {
 
 export function facingCategoryname(symlnk) {
   switch (symlnk) {
+    case "ALL":
+      return "All Categories";
     case "VEHICULAR":
       return "Accidents/Vehicular";
     case "CRIMES":
@@ -144,7 +148,7 @@ export function facingCategoryname(symlnk) {
 
 export function publicFacingRegion(region) {
   const asm =
-    typeof Regions[region] === "string" ? Regions[region] : Regions.GAR;
+    typeof Regions[region] === "string" ? Regions[region] : "All Regions";
   return asm;
 }
 

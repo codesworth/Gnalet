@@ -16,6 +16,10 @@ export default class SortOptions extends React.Component {
     updateSorts(e.target.name, e.target.value);
   };
 
+  update = () => {
+    this.props.updateQueries();
+  };
+
   render() {
     //const {periodVal} = this.props
     return (
@@ -78,6 +82,15 @@ export default class SortOptions extends React.Component {
               <option value="4">2019</option>
               <option value="5">All Time</option>
             </select>
+            <div className="input-group-append">
+              <button
+                className="btn btn-outline-info"
+                type="button"
+                onClick={this.update.bind(this)}
+              >
+                Update
+              </button>
+            </div>
           </div>
         </div>
       </div>

@@ -63,8 +63,8 @@ export const fetchReport = (client, options, last) => dispatch => {
   };
   store.settings = settings;
   let query = null;
-  if (category == "All") category = null;
-  if (region == "All") region = null;
+  if (category == "ALL") category = null;
+  if (region == "ALL") region = null;
 
   if (category && region) {
     query = store
