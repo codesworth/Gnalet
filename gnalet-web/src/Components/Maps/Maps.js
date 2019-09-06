@@ -20,57 +20,65 @@ class Maps extends Component {
   constructor() {
     super();
     this.state = {
-      markers: null,
+      markers: [],
       period: 0,
       showingInfoWindow: false,
       activeMarker: null,
       category: "ALL",
-      region: "ALL"
+      region: "ALL",
+      nextHolder: [],
+      previous: [],
+      lastsnapshot: null
     };
   }
 
   componentDidMount() {
     const { fetchReport, auth } = this.props;
-
     if (auth.user) {
       let options = {};
-      const { category, region, period } = this.state;
+      const { category, region, lastsnapshot, period } = this.state;
       if (category === "ALL" && region === "ALL") {
         options = { period };
       } else {
         options = { category, region, period };
       }
-      fetchReport(auth.user[CLIENT_KEY], options);
+      fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
     }
   }
 
   awakeFromFetch = () => {
-    const { fetchReport, auth } = this.props;
-
-    if (auth.user) {
-      let options = {};
-      const { category, region, period } = this.state;
-      if (category === "ALL" && region === "ALL") {
-        options = { period };
-      } else {
-        options = { category, region, period };
-      }
-      fetchReport(auth.user[CLIENT_KEY], options);
+    const { auth, fetchReport } = this.props;
+    if (typeof auth.user !== "object") return;
+    let options = {};
+    const { category, region, period, lastsnapshot } = this.state;
+    if (category === "ALL" && region == "ALL") {
+      options = { period };
+    } else {
+      options = { category, region, period };
     }
+    console.log(options);
+    fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
   };
 
   loadNext = () => {
     console.log("Will load Next");
-    const { reports, previous } = this.state;
+    const { reports, previous, nextHolder } = this.state;
     previous.push(reports);
+    if (nextHolder.length !== 0) {
+      const data = nextHolder.pop();
+      this.setState({ previous, reports: data });
+      return;
+    }
     this.setState({ previous });
-    this.refetchReports();
+    this.awakeFromFetch();
   };
 
   loadPrevious = () => {
-    const { previous } = this.state;
+    const { previous, reports, nextHolder } = this.state;
+    if (previous.length == 0) return;
     const data = previous.pop();
-    this.setState({ reports: data, previous });
+    if (reports) nextHolder.push(reports);
+    this.setState({ reports: data, previous, nextHolder });
   };
 
   componentWillReceiveProps(nextProps) {
@@ -80,13 +88,15 @@ class Maps extends Component {
       const parser = new ReportParser(reports.docs);
       const data = parser.documents;
 
-      const markers = [];
+      const markers = this.state.markers;
       reports.docs.forEach(doc => {
         const cat = doc.get(FIELD_CATEGORY);
         const ico = markerIcoForCategory(cat);
         const marker = { ico, report: doc.data() };
         markers.push(marker);
       });
+      console.log("Will update markers");
+
       this.setState({ markers });
     } else {
       //this.setState({ isFetching: false });
@@ -145,12 +155,12 @@ class Maps extends Component {
               </div>
             </div>
           </div>
-          <div className="row justify-content-center">
-            <Paginate
-              loadPrevious={this.loadPrevious.bind(this)}
-              loadNext={this.loadNext.bind(this)}
-            ></Paginate>
-          </div>
+        </div>
+        <div className="row justify-content-center mt-4">
+          <Paginate
+            loadPrevious={this.loadPrevious.bind(this)}
+            loadNext={this.loadNext.bind(this)}
+          ></Paginate>
         </div>
       </div>
     );

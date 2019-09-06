@@ -26,6 +26,7 @@ class Reports extends Component {
     category: "ALL",
     period: 0,
     previous: [],
+    nextHolder: [],
     lastsnapshot: null
   };
 
@@ -70,7 +71,12 @@ class Reports extends Component {
   }
 
   updateSorts = (args, val) => {
-    this.setState({ [args]: val, lastsnapshot: null });
+    this.setState({
+      [args]: val,
+      lastsnapshot: null,
+      previous: [],
+      nextHolder: []
+    });
   };
 
   updateQueries = () => {
@@ -92,16 +98,23 @@ class Reports extends Component {
 
   loadNext = () => {
     console.log("Will load Next");
-    const { reports, previous } = this.state;
+    const { reports, previous, nextHolder } = this.state;
     previous.push(reports);
+    if (nextHolder.length !== 0) {
+      const data = nextHolder.pop();
+      this.setState({ previous, reports: data });
+      return;
+    }
     this.setState({ previous });
     this.refetchReports();
   };
 
   loadPrevious = () => {
-    const { previous } = this.state;
+    const { previous, reports, nextHolder } = this.state;
+    if (previous.length == 0) return;
     const data = previous.pop();
-    this.setState({ reports: data, previous });
+    if (reports) nextHolder.push(reports);
+    this.setState({ reports: data, previous, nextHolder });
   };
 
   render() {
