@@ -81,7 +81,11 @@ export const fetchReport = (client, options, last) => dispatch => {
       .where(FIELD_SUPCODE, "==", region);
   }
 
-  query = matchPeriodQuery(query, pval, store);
+  if (last) {
+    query = matchPeriodQueryWithlast(query, pval, store, last);
+  } else {
+    query = matchPeriodQuery(query, pval, store);
+  }
 
   console.log(query);
 
@@ -90,9 +94,13 @@ export const fetchReport = (client, options, last) => dispatch => {
     .then(querysnap => {
       console.log(querysnap);
       if (querysnap) {
+        last = null;
+        if (querysnap.docs.length === QUERY_LIMIT) {
+          last = querysnap.docs[QUERY_LIMIT - 1];
+        }
         dispatch({
           type: REPOPRTS_QUERY,
-          payload: querysnap
+          payload: { docs: querysnap, last: last }
         });
       }
     })
@@ -177,6 +185,95 @@ const matchPeriodQuery = (query, pval, store) => {
         : store
             .collection(`${REF_REPORTS}`)
             .orderBy(_DATE, "desc")
+            .limit(QUERY_LIMIT);
+      break;
+  }
+};
+
+const matchPeriodQueryWithlast = (query, pval, store, last) => {
+  const day = moment().dayOfYear();
+  switch (pval) {
+    case Duration.today:
+      return query
+        ? query
+            .where(FIELD_DAY_OF_YEAR, "==", day)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, "==", day)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT);
+    case Duration.yesterday:
+      return query
+        ? query
+            .where(FIELD_DAY_OF_YEAR, "==", day - 1)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, "==", day - 1)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT);
+    case Duration.thisWeek:
+      const start = day - 6 > 0 ? day - 6 : 1;
+      return query
+        ? query
+            .where(FIELD_DAY_OF_YEAR, ">=", start)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(FIELD_DAY_OF_YEAR, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, ">=", start)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(FIELD_DAY_OF_YEAR, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT);
+
+    case Duration.thisMonth:
+      const mstart = day - 29 > 1 ? day - 29 : 1;
+      return query
+        ? query
+            .where(FIELD_DAY_OF_YEAR, ">=", mstart)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(FIELD_DAY_OF_YEAR, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .where(FIELD_DAY_OF_YEAR, ">=", mstart)
+            .where(FIELD_DAY_OF_YEAR, "<=", day)
+            .orderBy(FIELD_DAY_OF_YEAR, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT);
+
+    case Duration.thisYear:
+      const year = moment().year();
+      return query
+        ? query
+            .where("year", "==", year)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .query.where("year", "==", year)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
+            .limit(QUERY_LIMIT);
+    default:
+      return query
+        ? query.orderBy(_DATE).limit(QUERY_LIMIT)
+        : store
+            .collection(`${REF_REPORTS}`)
+            .orderBy(_DATE, "desc")
+            .startAfter(last)
             .limit(QUERY_LIMIT);
       break;
   }

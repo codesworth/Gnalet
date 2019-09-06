@@ -16,6 +16,7 @@ import {
 import { fetchReport, detailsFor } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "./Selects/SortOptions";
+import Paginate from "./Selects/Paginate";
 class Reports extends Component {
   state = {
     reports: [],
@@ -23,7 +24,9 @@ class Reports extends Component {
     isFetching: true,
     region: "ALL",
     category: "ALL",
-    period: 0
+    period: 0,
+    previous: [],
+    lastsnapshot: null
   };
 
   componentDidMount() {
@@ -33,13 +36,13 @@ class Reports extends Component {
     const { fetchReport, auth } = this.props;
     if (auth.user) {
       let options = {};
-      const { category, region } = this.state;
+      const { category, region, lastsnapshot } = this.state;
       if (category === "ALL" && region === "ALL") {
         options = { period };
       } else {
         options = { category, region, period };
       }
-      fetchReport(auth.user[CLIENT_KEY], options);
+      fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
     }
   }
 
@@ -51,19 +54,23 @@ class Reports extends Component {
   componentWillReceiveProps(nextProps) {
     const { reports } = nextProps.reports;
     console.log(`reports are: ${reports}`);
-    if (reports) {
+    if (reports && reports.docs) {
       console.log(reports);
-      const parser = new ReportParser(reports);
+      const parser = new ReportParser(reports.docs);
       const data = parser.documents;
       console.log(`Data are: ${data}`);
-      this.setState({ reports: data, isFetching: false });
+      this.setState({
+        reports: data,
+        lastsnapshot: reports.last,
+        isFetching: false
+      });
     } else {
       this.setState({ isFetching: false });
     }
   }
 
   updateSorts = (args, val) => {
-    this.setState({ [args]: val });
+    this.setState({ [args]: val, lastsnapshot: null });
   };
 
   updateQueries = () => {
@@ -73,14 +80,28 @@ class Reports extends Component {
   refetchReports = () => {
     const { auth, fetchReport } = this.props;
     let options = {};
-    const { category, region, period } = this.state;
+    const { category, region, period, lastsnapshot } = this.state;
     if (category === "ALL" && region == "ALL") {
       options = { period };
     } else {
       options = { category, region, period };
     }
     console.log(options);
-    fetchReport(auth.user[CLIENT_KEY], options);
+    fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
+  };
+
+  loadNext = () => {
+    console.log("Will load Next");
+    const { reports, previous } = this.state;
+    previous.push(reports);
+    this.setState({ previous });
+    this.refetchReports();
+  };
+
+  loadPrevious = () => {
+    const { previous } = this.state;
+    const data = previous.pop();
+    this.setState({ reports: data, previous });
   };
 
   render() {
@@ -165,6 +186,12 @@ class Reports extends Component {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="row justify-content-center">
+            <Paginate
+              loadPrevious={this.loadPrevious.bind(this)}
+              loadNext={this.loadNext.bind(this)}
+            ></Paginate>
           </div>
         </div>
       );

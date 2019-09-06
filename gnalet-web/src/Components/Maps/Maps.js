@@ -14,6 +14,7 @@ import {
 import { fetchReport } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "../Reports/Selects/SortOptions";
+import Paginate from "../Reports/Selects/Paginate";
 
 class Maps extends Component {
   constructor() {
@@ -58,15 +59,29 @@ class Maps extends Component {
     }
   };
 
+  loadNext = () => {
+    console.log("Will load Next");
+    const { reports, previous } = this.state;
+    previous.push(reports);
+    this.setState({ previous });
+    this.refetchReports();
+  };
+
+  loadPrevious = () => {
+    const { previous } = this.state;
+    const data = previous.pop();
+    this.setState({ reports: data, previous });
+  };
+
   componentWillReceiveProps(nextProps) {
     const { reports } = nextProps.reports;
     console.log(`reports are: ${reports}`);
-    if (reports) {
-      const parser = new ReportParser(reports);
+    if (reports && reports.docs) {
+      const parser = new ReportParser(reports.docs);
       const data = parser.documents;
 
       const markers = [];
-      reports.forEach(doc => {
+      reports.docs.forEach(doc => {
         const cat = doc.get(FIELD_CATEGORY);
         const ico = markerIcoForCategory(cat);
         const marker = { ico, report: doc.data() };
@@ -129,6 +144,12 @@ class Maps extends Component {
                 )}
               </div>
             </div>
+          </div>
+          <div className="row justify-content-center">
+            <Paginate
+              loadPrevious={this.loadPrevious.bind(this)}
+              loadNext={this.loadNext.bind(this)}
+            ></Paginate>
           </div>
         </div>
       </div>
