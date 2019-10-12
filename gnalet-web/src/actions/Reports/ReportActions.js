@@ -92,6 +92,7 @@ export const fetchReport = (client, options, last) => dispatch => {
   query
     .get()
     .then(querysnap => {
+      console.log("Thus is the querysnapshot");
       console.log(querysnap);
       if (querysnap) {
         last = null;
@@ -105,6 +106,8 @@ export const fetchReport = (client, options, last) => dispatch => {
       }
     })
     .catch(err => {
+      console.log("Error");
+
       dispatch({
         type: GET_ERRORS,
         payload: { report: "Error Fetching reports" }
@@ -169,6 +172,7 @@ const matchPeriodQuery = (query, pval, store) => {
 
     case Duration.thisYear:
       const year = moment().year();
+      console.log(`The moment year is ${year}`);
       return query
         ? query
             .where("year", "==", year)
@@ -176,7 +180,7 @@ const matchPeriodQuery = (query, pval, store) => {
             .limit(QUERY_LIMIT)
         : store
             .collection(`${REF_REPORTS}`)
-            .query.where("year", "==", year)
+            .where("year", "==", year)
             .orderBy(_DATE, "desc")
             .limit(QUERY_LIMIT);
     default:
@@ -291,4 +295,18 @@ export const detailsFor = report => dispatch => {
       payload: { report: "Error unknown" }
     });
   }
+};
+
+/**
+ * Update Status
+ */
+
+export const updateStatus = (client, id, status) => {
+  const store = backends[client].firestore();
+  store.doc(`${REF_REPORTS}/${id}`).update({ status: status });
+};
+
+export const updateCategory = (client, id, category) => {
+  const store = backends[client].firestore();
+  store.doc(`${REF_REPORTS}/${id}`).update({ category: category });
 };
