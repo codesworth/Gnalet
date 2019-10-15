@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
 import { connect } from "react-redux";
-
+import ReportDetailModal from "./ReportDetailModal";
+import Modal from "react-bootstrap/Modal";
 import PropTypes from "prop-types";
 import Spinner from "../layout/Spinner";
 import {
@@ -17,7 +18,7 @@ import { fetchReport, detailsFor } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "./Selects/SortOptions";
 import Paginate from "./Selects/Paginate";
-import Modal from "react-bootstrap4-modal";
+
 import ReportDetail from "./ReportDetail";
 class Reports extends Component {
   state = {
@@ -122,14 +123,59 @@ class Reports extends Component {
     this.setState({ reports: data, previous, nextHolder });
   };
 
+  modalBackdropClicked() {
+    this.setState({ show: false });
+  }
+
+  setLgShow = attr => {
+    console.log("Logged");
+  };
   showReportModal() {
-    const { show, report } = this.state;
+    const { report, show } = this.state;
     if (report) {
       return (
-        <Modal visible={show}>
-          <ReportDetail report={report}></ReportDetail>
+        <Modal
+          size="xl"
+          show={show}
+          aria-labelledby="example-modal-sizes-title-xl"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="example-modal-sizes-title-xl">
+              Large Modal
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>...</Modal.Body>
         </Modal>
+        // <Modal
+        //   size="xl"
+        //   show={show}
+        //   aria-labelledby="example-modal-sizes-title-sm"
+        // >
+        //   <Modal.Header closeButton>
+        //     <Modal.Title id="example-modal-sizes-title-sm">
+        //       Report Details
+        //     </Modal.Title>
+        //   </Modal.Header>
+        //   <Modal.Body>
+        //     <ReportDetail report={report}></ReportDetail>
+        //   </Modal.Body>
+        // </Modal>
       );
+      // return (
+      //   <div
+      //     class="modal fade bd-example-modal-xl"
+      //     tabindex="-1"
+      //     role="dialog"
+      //     aria-labelledby="myExtraLargeModalLabel"
+      //     aria-hidden="true"
+      //   >
+      //     <div class="modal-dialog modal-xl">
+      //       <div class="modal-content">
+      //         <ReportDetail report={report}></ReportDetail>
+      //       </div>
+      //     </div>
+      //   </div>
+      // );
     } else {
       return null;
     }
