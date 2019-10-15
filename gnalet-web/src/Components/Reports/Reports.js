@@ -17,6 +17,8 @@ import { fetchReport, detailsFor } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "./Selects/SortOptions";
 import Paginate from "./Selects/Paginate";
+import Modal from "react-bootstrap4-modal";
+import ReportDetail from "./ReportDetail";
 class Reports extends Component {
   state = {
     reports: [],
@@ -27,7 +29,9 @@ class Reports extends Component {
     period: 0,
     previous: [],
     nextHolder: [],
-    lastsnapshot: null
+    lastsnapshot: null,
+    show: false,
+    report: null
   };
 
   componentDidMount() {
@@ -48,8 +52,9 @@ class Reports extends Component {
   }
 
   showDetail = report => {
-    this.props.detailsFor(report);
-    this.props.history.push("/report/detail");
+    // this.props.detailsFor(report);
+    //this.props.history.push("/report/detail");
+    this.setState({ show: true, report });
   };
 
   componentWillReceiveProps(nextProps) {
@@ -117,6 +122,19 @@ class Reports extends Component {
     this.setState({ reports: data, previous, nextHolder });
   };
 
+  showReportModal() {
+    const { show, report } = this.state;
+    if (report) {
+      return (
+        <Modal visible={show}>
+          <ReportDetail report={report}></ReportDetail>
+        </Modal>
+      );
+    } else {
+      return null;
+    }
+  }
+
   render() {
     const { auth } = this.props;
 
@@ -140,6 +158,7 @@ class Reports extends Component {
       }
       return (
         <div className="container-main">
+          {this.showReportModal()}
           <div className="row">
             <div className="col-md-6 pt-4">
               <h3>

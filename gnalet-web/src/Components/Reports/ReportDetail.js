@@ -18,10 +18,10 @@ import {
   ACCESS_CODE_READ
 } from "../../Helpers/Constants";
 import { CategoryButton } from "./Selects/FunctionalComp";
-import {
-  updateStatus,
-  updateCategory
-} from "../../actions/Reports/ReportActions";
+// import {
+//   updateStatus,
+//   updateCategory
+// } from "../../actions/Reports/ReportActions";
 
 class ReportDetails extends Component {
   state = {
@@ -31,14 +31,6 @@ class ReportDetails extends Component {
     st: 0,
     selected: null
   };
-
-  // statusChanged = () => {
-  //     // const newStatus = this.state.st;
-  //     //console.log("I have been called with status: ",newStatus)
-  //     this.setState({st:0, show:false});
-  //    // const { firestore, } = this.props;
-  //     //firestore.collection(REF_REPORTS).doc(this.props.match.params.id).update({status:newStatus});
-  // }
 
   statusWillChange = status => {
     this.setState({ st: status, show: true });
@@ -127,16 +119,18 @@ class ReportDetails extends Component {
 
   modalbuttConfirmed = type => {
     const client = this.props.auth.user[CLIENT_KEY];
+    console.log("Home client: " + this.props.auth);
+
     console.longitude(this.props.auth.user);
     const { category } = this.state;
     const id = this.props.match.params.id;
-    const { updateStatus, updateCategory } = this.props;
+    //const { updateStatus, updateCategory } = this.props;
 
-    if (type > 0 && type < 5) {
-      updateStatus(client, id, type);
-    } else if (type === 5) {
-      updateCategory(client, id, category);
-    }
+    // if (type > 0 && type < 5) {
+    //   updateStatus(client, id, type);
+    // } else if (type === 5) {
+    //   updateCategory(client, id, category);
+    // }
   };
 
   showModal() {
@@ -415,13 +409,10 @@ class ReportDetails extends Component {
 
 ReportDetails.propTypes = {};
 
-export const mapStateToProps = state => ({
-  auth: state.auth,
-  report: state.reports.selected
-});
+export default ReportDetails;
 
-export default connect(
-  mapStateToProps,
-  updateStatus,
-  updateCategory
-)(ReportDetails);
+// export const mapStateToProps = state => ({
+//   auth: state.auth
+// });
+
+// export default connect({ updateStatus, updateCategory })(ReportDetails);

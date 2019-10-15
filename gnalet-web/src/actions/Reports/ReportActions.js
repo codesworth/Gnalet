@@ -302,6 +302,7 @@ export const detailsFor = report => dispatch => {
  */
 
 export const updateStatus = (client, id, status) => {
+  console.log("Cliet is: " + client);
   const store = backends[client].firestore();
   store.doc(`${REF_REPORTS}/${id}`).update({ status: status });
 };
