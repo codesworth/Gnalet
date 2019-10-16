@@ -39,6 +39,7 @@ class Home extends Component {
     const vals = {};
 
     const num = parseInt(value, 10);
+    this.setState({ period: num });
     this.runAnalysisForPeriod(num);
   };
 

@@ -148,7 +148,8 @@ class Reports extends Component {
     const { auth } = this.props;
 
     if (auth && !this.state.isFetching) {
-      const { reports, period } = this.state;
+      const { reports } = this.state;
+      const { period } = this.props.match.params;
       if (reports.length == -1) {
         return (
           <div className="row mg">
@@ -180,7 +181,7 @@ class Reports extends Component {
             <div className="col-md-8">
               <SortOptions
                 updateSorts={this.updateSorts}
-                periodval={this.props.match.params.period}
+                periodval={period}
                 updateQueries={this.updateQueries}
               ></SortOptions>
             </div>

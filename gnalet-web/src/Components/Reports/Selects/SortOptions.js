@@ -20,8 +20,29 @@ export default class SortOptions extends React.Component {
     this.props.updateQueries();
   };
 
+  valueForPeriod = val => {
+    console.log("The default is: " + val);
+    const rval = parseInt(val, 10);
+    switch (rval) {
+      case 0:
+        return "Today";
+      case 1:
+        return "Yesterday";
+      case 2:
+        return "Week";
+      case 3:
+        return "Month";
+      case 4:
+        return "2019";
+      case 5:
+        return "All Time";
+      default:
+        return "Duration";
+    }
+  };
+
   render() {
-    const { periodVal } = this.props;
+    const { periodval } = this.props;
     return (
       <div className="row mg">
         <div className="col-md-4">
@@ -69,19 +90,29 @@ export default class SortOptions extends React.Component {
         <div className="col-md-4">
           <div className="input-group   bg-white rounded">
             <select
-              defaultValue={periodVal.toString()}
+              value={periodval}
               className="custom-select"
               id="inputGroupSelect04"
               aria-label="Example select with button addon"
               onChange={this.onChange.bind(this)}
               name="period"
             >
-              <option value="0">Today</option>
-              <option value="1">Yesterday</option>
-              <option value="2">Week</option>
-              <option value="3">Month</option>
-              <option value="4">2019</option>
-              <option value="5">All Time</option>
+              {" "}
+              {["0", "1", "2", "3", "4", "5"].map(x => {
+                if (periodval.toString() === x) {
+                  return (
+                    <option key={x} value={x}>
+                      {this.valueForPeriod(periodval)}
+                    </option>
+                  );
+                } else {
+                  return (
+                    <option key={x} value={x}>
+                      {this.valueForPeriod(periodval)}
+                    </option>
+                  );
+                }
+              })}
             </select>
             <div className="input-group-append">
               <button
@@ -97,4 +128,16 @@ export default class SortOptions extends React.Component {
       </div>
     );
   }
+
+  // options = () => {
+  //   const def = this.props.periodval.toString()
+  //   const options = [def] //["0","1","2","3","4","5"]
+  //   for (let i = 0; i < 6; i++) {
+  //     if (i.toString() != def){
+  //       options.push
+  //     }
+
+  //   }
+
+  // }
 }
