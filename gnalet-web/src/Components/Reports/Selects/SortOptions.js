@@ -21,7 +21,7 @@ export default class SortOptions extends React.Component {
   };
 
   render() {
-    //const {periodVal} = this.props
+    const { periodVal } = this.props;
     return (
       <div className="row mg">
         <div className="col-md-4">
@@ -69,6 +69,7 @@ export default class SortOptions extends React.Component {
         <div className="col-md-4">
           <div className="input-group   bg-white rounded">
             <select
+              defaultValue={periodVal.toString()}
               className="custom-select"
               id="inputGroupSelect04"
               aria-label="Example select with button addon"

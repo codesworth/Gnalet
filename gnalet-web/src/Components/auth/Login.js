@@ -46,7 +46,7 @@ class Login extends Component {
 
     return (
       <div className="row">
-        <div className="col-md-6 mx-auto">
+        <div className="col-md-8 col-lg-6 col-xl-6 col-sm-10 mx-auto">
           {this.state.isLoading ? (
             <div
               style={{

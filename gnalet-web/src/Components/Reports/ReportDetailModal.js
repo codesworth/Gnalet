@@ -22,6 +22,8 @@ class ReportDetailModal extends Component {
   }
 
   hideModal = () => {
+    const { hide } = this.props;
+    hide();
     this.setState({ show: false });
   };
 

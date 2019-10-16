@@ -96,7 +96,7 @@ class Reports extends Component {
     let options = {};
     const { category, region, period, lastsnapshot, status } = this.state;
     if (category === "ALL" && region == "ALL") {
-      options = { period };
+      options = { period, status };
     } else {
       options = { category, region, period, status };
     }
@@ -125,11 +125,19 @@ class Reports extends Component {
     this.setState({ reports: data, previous, nextHolder });
   };
 
+  hideModal = () => {
+    this.setState({ show: false });
+  };
+
   showReportModal() {
     const { report, show } = this.state;
     if (report) {
       return (
-        <ReportDetailModal report={report} show={show}></ReportDetailModal>
+        <ReportDetailModal
+          report={report}
+          show={show}
+          hide={this.hideModal.bind(this)}
+        ></ReportDetailModal>
       );
     } else {
       return null;
@@ -140,7 +148,7 @@ class Reports extends Component {
     const { auth } = this.props;
 
     if (auth && !this.state.isFetching) {
-      const { reports } = this.state;
+      const { reports, period } = this.state;
       if (reports.length == -1) {
         return (
           <div className="row mg">
