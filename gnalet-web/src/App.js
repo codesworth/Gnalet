@@ -34,7 +34,7 @@ class App extends Component {
                 <PrivateRoute exact path="/" component={Home} />
                 <PrivateRoute
                   exact
-                  path="/reports/:period"
+                  path="/reports/:status/:period"
                   component={Reports}
                 />
                 <PrivateRoute

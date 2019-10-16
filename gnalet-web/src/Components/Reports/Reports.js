@@ -9,7 +9,6 @@ import Spinner from "../layout/Spinner";
 import {
   CLIENT_KEY,
   formatDate,
-  getStatusFromCode,
   FIELD_SUPBODY,
   _DATE,
   FIELD_CATEGORY
@@ -18,7 +17,7 @@ import { fetchReport, detailsFor } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "./Selects/SortOptions";
 import Paginate from "./Selects/Paginate";
-
+import { StatusBadge } from "./Selects/FunctionalComp";
 import ReportDetail from "./ReportDetail";
 class Reports extends Component {
   state = {
@@ -32,22 +31,25 @@ class Reports extends Component {
     nextHolder: [],
     lastsnapshot: null,
     show: false,
-    report: null
+    report: null,
+    status: null
   };
 
   componentDidMount() {
+    const { status } = this.props.match.params;
     const period = parseInt(this.props.match.params.period, 10);
-    console.log(`Ten perios is ${period}`);
+    //console.log(`Ten perios is ${period}`);
 
     const { fetchReport, auth } = this.props;
     if (auth.user) {
       let options = {};
       const { category, region, lastsnapshot } = this.state;
       if (category === "ALL" && region === "ALL") {
-        options = { period };
+        options = { period, status };
       } else {
         options = { category, region, period };
       }
+      this.setState({ status, period });
       fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
     }
   }
@@ -92,11 +94,11 @@ class Reports extends Component {
   refetchReports = () => {
     const { auth, fetchReport } = this.props;
     let options = {};
-    const { category, region, period, lastsnapshot } = this.state;
+    const { category, region, period, lastsnapshot, status } = this.state;
     if (category === "ALL" && region == "ALL") {
       options = { period };
     } else {
-      options = { category, region, period };
+      options = { category, region, period, status };
     }
     console.log(options);
     fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
@@ -123,59 +125,12 @@ class Reports extends Component {
     this.setState({ reports: data, previous, nextHolder });
   };
 
-  modalBackdropClicked() {
-    this.setState({ show: false });
-  }
-
-  setLgShow = attr => {
-    console.log("Logged");
-  };
   showReportModal() {
     const { report, show } = this.state;
     if (report) {
       return (
-        <Modal
-          size="xl"
-          show={show}
-          aria-labelledby="example-modal-sizes-title-xl"
-        >
-          <Modal.Header closeButton>
-            <Modal.Title id="example-modal-sizes-title-xl">
-              Large Modal
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>...</Modal.Body>
-        </Modal>
-        // <Modal
-        //   size="xl"
-        //   show={show}
-        //   aria-labelledby="example-modal-sizes-title-sm"
-        // >
-        //   <Modal.Header closeButton>
-        //     <Modal.Title id="example-modal-sizes-title-sm">
-        //       Report Details
-        //     </Modal.Title>
-        //   </Modal.Header>
-        //   <Modal.Body>
-        //     <ReportDetail report={report}></ReportDetail>
-        //   </Modal.Body>
-        // </Modal>
+        <ReportDetailModal report={report} show={show}></ReportDetailModal>
       );
-      // return (
-      //   <div
-      //     class="modal fade bd-example-modal-xl"
-      //     tabindex="-1"
-      //     role="dialog"
-      //     aria-labelledby="myExtraLargeModalLabel"
-      //     aria-hidden="true"
-      //   >
-      //     <div class="modal-dialog modal-xl">
-      //       <div class="modal-content">
-      //         <ReportDetail report={report}></ReportDetail>
-      //       </div>
-      //     </div>
-      //   </div>
-      // );
     } else {
       return null;
     }
@@ -245,7 +200,9 @@ class Reports extends Component {
                     <td>{report.Reporter}</td>
                     <td>{report[FIELD_SUPBODY]}</td>
                     <td>{formatDate(report[_DATE])}</td>
-                    <td>{getStatusFromCode(report.status)}</td>
+                    <td>
+                      <StatusBadge status={report.status} />
+                    </td>
                     <td>
                       <span className="badge badge-pill badge-primary">
                         {report[FIELD_CATEGORY]}

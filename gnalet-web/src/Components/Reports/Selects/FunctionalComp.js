@@ -1,4 +1,5 @@
 import React from "react";
+import { getStatusFromCode } from "../../../Helpers/Constants";
 
 export const CategoryButton = cat => {
   let className = "";
@@ -38,6 +39,34 @@ export const CategoryButton = cat => {
       <button className={className}>
         {cat.toUpperCase()} <i className="fas fa-map-marker-alt"></i>
       </button>
+    </div>
+  );
+};
+
+export const StatusBadge = status => {
+  let classname = "";
+  console.log(status);
+
+  switch (status.status) {
+    case 0:
+      classname = "badge badge-danger";
+      break;
+    case 1:
+      classname = "badge badge-warning";
+      break;
+    case 2:
+      classname = "badge badge-success";
+      break;
+    case 3:
+      classname = "badge badge-dark";
+      break;
+    default:
+      classname = "badge badge-info";
+  }
+
+  return (
+    <div>
+      <span className={classname}>{getStatusFromCode(status.status)}</span>
     </div>
   );
 };

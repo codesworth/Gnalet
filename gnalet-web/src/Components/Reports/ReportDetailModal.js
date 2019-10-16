@@ -16,6 +16,15 @@ class ReportDetailModal extends Component {
     this.setState({ report, show });
   }
 
+  componentWillReceiveProps(nextProps) {
+    const { report, show } = nextProps;
+    this.setState({ report, show });
+  }
+
+  hideModal = () => {
+    this.setState({ show: false });
+  };
+
   render() {
     const { report, show } = this.state;
 
@@ -23,11 +32,12 @@ class ReportDetailModal extends Component {
       return (
         <Modal
           size="xl"
+          onHide={this.hideModal.bind(this)}
           show={show}
-          aria-labelledby="example-modal-sizes-title-sm"
+          aria-labelledby="example-modal-sizes-title-xl"
         >
           <Modal.Header closeButton>
-            <Modal.Title id="example-modal-sizes-title-sm">
+            <Modal.Title id="example-modal-sizes-title-xl">
               Report Details
             </Modal.Title>
           </Modal.Header>

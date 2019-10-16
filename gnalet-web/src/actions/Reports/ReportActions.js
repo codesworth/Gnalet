@@ -14,7 +14,8 @@ import {
   FIELD_SUPCODE,
   _DATE,
   FIELD_DAY_OF_YEAR,
-  QUERY_LIMIT
+  QUERY_LIMIT,
+  CASE_STATUS
 } from "../../Helpers/Constants";
 import * as moment from "moment";
 
@@ -54,8 +55,23 @@ export const getRportAnalytics = (client, allTime = false) => dispatch => {
     });
 };
 
+const statusInt = status => {
+  switch (status) {
+    case "unsolved":
+      return 0;
+    case "pending":
+      return 1;
+    case "solved":
+      return 2;
+    case "flagged":
+      return 3;
+    default:
+      return 4;
+  }
+};
+
 export const fetchReport = (client, options, last) => dispatch => {
-  let { category, region, period } = options;
+  let { category, region, period, status } = options;
   const pval = parseInt(period, 10);
   const store = backends[client].firestore();
   const settings = {
@@ -79,6 +95,15 @@ export const fetchReport = (client, options, last) => dispatch => {
     query = store
       .collection(`${REF_REPORTS}`)
       .where(FIELD_SUPCODE, "==", region);
+  }
+
+  if (status) {
+    const stat = statusInt(status);
+    if (query) {
+      query = query.where(CASE_STATUS, "==", stat);
+    } else {
+      query = store.collection(`${REF_REPORTS}`).where(CASE_STATUS, "==", stat);
+    }
   }
 
   if (last) {
@@ -106,7 +131,7 @@ export const fetchReport = (client, options, last) => dispatch => {
       }
     })
     .catch(err => {
-      console.log("Error");
+      console.log("Error" + err);
 
       dispatch({
         type: GET_ERRORS,

@@ -30,7 +30,7 @@ class Home extends Component {
     //e.preventDefault()
     const { history } = this.props;
     const { period } = this.state;
-    history.push(`/reports/${period}`);
+    history.push(`/reports/${path}/${period}`);
   };
 
   periodChange = e => {
