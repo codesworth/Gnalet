@@ -108,7 +108,7 @@ export default class SortOptions extends React.Component {
                 } else {
                   return (
                     <option key={x} value={x}>
-                      {this.valueForPeriod(periodval)}
+                      {this.valueForPeriod(x)}
                     </option>
                   );
                 }
