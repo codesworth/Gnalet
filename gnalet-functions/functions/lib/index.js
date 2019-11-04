@@ -1,115 +1,102 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const Constants_1 = require("./Constants");
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
-const cors = require("cors");
+//import * as cors from "cors";
 const Analytics_1 = require("./Analytics/Analytics");
 const Notifications_1 = require("./Notifications");
 const Tests_1 = require("./Tests");
-const Auth_1 = require("./Auth");
 const Regions_1 = require("./Analytics/Regions");
-//const cors = require('cors')({origin: true});
 admin.initializeApp();
-const store = admin.firestore();
+exports.store = admin.firestore();
 const rsettings = { timestampsInSnapshots: true };
-store.settings(rsettings);
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
-// export const helloWorld = functions.https.onRequest((request, response) => {
-//  response.send("Hello from Firebase!");
-// });
-const corsHandler = cors({ origin: true });
+exports.store.settings(rsettings);
+//const corsHandler = cors({ origin: true });
 //const corsHandler = cors({origin:true});
 exports.analyticsOnAdd = functions.firestore
     .document(`${Constants_1.REF_REPORTS}/{dcId}`)
-    .onCreate((snap, context) => __awaiter(this, void 0, void 0, function* () {
-    const category = snap.get(Constants_1.FIELD_CATEGORY);
-    const sup = snap.get(Constants_1.FIELD_SUP_CODE);
-    const status = snap.get(Constants_1.CASE_STATUS);
+    .onCreate(async (snap, context) => {
     try {
-        return Analytics_1.statusDidUpdated(sup, category, category, status, status);
+        return Analytics_1.analyse(snap, null);
     }
     catch (e) {
         console.log("Error happened with sig: ", e);
         return Promise.reject(e);
     }
-}));
+});
 exports.reportWasUpdated = functions.firestore
     .document(`${Constants_1.REF_REPORTS}/{dcId}`)
-    .onUpdate((snap, context) => __awaiter(this, void 0, void 0, function* () {
+    .onUpdate(async (snap, context) => {
     const befdoc = snap.before;
     const after = snap.after;
     const uid = befdoc.get("uid");
-    const oldstatus = befdoc.get(Constants_1.CASE_STATUS);
-    const newstatus = after.get(Constants_1.CASE_STATUS);
+    const oldstatus = befdoc.get(Constants_1.FIELD_STATUS);
+    const newstatus = after.get(Constants_1.FIELD_STATUS);
+    const sup = after.get(Constants_1.FIELD_SUPBODY);
     const oldcat = befdoc.get(Constants_1.FIELD_CATEGORY);
     const afcat = after.get(Constants_1.FIELD_CATEGORY);
-    const sup = after.get(Constants_1.FIELD_SUP_CODE);
-    const ts = after.get("ts");
-    const month = Constants_1.returnMonthYear(ts);
     try {
-        // if (oldcat !== afcat) {
-        //   updatedCategory(oldcat, month, afcat, oldstatus, sup);
-        // }
-        // if (oldstatus !== newstatus) {
-        //   statusWasUpdated(oldcat, month, sup, afcat, oldstatus, newstatus);
-        // }
-        const resp = yield Analytics_1.statusDidUpdated(sup, oldcat, afcat, oldstatus, newstatus);
-        return Notifications_1.sendNotification(store, uid, after, admin.messaging(), sup);
+        if (oldstatus === newstatus && oldcat === afcat) {
+            return Promise.resolve("Nothing");
+        }
+        //const promises:any = [];
+        const resp = Analytics_1.analyse(after, befdoc);
+        const notif = Notifications_1.sendNotification(exports.store, uid, after, admin.messaging(), sup);
+        return Promise.all([resp, notif]);
     }
     catch (e) {
         //const ref:admin.firestore.Query = admin.firestore().collection('').where()
         console.log("Error occurred with signature", e);
         return Promise.reject(e);
     }
-}));
-exports.deletedDocument = functions.firestore
-    .document(`${Constants_1.REF_REPORTS}/{docId}`)
-    .onDelete((snap, context) => __awaiter(this, void 0, void 0, function* () {
-    const status = snap.get(Constants_1.CASE_STATUS);
-    const category = snap.get(Constants_1.FIELD_CATEGORY);
-    const supcode = snap.get(Constants_1.FIELD_SUP_CODE);
+});
+/*
+export const deletedDocument = functions.firestore
+  .document(`${REF_REPORTS}/{docId}`)
+  .onDelete(async (snap, context) => {
+    const status = snap.get(FIELD_STATUS);
+    const category = snap.get(FIELD_CATEGORY);
+    const supcode = snap.get(FIELD_SUP_CODE);
+
     try {
-        return Analytics_1.documentDeleted(status, category, supcode);
+      return documentDeleted(status, category, supcode);
+    } catch (e) {
+      console.log("Error occurred with sig: ", e);
+      return Promise.reject(e);
     }
-    catch (e) {
-        console.log("Error occurred with sig: ", e);
-        return Promise.reject(e);
-    }
-}));
-exports.performAnalyticsOnAll = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    return Analytics_1.performAnalyticsOnAllDocs(response);
-}));
-exports.addAuthorityAccount = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    return Auth_1.createAuthority(store, corsHandler, request, response, admin);
-}));
-function fetchDocBy(uid) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return admin
-            .firestore()
-            .doc(uid)
-            .get();
-    });
+  });
+
+export const performAnalyticsOnAll = functions.https.onRequest(
+  async (request, response) => {
+    return performAnalyticsOnAllDocs(response);
+  }
+);
+
+export const addAuthorityAccount = functions.https.onRequest(
+  async (request, response) => {
+    return createAuthority(store, corsHandler, request, response, admin);
+  }
+);
+
+async function fetchDocBy(uid: string) {
+  return admin
+    .firestore()
+    .doc(uid)
+    .get();
 }
-exports.resetToZero = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    return Analytics_1.resetAnalyticsToZero(response);
+
+export const resetToZero = functions.https.onRequest(
+  async (request, response) => {
+    return resetAnalyticsToZero(response);
     //const r = getWeekNumber(new Date());
     //console.log(date+' The week stuff are',r);
-}));
-exports.test_addDuplicates = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
-    return Tests_1.testDuplicates(store, response);
-}));
-exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(this, void 0, void 0, function* () {
+  }
+);*/
+exports.test_addDuplicates = functions.https.onRequest(async (request, response) => {
+    return Tests_1.testDuplicates(exports.store, response);
+});
+exports.alignAuths = functions.https.onRequest(async (request, response) => {
     //const batch = store.batch();
     // for (const key in AssemblyKeys) {
     //   data.push(key);
@@ -118,10 +105,10 @@ exports.alignAuths = functions.https.onRequest((request, response) => __awaiter(
     for (const key in Regions_1.Regions) {
         data.push(key);
     }
-    const resp = yield store
+    const resp = await exports.store
         .collection(Constants_1.REF_AUTHORITIES)
         .doc("yXG7QRkYBzS8nZUUZqzyZyGz4wI2")
         .update({ region: data });
     return response.status(200).send(resp);
-}));
+});
 //# sourceMappingURL=index.js.map

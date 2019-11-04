@@ -99,10 +99,14 @@ export const fetchReport = (client, options, last) => dispatch => {
 
   if (status) {
     const stat = statusInt(status);
-    if (query) {
-      query = query.where(CASE_STATUS, "==", stat);
-    } else {
-      query = store.collection(`${REF_REPORTS}`).where(CASE_STATUS, "==", stat);
+    if (stat < 4) {
+      if (query) {
+        query = query.where(CASE_STATUS, "==", stat);
+      } else {
+        query = store
+          .collection(`${REF_REPORTS}`)
+          .where(CASE_STATUS, "==", stat);
+      }
     }
   }
 
@@ -114,30 +118,31 @@ export const fetchReport = (client, options, last) => dispatch => {
 
   console.log(query);
 
-  query
-    .get()
-    .then(querysnap => {
-      console.log("Thus is the querysnapshot");
-      console.log(querysnap);
-      if (querysnap) {
-        last = null;
-        if (querysnap.docs.length === QUERY_LIMIT) {
-          last = querysnap.docs[QUERY_LIMIT - 1];
-        }
-        dispatch({
-          type: REPOPRTS_QUERY,
-          payload: { docs: querysnap, last: last }
-        });
+  //query.onSnapshot()
+  //.get()
+  //.then
+  query.onSnapshot(querysnap => {
+    console.log("Thus is the querysnapshot");
+    console.log(querysnap);
+    if (querysnap) {
+      last = null;
+      if (querysnap.docs.length === QUERY_LIMIT) {
+        last = querysnap.docs[QUERY_LIMIT - 1];
       }
-    })
-    .catch(err => {
-      console.log("Error" + err);
-
       dispatch({
-        type: GET_ERRORS,
-        payload: { report: "Error Fetching reports" }
+        type: REPOPRTS_QUERY,
+        payload: { docs: querysnap, last: last }
       });
-    });
+    }
+  });
+  // .catch(err => {
+  //   console.log("Error" + err);
+
+  //   dispatch({
+  //     type: GET_ERRORS,
+  //     payload: { report: "Error Fetching reports" }
+  //   });
+  // });
 };
 
 const matchPeriodQuery = (query, pval, store) => {

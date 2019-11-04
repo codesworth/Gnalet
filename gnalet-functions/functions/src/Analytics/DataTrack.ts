@@ -50,7 +50,7 @@ export class AnalyticData {
     }
   }
 
-  categoryChange(status) {
+  categoryChange(status: number) {
     switch (status) {
       case 0:
         this.unsolved--;

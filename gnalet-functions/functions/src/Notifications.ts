@@ -6,8 +6,8 @@ export async function sendNotification(
   store: any,
   uid: string,
   after: DocumentSnapshot,
-  messaging,
-  sup
+  messaging: any,
+  sup: any
 ) {
   const tokensnap = await store
     .collection(REF_TOKENS)

@@ -131,6 +131,7 @@ class ReportDetails extends Component {
     } else if (type === 5) {
       updateCategory(client, id, category);
     }
+    this.props.hideModal();
     this.setState({ show: false });
   };
 

@@ -149,8 +149,8 @@ class Reports extends Component {
     const { auth } = this.props;
 
     if (auth && !this.state.isFetching) {
-      const { reports } = this.state;
-      const { period } = this.props.match.params;
+      const { reports, period } = this.state;
+      //const { period } = this.props.match.params;
       if (reports.length == -1) {
         return (
           <div className="row mg">

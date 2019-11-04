@@ -68,7 +68,7 @@ export function returnMonthYear(ts?: number): string {
   if (ts === null) {
     date = new Date();
   } else {
-    date = new Date(ts);
+    date = new Date(ts!);
   }
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
@@ -78,7 +78,7 @@ export function returnMonthYear(ts?: number): string {
   return val;
 }
 
-export function getWeekNumber(d) {
+export function getWeekNumber(d: any) {
   // Copy date so don't modify original
   //d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
   // Set to nearest Thursday: current date + 4 - current day number
@@ -94,7 +94,7 @@ export function getWeekNumber(d) {
   return [d.getUTCFullYear(), weekNo];
 }
 
-export function helperAccess(access) {
+export function helperAccess(access: string) {
   if (access === "1000") {
     return 1000;
   } else if (access === "1020") {

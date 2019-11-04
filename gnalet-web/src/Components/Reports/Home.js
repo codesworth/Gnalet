@@ -122,7 +122,7 @@ class Home extends Component {
             <div className="col-sm-6" style={{ marginBottom: "3%" }}>
               <div className="card shadow p-3 mb-5 bg-white rounded">
                 <div className="card-body">
-                  <h5 className="card-title">Total Reports This Year</h5>
+                  <h5 className="card-title">Total Reports</h5>
                   <h6 className="card-text">{data.total} Total Reports</h6>
                   <button
                     className="btn btn-primary btn-block"

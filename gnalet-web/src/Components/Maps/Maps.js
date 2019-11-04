@@ -45,7 +45,11 @@ class Maps extends Component {
       } else {
         options = { category, region, period };
       }
-      fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
+      fetchReport(
+        auth.user[CLIENT_KEY],
+        { ...options, status: "unsolved" },
+        lastsnapshot
+      );
     }
   }
 
@@ -60,7 +64,11 @@ class Maps extends Component {
       options = { category, region, period };
     }
     console.log(options);
-    fetchReport(auth.user[CLIENT_KEY], options, lastsnapshot);
+    fetchReport(
+      auth.user[CLIENT_KEY],
+      { ...options, status: "unsolved" },
+      lastsnapshot
+    );
   };
 
   loadNext = () => {

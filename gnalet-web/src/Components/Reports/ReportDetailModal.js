@@ -48,6 +48,7 @@ class ReportDetailModal extends Component {
             <ReportDetails
               report={report}
               user={this.props.user}
+              hideModal={this.hideModal}
             ></ReportDetails>
           </Modal.Body>
         </Modal>

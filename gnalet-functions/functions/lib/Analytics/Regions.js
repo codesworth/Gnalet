@@ -1,22 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Regions = {
-    "OR": "Oti Region",
-    "BER": "Bono East Region",
-    "AHR": "Ahafo Region",
-    "BR": "Bono Region",
-    "NER": "North East Region",
-    "SR": "Savannah Region",
-    "WNR": "Western North Region",
-    "WR": "Western Region",
-    "VR": "Volta Region",
-    "GAR": "Greater Accra Region",
-    "ER": "Eastern Region",
-    "AR": "Ashanti Region",
-    "CR": "Central Region",
-    "NR": "Northern Region",
-    "UER": "Upper East Region",
-    "UWR": "Upper West Region"
+    OR: "Oti Region",
+    BER: "Bono East Region",
+    AHR: "Ahafo Region",
+    BR: "Bono Region",
+    NER: "North East Region",
+    SR: "Savannah Region",
+    WNR: "Western North Region",
+    WR: "Western Region",
+    VR: "Volta Region",
+    GAR: "Greater Accra Region",
+    ER: "Eastern Region",
+    AR: "Ashanti Region",
+    CR: "Central Region",
+    NR: "Northern Region",
+    UER: "Upper East Region",
+    UWR: "Upper West Region"
 };
 /*
 

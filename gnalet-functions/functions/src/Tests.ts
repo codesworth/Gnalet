@@ -1,11 +1,11 @@
 import { REF_ANALYTICS, FIELD_DUPLICATE, REF_MONTHS } from "./Constants";
 
-export async function testDuplicates(store: any, response) {
+export async function testDuplicates(store: any, response: any) {
   const batch = store.batch();
-  const months = [];
+  const months: any = [];
   try {
     const snapdata = await store.collection(REF_ANALYTICS).get();
-    snapdata.docs.forEach(element => {
+    snapdata.docs.forEach((element: any) => {
       const data = element.data();
       for (const key in data) {
         const val = data[key];
@@ -20,7 +20,7 @@ export async function testDuplicates(store: any, response) {
 
     for (const colref of months) {
       const coldata = await colref.get();
-      coldata.docs.forEach(celement => {
+      coldata.docs.forEach((celement: any) => {
         const cdata = celement.data();
         for (const key in cdata) {
           const val = cdata[key];

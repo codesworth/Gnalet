@@ -2,35 +2,32 @@ import {
   REF_REPORTS,
   FIELD_CATEGORY,
   FIELD_STATUS,
-  FIELD_SUP_CODE,
   REF_AUTHORITIES,
   FIELD_SUPBODY
 } from "./Constants";
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
-import * as cors from "cors";
+//import * as cors from "cors";
 import { analyse } from "./Analytics/Analytics";
 import { sendNotification } from "./Notifications";
 import { testDuplicates } from "./Tests";
-import { createAuthority } from "./Auth";
+
 import { Regions } from "./Analytics/Regions";
 
-//const cors = require('cors')({origin: true});
-
 admin.initializeApp();
-const store = admin.firestore();
+export const store = admin.firestore();
 
 const rsettings = { timestampsInSnapshots: true };
 store.settings(rsettings);
 
-const corsHandler = cors({ origin: true });
+//const corsHandler = cors({ origin: true });
 //const corsHandler = cors({origin:true});
 
 export const analyticsOnAdd = functions.firestore
   .document(`${REF_REPORTS}/{dcId}`)
   .onCreate(async (snap, context) => {
     try {
-      return analyse(snap);
+      return analyse(snap, null);
     } catch (e) {
       console.log("Error happened with sig: ", e);
       return Promise.reject(e);
@@ -49,10 +46,10 @@ export const reportWasUpdated = functions.firestore
     const oldcat = befdoc.get(FIELD_CATEGORY);
     const afcat = after.get(FIELD_CATEGORY);
     try {
-      if (oldstatus == newstatus && oldcat === afcat) {
+      if (oldstatus === newstatus && oldcat === afcat) {
         return Promise.resolve("Nothing");
       }
-      const promises = [];
+      //const promises:any = [];
       const resp = analyse(after, befdoc);
       const notif = sendNotification(store, uid, after, admin.messaging(), sup);
       return Promise.all([resp, notif]);
