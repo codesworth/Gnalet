@@ -7,7 +7,9 @@ import {
   FIELD_STATUS,
   REF_ANALYTICS_YEAR,
   FIELD_SUP_CODE,
-  REF_ANALYTICS_DAY_OF_YEAR
+  REF_ANALYTICS_DAY_OF_YEAR,
+  FIELD_DAY_OF_YEAR,
+  FIELD_YEAR
 } from "../Constants";
 
 import { Regions } from "./Regions";
@@ -29,8 +31,12 @@ export const analyse = async (
   const category = snapshot.get(FIELD_CATEGORY);
   const region = snapshot.get(FIELD_SUP_CODE);
 
-  const year = moment().format("YYYY");
-  const day_of_year = moment().dayOfYear();
+  const year = initialSnapshot
+    ? initialSnapshot.get(FIELD_YEAR)
+    : moment().format("YYYY");
+  const day_of_year = initialSnapshot
+    ? initialSnapshot.get(FIELD_DAY_OF_YEAR)
+    : moment().dayOfYear();
   const allAnalyticRef = store.doc(`${REF_ANALYTICS}/${region}`);
   const allexistingAnalyticSnap = await allAnalyticRef.get();
   const thisYearRef = store.doc(

@@ -25,7 +25,8 @@ export const ECG = "ECG";
 export const HFDA = "HFDA";
 export const OTHERS = "OTHERS";
 export const GSA = "GSA";
-
+export const FIELD_DAY_OF_YEAR = "dayOfYear";
+export const FIELD_YEAR = "year";
 export const FIELD_EMAIL = "email";
 export const FIELD_PHONE = "phone";
 export const FIELD_DESC = "description";
