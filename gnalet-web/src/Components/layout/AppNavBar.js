@@ -109,11 +109,7 @@ class AppNavBar extends Component {
                     {user ? user.username : ""}
                   </a>
                 </li>
-                <li>
-                  <Link to="/settings" className="nav-link">
-                    Settings
-                  </Link>
-                </li>
+
                 <li className="nav-item">
                   <a
                     href="/#"

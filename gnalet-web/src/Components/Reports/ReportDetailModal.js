@@ -29,6 +29,7 @@ class ReportDetailModal extends Component {
 
   render() {
     const { report, show } = this.state;
+    console.log(this.props.user);
 
     if (show && report) {
       return (
@@ -44,7 +45,10 @@ class ReportDetailModal extends Component {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <ReportDetails report={report}></ReportDetails>
+            <ReportDetails
+              report={report}
+              user={this.props.user}
+            ></ReportDetails>
           </Modal.Body>
         </Modal>
       );

@@ -18,10 +18,10 @@ import {
   ACCESS_CODE_READ
 } from "../../Helpers/Constants";
 import { CategoryButton } from "./Selects/FunctionalComp";
-// import {
-//   updateStatus,
-//   updateCategory
-// } from "../../actions/Reports/ReportActions";
+import {
+  updateStatus,
+  updateCategory
+} from "../../actions/Reports/ReportActions";
 
 class ReportDetails extends Component {
   state = {
@@ -81,7 +81,7 @@ class ReportDetails extends Component {
     console.log("The state is now: ", this.state);
     //console.log(this.props.match.params.category );
 
-    if (this.props.match.params.category !== c) {
+    if (this.props.report.category !== c) {
       console.log("New Category is,", c);
       this.setState({ category: c, canupdate: true });
     } else {
@@ -118,19 +118,20 @@ class ReportDetails extends Component {
   };
 
   modalbuttConfirmed = type => {
-    const client = this.props.auth.user[CLIENT_KEY];
-    console.log("Home client: " + this.props.auth);
+    console.log(this.props.user[CLIENT_KEY]);
 
-    console.longitude(this.props.auth.user);
+    const client = this.props.user[CLIENT_KEY];
+
     const { category } = this.state;
-    const id = this.props.match.params.id;
+    const id = this.props.report.id;
     //const { updateStatus, updateCategory } = this.props;
 
-    // if (type > 0 && type < 5) {
-    //   updateStatus(client, id, type);
-    // } else if (type === 5) {
-    //   updateCategory(client, id, category);
-    // }
+    if (type > 0 && type < 5) {
+      updateStatus(client, id, type);
+    } else if (type === 5) {
+      updateCategory(client, id, category);
+    }
+    this.setState({ show: false });
   };
 
   showModal() {

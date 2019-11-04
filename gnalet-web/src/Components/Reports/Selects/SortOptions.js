@@ -99,7 +99,7 @@ export default class SortOptions extends React.Component {
             >
               {" "}
               {["0", "1", "2", "3", "4", "5"].map(x => {
-                if (periodval.toString() === x) {
+                if (periodval && periodval.toString() === x) {
                   return (
                     <option key={x} value={x}>
                       {this.valueForPeriod(periodval)}

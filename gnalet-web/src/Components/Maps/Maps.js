@@ -15,6 +15,7 @@ import { fetchReport } from "../../actions/Reports/ReportActions";
 import { ReportParser } from "../../actions/Reports/ReportParser";
 import SortOptions from "../Reports/Selects/SortOptions";
 import Paginate from "../Reports/Selects/Paginate";
+import ReportDetailModal from "../Reports/ReportDetailModal";
 
 class Maps extends Component {
   constructor() {
@@ -28,7 +29,9 @@ class Maps extends Component {
       region: "ALL",
       nextHolder: [],
       previous: [],
-      lastsnapshot: null
+      lastsnapshot: null,
+      report: null,
+      show: false
     };
   }
 
@@ -111,10 +114,34 @@ class Maps extends Component {
     this.awakeFromFetch();
   };
 
+  hideModal = () => {
+    this.setState({ report: null, show: false });
+  };
+
+  showReportModal() {
+    const { report, show } = this.state;
+    console.log(`User is ${this.props.auth.user}`);
+    console.log(this.props);
+
+    if (report) {
+      return (
+        <ReportDetailModal
+          report={report}
+          show={show}
+          user={this.props.auth.user}
+          hide={this.hideModal.bind(this)}
+        ></ReportDetailModal>
+      );
+    } else {
+      return null;
+    }
+  }
+
   openDetail(marker) {
     // const category = marker.report[FIELD_CATEGORY];
     // const id = marker.report.id;
     // window.history.push(`/report/${category}/${id}`);
+    this.setState({ report: marker.report, show: true });
   }
 
   markerClicked(marker) {
@@ -126,6 +153,7 @@ class Maps extends Component {
     const { markers, activeMarker, showingInfoWindow } = this.state;
     return (
       <div>
+        {this.showReportModal()}
         <div className="row">
           <div className="col-md-3 col-xl-2 col-sm-3">
             <h1>Maps</h1>
@@ -146,7 +174,7 @@ class Maps extends Component {
                     markers={markers}
                     activeMarker={activeMarker}
                     showingInfoWindow={showingInfoWindow}
-                    markerClicked={this.markerClicked.bind(this)}
+                    markerClicked={this.openDetail.bind(this)}
                     openDetail={this.openDetail.bind(this)}
                   />
                 ) : (

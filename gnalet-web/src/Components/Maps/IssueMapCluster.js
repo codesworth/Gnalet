@@ -43,7 +43,7 @@ export const IssuesMap = compose(
           lat: marker.report.latitude,
           lng: marker.report.longitude
         }}
-        onClick={() => props.markerClicked(marker)}
+        onClick={() => props.openDetail(marker)}
       />
     ))}
     {props.activeMarker ? (
@@ -54,19 +54,21 @@ export const IssuesMap = compose(
         }}
         marker={props.activeMarker}
         visible={props.showingInfoWindow}
-        onCloseClick={() => props.openDetail(props.activeMarker)}
+        //onCloseClick={() => props.openDetail(props.activeMarker)}
       >
         <div>
           <Link
-            to={`/report/${props.activeMarker.report[FIELD_CATEGORY]}/${
-              props.activeMarker.report.id
-            }`}
+            to="#"
+            x={`/report/${props.activeMarker.report[FIELD_CATEGORY]}/${props.activeMarker.report.id}`}
             className="btn btn-secondary btn-sm"
           >
             {props.activeMarker
               ? props.activeMarker.report[FIELD_CATEGORY]
               : null}
-            <i className="fas fa-arrow-circle-right" />
+            <i
+              className="fas fa-arrow-circle-right"
+              onClick={() => console.log("Hello World")}
+            />
           </Link>
         </div>
       </InfoWindow>

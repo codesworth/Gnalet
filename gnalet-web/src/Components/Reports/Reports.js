@@ -136,6 +136,7 @@ class Reports extends Component {
         <ReportDetailModal
           report={report}
           show={show}
+          user={this.props.auth.user}
           hide={this.hideModal.bind(this)}
         ></ReportDetailModal>
       );
