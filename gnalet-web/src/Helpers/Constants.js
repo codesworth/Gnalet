@@ -36,6 +36,8 @@ export const HFDA = "HFDA";
 export const OTHERS = "OTHERS";
 export const QUERY_LIMIT = 20;
 export const GSA = "GSA";
+export const COVID_19 = "COVID-19";
+export const COVID_SOCIAL = "SOCIAL-DISTANCING";
 export const FIELD_DUPLICATE = "duplicate";
 export const CASE_EMAIL = "email";
 export const CASE_PHONE = "phone";
@@ -69,6 +71,8 @@ export const FIELD_DAY_OF_YEAR = "dayOfYear";
 
 export const category_ids = [
   "ALL",
+  "COVID-19",
+  "SOCIAL-DISTANCING",
   "VEHICULAR",
   "SANITATION",
   "CRIMES",
@@ -78,7 +82,7 @@ export const category_ids = [
   "HFDA",
   "GSA",
   "OTHERS",
-  "INDISCIPLINE"
+  "INDISCIPLINE",
 ];
 
 export const regionArray = [
@@ -98,7 +102,7 @@ export const regionArray = [
   "CR",
   "NR",
   "UER",
-  "UWR"
+  "UWR",
 ];
 
 export function formatDate(date) {
@@ -123,6 +127,10 @@ export function facingCategoryname(symlnk) {
   switch (symlnk) {
     case "ALL":
       return "All Categories";
+    case "COVID-19":
+      return "COVID-19 (Corona Virus)";
+    case "SOCIAL-DISTANCING":
+      return "COVID-19 Social Distancing Violation";
     case "VEHICULAR":
       return "Accidents/Vehicular";
     case "CRIMES":
@@ -161,9 +169,7 @@ export function returnMonthYear(ts) {
   }
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  const val = String(year)
-    .concat("-")
-    .concat(String(month));
+  const val = String(year).concat("-").concat(String(month));
   return val;
 }
 

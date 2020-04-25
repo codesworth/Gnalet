@@ -8,10 +8,12 @@ import {
   VEHICULAR,
   CRIMES,
   HFDA,
+  COVID_19,
+  COVID_SOCIAL,
   GSA,
   POTHOLES,
   ECG,
-  WATER
+  WATER,
 } from "../Helpers/Constants";
 import { MAPS_GET_LATEST } from "./types";
 import accident from "../img/accident2.png";
@@ -27,20 +29,20 @@ import sanitation from "../img/sanitation.png";
 
 const store = firebase.firestore();
 const settings = {
-  timestampsInSnapshots: true
+  timestampsInSnapshots: true,
 };
 store.settings = settings;
 
-export const getlast20Issues = id => dispatch => {
+export const getlast20Issues = (id) => (dispatch) => {
   console.log("I was called");
   store
     .collection(REF_REPORTS)
     .orderBy(_DATE, "desc")
     .limit(20)
     .get()
-    .then(bigquery => {
+    .then((bigquery) => {
       const markers = [];
-      bigquery.docs.forEach(doc => {
+      bigquery.docs.forEach((doc) => {
         const cat = doc.get(FIELD_CATEGORY);
         const ico = markerIcoForCategory(cat);
         const marker = { ico, report: doc.data() };
@@ -50,12 +52,12 @@ export const getlast20Issues = id => dispatch => {
 
       dispatch({ type: MAPS_GET_LATEST, payload: markers });
     })
-    .catch(e => {
+    .catch((e) => {
       console.log("Error occurred: " + e);
     });
 };
 
-export const markerIcoForCategory = cat => {
+export const markerIcoForCategory = (cat) => {
   switch (cat) {
     case SANITATION:
       return sanitation;
@@ -64,6 +66,10 @@ export const markerIcoForCategory = cat => {
     case CRIMES:
       return crime;
     case HFDA:
+      return health;
+    case COVID_SOCIAL:
+      return health;
+    case COVID_19:
       return health;
     case GSA:
       return gsa;
@@ -78,7 +84,7 @@ export const markerIcoForCategory = cat => {
   }
 };
 
-const generateMarkersFromIssues = bigquery => {
+const generateMarkersFromIssues = (bigquery) => {
   /**
    * Format of an Issue marker:
    * {issue:{},icon:icon}

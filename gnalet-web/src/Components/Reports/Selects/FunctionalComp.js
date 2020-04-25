@@ -1,7 +1,7 @@
 import React from "react";
 import { getStatusFromCode } from "../../../Helpers/Constants";
 
-export const CategoryButton = cat => {
+export const CategoryButton = (cat) => {
   let className = "";
   switch (cat) {
     case "VEHICULAR":
@@ -25,6 +25,12 @@ export const CategoryButton = cat => {
     case "HFDA":
       className = "btn btn-outline-success";
       break;
+    case "COVID-19":
+      className = "btn btn-outline-danger";
+      break;
+    case "SOCIAL-DISTANCING":
+      className = "btn btn-outline-danger";
+      break;
     case "GSA":
       className = "btn btn-outline-secondary";
       break;
@@ -43,7 +49,7 @@ export const CategoryButton = cat => {
   );
 };
 
-export const StatusBadge = status => {
+export const StatusBadge = (status) => {
   let classname = "";
   console.log(status);
 

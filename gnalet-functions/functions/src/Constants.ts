@@ -23,6 +23,8 @@ export const WATER = "WATER";
 export const POTHOLES = "POTHOLES";
 export const ECG = "ECG";
 export const HFDA = "HFDA";
+export const COVID_19 = "COVID-19";
+export const COVID_SOCIAL = "SOCIAL-DISTANCING";
 export const OTHERS = "OTHERS";
 export const GSA = "GSA";
 export const FIELD_DAY_OF_YEAR = "dayOfYear";
@@ -72,9 +74,7 @@ export function returnMonthYear(ts?: number): string {
   }
   const month = date.getMonth() + 1;
   const year = date.getFullYear();
-  const val = String(year)
-    .concat("-")
-    .concat(String(month));
+  const val = String(year).concat("-").concat(String(month));
   return val;
 }
 

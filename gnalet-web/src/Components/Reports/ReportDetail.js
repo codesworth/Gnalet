@@ -15,12 +15,12 @@ import {
   formatDate,
   getStatusFromCode,
   facingCategoryname,
-  ACCESS_CODE_READ
+  ACCESS_CODE_READ,
 } from "../../Helpers/Constants";
 import { CategoryButton } from "./Selects/FunctionalComp";
 import {
   updateStatus,
-  updateCategory
+  updateCategory,
 } from "../../actions/Reports/ReportActions";
 
 class ReportDetails extends Component {
@@ -29,17 +29,17 @@ class ReportDetails extends Component {
     category: "",
     show: false,
     st: 0,
-    selected: null
+    selected: null,
   };
 
-  statusWillChange = status => {
+  statusWillChange = (status) => {
     this.setState({ st: status, show: true });
     //console.log("New Sttua, ", status);
   };
 
-  onChange = e => this.setState({ [e.target.name]: e.target.value });
+  onChange = (e) => this.setState({ [e.target.name]: e.target.value });
 
-  cateChanged = e => {
+  cateChanged = (e) => {
     e.preventDefault();
 
     console.log("The state is now: ", this.state);
@@ -51,27 +51,33 @@ class ReportDetails extends Component {
         c = this.props.match.params.category;
         break;
       case 1:
-        c = "VEHICULAR";
+        c = "COVID-19";
         break;
       case 2:
-        c = "CRIMES";
+        c = "SOCIAL-DISTANCING";
         break;
       case 3:
-        c = "SANITATION";
+        c = "VEHICULAR";
         break;
       case 4:
-        c = "POTHOLES";
+        c = "CRIMES";
         break;
       case 5:
-        c = "ECG";
+        c = "SANITATION";
         break;
       case 6:
-        c = "WATER";
+        c = "POTHOLES";
         break;
       case 7:
-        c = "HFDA";
+        c = "ECG";
         break;
       case 8:
+        c = "WATER";
+        break;
+      case 9:
+        c = "HFDA";
+        break;
+      case 10:
         c = "GSA";
         break;
       default:
@@ -104,11 +110,11 @@ class ReportDetails extends Component {
     firestore
       .doc(`${REF_REPORTS}/${id}`)
       .update({ category })
-      .then(x => {
+      .then((x) => {
         //console.log("The update was succesful: ",x);
         this.props.history.push("/");
       })
-      .catch(e => {
+      .catch((e) => {
         console.log("Error Occurred : ", e);
       });
   };
@@ -117,7 +123,7 @@ class ReportDetails extends Component {
     this.setState({ show: false, st: 0 });
   };
 
-  modalbuttConfirmed = type => {
+  modalbuttConfirmed = (type) => {
     console.log(this.props.user[CLIENT_KEY]);
 
     const client = this.props.user[CLIENT_KEY];
@@ -227,21 +233,23 @@ class ReportDetails extends Component {
             onChange={this.cateChanged.bind(this)}
           >
             <option value="0">{facingCategoryname(category)}</option>
-            <option value="1">Accidents/Vehicular</option>
-            <option value="2">Criminal Activities</option>
-            <option value="3">Sanitation</option>
-            <option value="4">Potholes</option>
-            <option value="5">Electricity/ECG</option>
-            <option value="6">Pipes/Water</option>
-            <option value="7">Food/Drugs Board</option>
-            <option value="8">Ghana Standards Authority</option>
-            <option value="9">Others</option>
+            <option value="1">COVID-19 (Corona Virus)</option>
+            <option value="2">COVID-19 (Social Distancing Voilation</option>
+            <option value="3">Accidents/Vehicular</option>
+            <option value="4">Criminal Activities</option>
+            <option value="5">Sanitation</option>
+            <option value="6">Potholes</option>
+            <option value="7">Electricity/ECG</option>
+            <option value="8">Pipes/Water</option>
+            <option value="9">Food/Drugs Board</option>
+            <option value="10">Ghana Standards Authority</option>
+            <option value="11">Others</option>
           </select>
           <div className="input-group-append">
             <button
               className={classnames({
                 "btn-primary": canupdate,
-                "btn btn-outline-secondary": !canupdate
+                "btn btn-outline-secondary": !canupdate,
               })}
               type="button"
               onClick={this.statusWillChange.bind(this, 5)}
