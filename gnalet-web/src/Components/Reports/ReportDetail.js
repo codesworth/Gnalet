@@ -234,7 +234,7 @@ class ReportDetails extends Component {
           >
             <option value="0">{facingCategoryname(category)}</option>
             <option value="1">COVID-19 (Corona Virus)</option>
-            <option value="2">COVID-19 (Social Distancing Voilation</option>
+            <option value="2">COVID-19 (Social Distancing Voilation)</option>
             <option value="3">Accidents/Vehicular</option>
             <option value="4">Criminal Activities</option>
             <option value="5">Sanitation</option>

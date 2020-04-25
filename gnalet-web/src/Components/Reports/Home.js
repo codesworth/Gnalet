@@ -11,7 +11,7 @@ import {
   FIELD_PENDING,
   FIELD_FLAGGED,
   FIELD_SOLVED,
-  CLIENT_KEY
+  CLIENT_KEY,
 } from "../../Helpers/Constants";
 import { AnalyticParser } from "../../actions/Reports/AnalyticParser";
 import { Duration } from "../../Helpers/Assemblies";
@@ -23,17 +23,17 @@ class Home extends Component {
     canFetch: false,
     allTime: false,
     data: null,
-    period: 0
+    period: 0,
   };
 
-  onclicked = path => {
+  onclicked = (path) => {
     //e.preventDefault()
     const { history } = this.props;
     const { period } = this.state;
     history.push(`/reports/${path}/${period}`);
   };
 
-  periodChange = e => {
+  periodChange = (e) => {
     e.preventDefault();
     const value = e.target.value;
     const vals = {};
@@ -75,7 +75,7 @@ class Home extends Component {
     }
   }
 
-  runAnalysisForPeriod = period => {
+  runAnalysisForPeriod = (period) => {
     const { snapshot, allTime, alltimeSnap } = this.state;
     if (period === Duration.allTime) {
       if (allTime && alltimeSnap) {
@@ -204,7 +204,7 @@ class Home extends Component {
             <option value="1">Yesterday</option>
             <option value="2">Week</option>
             <option value="3">Month</option>
-            <option value="4">2019</option>
+            <option value="4">2020</option>
             <option value="5">All Time</option>
           </select>
           <div className="input-group-append">
@@ -239,7 +239,7 @@ class Home extends Component {
       unsolved: u,
       pending: p,
       flag: f,
-      solved: s
+      solved: s,
     };
     return fl;
   }
@@ -247,18 +247,15 @@ class Home extends Component {
 
 Home.propTypes = {
   firestore: PropTypes.object.isRequired,
-  clients: PropTypes.array
+  clients: PropTypes.array,
 };
 
-const mapStatetoProps = state => ({
+const mapStatetoProps = (state) => ({
   auth: state.auth,
-  reports: state.reports
+  reports: state.reports,
 });
 
-export default connect(
-  mapStatetoProps,
-  { getRportAnalytics }
-)(Home);
+export default connect(mapStatetoProps, { getRportAnalytics })(Home);
 
 /**
  * 
